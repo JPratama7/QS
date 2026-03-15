@@ -1,3 +1,4 @@
 module config
 singleton Config 1.0 Config.qml
 singleton Theme 1.0 Theme.qml
+singleton JsonConfig 1.0 JsonConfig.qml

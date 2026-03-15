@@ -17,6 +17,7 @@ Item {
     property var popupComponent: null
     property var popupInstance: null
     property bool showBackground: true
+    property color containerColor: Config.Theme.widgetBg
 
     // Bar Position (inherited from parent or config)
     property int barPosition: Config.Config.position

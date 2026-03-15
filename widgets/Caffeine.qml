@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import Quickshell.Io
 import "../config" as Config
 import "../base" as Base
@@ -9,6 +8,16 @@ Base.BaseWidget {
     id: root
 
     property bool caffeineActive: false
+    containerColor: caffeineActive ? Config.Theme.warning : Config.Theme.widgetBg
+
+    Component.onCompleted: {
+        // Restore the inhibitor state on startup based on the saved setting
+        if (caffeineActive) {
+            caffeineOn.running = true
+        } else {
+            caffeineOff.running = true
+        }
+    }
 
     tooltipText: caffeineActive ? "Caffeine: On (Sleep prevented)" : "Caffeine: Off"
 
@@ -17,8 +26,8 @@ Base.BaseWidget {
     Components.BarIcon {
         id: caffeineIcon
         anchors.centerIn: parent
-        icon: caffeineActive ? "󰅪" : "󰅩"
-        color: caffeineActive ? Config.Theme.bgDark : Config.Theme.fg
+        icon: root.caffeineActive ? "󰅪" : "󰅩"
+        color: root.caffeineActive ? Config.Theme.bgDark : Config.Theme.fg
         size: Config.Theme.iconSize
     }
 

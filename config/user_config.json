@@ -1,1 +1,26 @@
-{"test": 123}
+{
+  "layout": {
+    "left": ["workspaces", "windowTitle"],
+    "right": [
+      "systemMonitor",
+      "network",
+      "bluetooth",
+      "battery",
+      "audio",
+      "brightness",
+      "nightShift",
+      "caffeine",
+      "clock"
+    ]
+  },
+  "widgets": {
+    "clock": {
+      "timeFormat": "HH:mm",
+      "dateFormat": "dd/MM",
+      "showDate": true
+    },
+    "workspaces": {
+      "count": 10
+    }
+  }
+}

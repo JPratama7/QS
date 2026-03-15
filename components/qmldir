@@ -1,0 +1,10 @@
+module components
+BarButton 1.0 BarButton.qml
+BarGraph 1.0 BarGraph.qml
+BarIcon 1.0 BarIcon.qml
+BarProgress 1.0 BarProgress.qml
+BarSlider 1.0 BarSlider.qml
+BarText 1.0 BarText.qml
+BarToggle 1.0 BarToggle.qml
+BarTooltip 1.0 BarTooltip.qml
+WidgetColumn 1.0 WidgetColumn.qml

@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import Quickshell.Io
 import "../config" as Config
 import "../base" as Base
@@ -11,6 +10,15 @@ Base.BaseWidget {
     property bool nightModeActive: false
     property int temperature: 4500
     property int transitionDuration: 5
+    containerColor: nightModeActive ? Config.Theme.warning : Config.Theme.widgetBg
+
+    Component.onCompleted: {
+        if (nightModeActive) {
+            nightModeOn.running = true
+        } else {
+            nightModeOff.running = true
+        }
+    }
 
     tooltipText: nightModeActive ? "Night Mode: On (" + temperature + "K)" : "Night Mode: Off"
 

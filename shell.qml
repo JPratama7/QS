@@ -11,6 +11,12 @@ import "components" as Components
 Scope {
     id: root
 
+    Component.onCompleted: {
+        Qt.application.name = "QuickshellBar"
+        Qt.application.organization = "Quickshell"
+        Qt.application.domain = "quickshell.org"
+    }
+
     // Variants for multi-monitor support
     Variants {
         model: Quickshell.screens
@@ -44,6 +50,28 @@ Scope {
                 anchors.fill: parent
                 anchors.margins: Config.Theme.barPadding
 
+                Component {
+                    id: widgetDelegate
+                    Components.WidgetColumn {
+                        id: delegateRoot
+
+                        required property string modelData
+                        bgColor: loader.item ? loader.item.containerColor : Config.Theme.widgetBg
+
+                        Loader {
+                            id: loader
+                            source: "widgets/" + delegateRoot.modelData.charAt(0).toUpperCase() + delegateRoot.modelData.slice(1) + ".qml"
+
+                            onLoaded: {
+                                if (item.hasOwnProperty("showBackground")) {
+                                    item.showBackground = false
+                                }
+                            }
+                        }
+                    }
+                }
+
+
                 // Horizontal layout
                 RowLayout {
                     id: horizontalLayout
@@ -55,19 +83,22 @@ Scope {
                     Row {
                         spacing: Config.Theme.barSpacing
                         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                        Components.WidgetColumn {
-                            bgColor: Config.Theme.widgetBg
-                            Widgets.Workspaces {
-                                visible: Config.Config.showWorkspaces
-                                showBackground: false
-                            }
+                        Repeater {
+                            model: Config.JsonConfig.layout.left || []
+                            delegate: widgetDelegate
                         }
-                        Components.WidgetColumn {
-                            bgColor: Config.Theme.widgetBg
-                            Widgets.WindowTitle {
-                                visible: Config.Config.showWindowTitle
-                                showBackground: false
-                            }
+                    }
+
+                    // Spacer
+                    Item { Layout.fillWidth: true }
+
+                    // Center section
+                    Row {
+                        spacing: Config.Theme.barSpacing
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                        Repeater {
+                            model: Config.JsonConfig.layout.center || []
+                            delegate: widgetDelegate
                         }
                     }
 
@@ -78,70 +109,9 @@ Scope {
                     Row {
                         spacing: Config.Theme.barSpacing
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                        Components.WidgetColumn {
-                            bgColor: Config.Theme.widgetBg
-                            Widgets.SystemMonitor {
-                                visible: Config.Config.showSystemMonitor
-                                showBackground: false
-                            }
-                        }
-                        Components.WidgetColumn {
-                            bgColor: Config.Theme.widgetBg
-                            Widgets.Network {
-                                visible: Config.Config.showNetwork
-                                showBackground: false
-                            }
-                        }
-                        Components.WidgetColumn {
-                            bgColor: Config.Theme.widgetBg
-                            Widgets.Bluetooth {
-                                visible: Config.Config.showBluetooth
-                                showBackground: false
-                            }
-                        }
-                        Components.WidgetColumn {
-                            bgColor: Config.Theme.widgetBg
-                            Widgets.Battery {
-                                visible: Config.Config.showBattery
-                                showBackground: false
-                            }
-                        }
-                        Components.WidgetColumn {
-                            bgColor: Config.Theme.widgetBg
-                            Widgets.Audio {
-                                visible: Config.Config.showAudio
-                                showBackground: false
-                            }
-                        }
-                        Components.WidgetColumn {
-                            bgColor: Config.Theme.widgetBg
-                            Widgets.Brightness {
-                                visible: Config.Config.showBrightness
-                                showBackground: false
-                            }
-                        }
-                        Components.WidgetColumn {
-                            bgColor: nightShiftWidget.nightModeActive ? Config.Theme.warning : Config.Theme.widgetBg
-                            Widgets.NightShift {
-                                id: nightShiftWidget
-                                visible: Config.Config.showNightShift
-                                showBackground: false
-                            }
-                        }
-                        Components.WidgetColumn {
-                            bgColor: caffeineWidget.caffeineActive ? Config.Theme.warning : Config.Theme.widgetBg
-                            Widgets.Caffeine {
-                                id: caffeineWidget
-                                visible: Config.Config.showCaffeine
-                                showBackground: false
-                            }
-                        }
-                        Components.WidgetColumn {
-                            bgColor: Config.Theme.widgetBg
-                            Widgets.Clock {
-                                visible: Config.Config.showClock
-                                showBackground: false
-                            }
+                        Repeater {
+                            model: Config.JsonConfig.layout.right || []
+                            delegate: widgetDelegate
                         }
                     }
                 }
@@ -157,12 +127,22 @@ Scope {
                     Column {
                         spacing: Config.Theme.barSpacing
                         Layout.alignment: Qt.AlignTop
-                        Components.WidgetColumn {
-                            bgColor: Config.Theme.widgetBg
-                            Widgets.Workspaces {
-                                visible: Config.Config.showWorkspaces
-                                showBackground: false
-                            }
+                        Repeater {
+                            model: Config.JsonConfig.layout.left || []
+                            delegate: widgetDelegate
+                        }
+                    }
+
+                    // Spacer
+                    Item { Layout.fillHeight: true }
+
+                    // Middle section
+                    Column {
+                        spacing: Config.Theme.barSpacing
+                        Layout.alignment: Qt.AlignVCenter
+                        Repeater {
+                            model: Config.JsonConfig.layout.center || []
+                            delegate: widgetDelegate
                         }
                     }
 
@@ -173,12 +153,9 @@ Scope {
                     Column {
                         spacing: Config.Theme.barSpacing
                         Layout.alignment: Qt.AlignBottom
-                        Components.WidgetColumn {
-                            bgColor: Config.Theme.widgetBg
-                            Widgets.Clock {
-                                visible: Config.Config.showClock
-                                showBackground: false
-                            }
+                        Repeater {
+                            model: Config.JsonConfig.layout.right || []
+                            delegate: widgetDelegate
                         }
                     }
                 }

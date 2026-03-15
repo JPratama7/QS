@@ -1,0 +1,4 @@
+module base
+BaseComponent 1.0 BaseComponent.qml
+BasePopup 1.0 BasePopup.qml
+BaseWidget 1.0 BaseWidget.qml

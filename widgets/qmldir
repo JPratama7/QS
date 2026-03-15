@@ -1,0 +1,12 @@
+module widgets
+Audio 1.0 Audio.qml
+Battery 1.0 Battery.qml
+Bluetooth 1.0 Bluetooth.qml
+Brightness 1.0 Brightness.qml
+Caffeine 1.0 Caffeine.qml
+Clock 1.0 Clock.qml
+Network 1.0 Network.qml
+NightShift 1.0 NightShift.qml
+SystemMonitor 1.0 SystemMonitor.qml
+WindowTitle 1.0 WindowTitle.qml
+Workspaces 1.0 Workspaces.qml

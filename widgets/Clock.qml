@@ -6,10 +6,18 @@ import "../components" as Components
 Base.BaseWidget {
     id: root
 
-    property string timeFormat: "HH:mm"
-    property string dateFormat: "dd/MM"
-    property bool showDate: true
-    property bool showSeconds: false
+    // Fetch values from JSON config or fallback to defaults
+    property var widgetConfig: Config.JsonConfig.getWidgetConfig("clock", {
+        "timeFormat": "HH:mm",
+        "dateFormat": "dd/MM",
+        "showDate": true,
+        "showSeconds": false
+    })
+
+    property string timeFormat: widgetConfig.timeFormat
+    property string dateFormat: widgetConfig.dateFormat
+    property bool showDate: widgetConfig.showDate
+    property bool showSeconds: widgetConfig.showSeconds
 
     hasPopup: true
     tooltipText: Qt.formatDateTime(new Date(), "dddd, MMMM d, yyyy")

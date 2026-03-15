@@ -8,9 +8,16 @@ import "../components" as Components
 Base.BaseWidget {
     id: root
 
-    property int workspaceCount: 10
-    property bool showIcons: false
-    property bool showNames: false
+    // Fetch values from JSON config or fallback to defaults
+    property var widgetConfig: Config.JsonConfig.getWidgetConfig("workspaces", {
+        "workspaceCount": 10,
+        "showIcons": false,
+        "showNames": false
+    })
+
+    property int workspaceCount: widgetConfig.workspaceCount
+    property bool showIcons: widgetConfig.showIcons
+    property bool showNames: widgetConfig.showNames
 
     tooltipText: "Workspaces"
     implicitWidth: workspaceRow.implicitWidth + (Config.Theme.widgetPadding * 2)
@@ -76,7 +83,7 @@ Base.BaseWidget {
     function getWorkspaceIcon(workspace: var): string {
         // Return icon based on workspace content or empty
         if (!root.showIcons) return ""
-        
+
         // Check for windows in workspace
         const windows = workspace.toplevels
         if (windows && windows.length > 0) {
