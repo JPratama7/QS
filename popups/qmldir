@@ -1,0 +1,5 @@
+module popups
+CalendarPopup 1.0 CalendarPopup.qml
+SystemMonitorPopup 1.0 SystemMonitorPopup.qml
+NetworkPopup 1.0 NetworkPopup.qml
+AudioPopup 1.0 AudioPopup.qml

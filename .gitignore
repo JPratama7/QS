@@ -1,0 +1,4 @@
+.qmlls.ini
+
+/*.qml
+!shell.qml
