@@ -7,4 +7,5 @@ BarSlider 1.0 BarSlider.qml
 BarText 1.0 BarText.qml
 BarToggle 1.0 BarToggle.qml
 BarTooltip 1.0 BarTooltip.qml
+Tooltip 1.0 Tooltip.qml
 WidgetColumn 1.0 WidgetColumn.qml
