@@ -1,5 +1,6 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
-import Quickshell
 import Quickshell.Hyprland
 import "../../config" as Config
 import "../../base" as Base
@@ -28,43 +29,97 @@ Base.BaseWidget {
         anchors.centerIn: parent
         spacing: Config.Theme.spacing
 
+        // Cache static content as a texture for smoother rendering
+        layer.enabled: true
+        layer.smooth: true
+
+        // Smooth layout changes when items appear/disappear
+        move: Transition {
+            NumberAnimation {
+                properties: "x,y"
+                duration: 150
+                easing.type: Easing.OutCubic
+            }
+        }
+
         Repeater {
             model: Hyprland.workspaces
 
             Item {
                 id: workspaceItem
                 required property var modelData
-                property var workspace: modelData
 
-                implicitWidth: workspaceBtn.implicitWidth
-                implicitHeight: Config.Theme.componentSize
+                // Only show workspaces 1-10
+                readonly property bool shouldShow: modelData.id >= 1 && modelData.id <= root.workspaceCount
 
-                // Only show workspaces 1-10 (filter out named workspaces with negative IDs)
-                visible: workspace.id >= 1 && workspace.id <= root.workspaceCount
+                // Cache computed values
+                readonly property color cachedColor: root.getWorkspaceColor(modelData)
+                readonly property string cachedIcon: root.getWorkspaceIcon(modelData)
+                readonly property bool isFocused: modelData === Hyprland.focusedWorkspace
 
-                Components.BarButton {
-                    id: workspaceBtn
+                implicitWidth: shouldShow && workspaceLoader.item ? (workspaceLoader.item as Item).implicitWidth : 0
+                implicitHeight: shouldShow && workspaceLoader.item ? (workspaceLoader.item as Item).implicitHeight : Config.Theme.componentSize
+
+                // Lazily Load Component
+                Loader {
+                    id: workspaceLoader
                     anchors.centerIn: parent
+                    active: workspaceItem.shouldShow
 
-                    text: workspace.id.toString()
-                    icon: getWorkspaceIcon(workspace)
-                    iconColor: getWorkspaceColor(workspace)
-                    showBackground: false
+                    asynchronous: true
 
-                    onClicked: {
-                        Hyprland.dispatch("workspace " + workspace.id)
+                    // Pass cached values as properties
+                    property int wsId: workspaceItem.modelData.id
+                    property color wsColor: workspaceItem.cachedColor
+                    property string wsIcon: workspaceItem.cachedIcon
+                    property bool wsFocused: workspaceItem.isFocused
+
+                    sourceComponent: Component {
+                        Item {
+                            id: workspaceContent
+                            property int wsId: workspaceLoader.wsId
+                            property color wsColor: workspaceLoader.wsColor
+                            property string wsIcon: workspaceLoader.wsIcon
+                            property bool wsFocused: workspaceLoader.wsFocused
+
+                            implicitWidth: workspaceBtn.implicitWidth
+                            implicitHeight: Config.Theme.componentSize
+
+                            opacity: 1
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: 100
+                                    easing.type: Easing.OutCubic
+                                }
+                            }
+
+                            Components.BarButton {
+                                id: workspaceBtn
+                                anchors.centerIn: parent
+
+                                text: workspaceContent.wsId.toString()
+                                icon: workspaceContent.wsIcon
+                                iconColor: workspaceContent.wsColor
+                                showBackground: false
+
+                                onClicked: {
+                                    Hyprland.dispatch("workspace " + workspaceContent.wsId)
+                                }
+                            }
+
+                            // Active indicator
+                            Rectangle {
+                                anchors.bottom: parent.bottom
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                width: workspaceBtn.width - 4
+                                height: 2
+                                radius: 1
+                                color: workspaceContent.wsColor
+                                visible: workspaceContent.wsFocused
+                            }
+                        }
                     }
-                }
-
-                // Active indicator
-                Rectangle {
-                    anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: workspaceBtn.width - 4
-                    height: 2
-                    radius: 1
-                    color: getWorkspaceColor(workspace)
-                    visible: workspace === Hyprland.focusedWorkspace
                 }
             }
         }
