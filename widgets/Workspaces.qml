@@ -8,8 +8,8 @@ import "../components" as Components
 Base.BaseWidget {
     id: root
 
-    // Fetch values from JSON config or fallback to defaults
-    property var widgetConfig: Config.JsonConfig.getWidgetConfig("workspaces", {
+    // Fetch values from Config or fallback to defaults
+    property var widgetConfig: Config.Config.getWidgetConfig("workspaces", {
         "workspaceCount": 10,
         "showIcons": false,
         "showNames": false
