@@ -90,7 +90,7 @@ Scope {
                         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
 
                         Repeater {
-                            model: Config.JsonConfig.layout.left || []
+                            model: Config.Config.layout.left || []
                             delegate: widgetDelegate
                         }
 
@@ -107,7 +107,7 @@ Scope {
                         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                         Repeater {
-                            model: Config.JsonConfig.layout.center || []
+                            model: Config.Config.layout.center || []
                             delegate: widgetDelegate
                         }
 
@@ -124,7 +124,7 @@ Scope {
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
 
                         Repeater {
-                            model: Config.JsonConfig.layout.right || []
+                            model: Config.Config.layout.right || []
                             delegate: widgetDelegate
                         }
 
@@ -146,7 +146,7 @@ Scope {
                         Layout.alignment: Qt.AlignTop
 
                         Repeater {
-                            model: Config.JsonConfig.layout.left || []
+                            model: Config.Config.layout.left || []
                             delegate: widgetDelegate
                         }
 
@@ -163,7 +163,7 @@ Scope {
                         Layout.alignment: Qt.AlignVCenter
 
                         Repeater {
-                            model: Config.JsonConfig.layout.center || []
+                            model: Config.Config.layout.center || []
                             delegate: widgetDelegate
                         }
 
@@ -180,7 +180,7 @@ Scope {
                         Layout.alignment: Qt.AlignBottom
 
                         Repeater {
-                            model: Config.JsonConfig.layout.right || []
+                            model: Config.Config.layout.right || []
                             delegate: widgetDelegate
                         }
 

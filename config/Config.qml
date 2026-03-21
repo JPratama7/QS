@@ -17,6 +17,9 @@ Singleton {
     // Shorthand reference to StateStore path (may be undefined during init)
     readonly property var storeConfig: Services.StateStore.widgets?.bar?.config || null
 
+    // Status flag (always true since StateStore is immediate)
+    readonly property bool isLoaded: true
+
     // Bar Layout Configuration - Bind to StateStore with fallback defaults
     property int position: root.storeConfig?.position ?? 0
     property int barSize: root.storeConfig?.barSize ?? 32
@@ -71,6 +74,22 @@ Singleton {
     onPopupHeightChanged: if (root.storeConfig) root.storeConfig.popupHeight = popupHeight
     onPopupAutoCloseChanged: if (root.storeConfig) root.storeConfig.popupAutoClose = popupAutoClose
 
+    // Layout Configuration - Bind to StateStore with fallback defaults
+    property var layoutLeft: root.storeConfig?.layoutLeft ?? ["workspaces", "windowTitle"]
+    property var layoutCenter: root.storeConfig?.layoutCenter ?? []
+    property var layoutRight: root.storeConfig?.layoutRight ?? ["systemMonitor", "network", "bluetooth", "battery", "audio", "brightness", "nightShift", "caffeine", "clock"]
+
+    // Layout helper object for compatibility
+    readonly property var layout: ({
+        left: layoutLeft,
+        center: layoutCenter,
+        right: layoutRight
+    })
+
+    onLayoutLeftChanged: if (root.storeConfig) root.storeConfig.layoutLeft = layoutLeft
+    onLayoutCenterChanged: if (root.storeConfig) root.storeConfig.layoutCenter = layoutCenter
+    onLayoutRightChanged: if (root.storeConfig) root.storeConfig.layoutRight = layoutRight
+
     // Helper Functions
     readonly property bool isHorizontal: position === Config.Position.Top || position === Config.Position.Bottom
     readonly property bool isVertical: position === Config.Position.Left || position === Config.Position.Right
@@ -110,5 +129,19 @@ Singleton {
                 break
         }
         return anchors
+    }
+
+    // Widget config helper - fetch config for a specific widget, merging with default fallback values
+    function getWidgetConfig(widgetName, defaultValues) {
+        const configKey = widgetName + "Config"
+        const widgetConfig = root.storeConfig?.[configKey]
+        if (!widgetConfig) {
+            return Object.assign({}, defaultValues)
+        }
+        const result = Object.assign({}, defaultValues)
+        for (var key in widgetConfig) {
+            result[key] = widgetConfig[key]
+        }
+        return result
     }
 }
