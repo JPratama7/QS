@@ -2,3 +2,5 @@
 
 /*.qml
 !shell.qml
+
+.vscode
