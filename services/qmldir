@@ -1,4 +1,5 @@
 module services
+singleton StateStore 1.0 StateStore.qml
 singleton SystemService 1.0 SystemService.qml
 singleton NetworkService 1.0 NetworkService.qml
 singleton BluetoothService 1.0 BluetoothService.qml
