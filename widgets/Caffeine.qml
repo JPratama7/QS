@@ -3,23 +3,29 @@ import Quickshell.Io
 import "../config" as Config
 import "../base" as Base
 import "../components" as Components
+import "../services" as Services
 
 Base.BaseWidget {
     id: root
 
-    property bool caffeineActive: false
-    containerColor: caffeineActive ? Config.Theme.warning : Config.Theme.widgetBg
+    // Shorthand reference to StateStore path (may be undefined during init)
+    readonly property var config: Services.StateStore.widgets?.bar?.caffeine || null
+
+    // Bind to config for clean internal access with fallback default
+    property bool caffeineActive: root.config?.active ?? false
+
+    containerColor: root.caffeineActive ? Config.Theme.warning : Config.Theme.widgetBg
 
     Component.onCompleted: {
         // Restore the inhibitor state on startup based on the saved setting
-        if (caffeineActive) {
+        if (root.caffeineActive) {
             caffeineOn.running = true
         } else {
             caffeineOff.running = true
         }
     }
 
-    tooltipText: caffeineActive ? "Caffeine: On (Sleep prevented)" : "Caffeine: Off"
+    tooltipText: root.caffeineActive ? "Caffeine: On (Sleep prevented)" : "Caffeine: Off"
 
     implicitWidth: caffeineIcon.implicitWidth + (Config.Theme.widgetPadding * 2)
 
@@ -32,17 +38,20 @@ Base.BaseWidget {
     }
 
     onClicked: {
-        toggleCaffeine()
+        root.toggleCaffeine()
     }
 
     function toggleCaffeine(): void {
-        caffeineActive = !caffeineActive
-        if (caffeineActive) {
+        root.caffeineActive = !root.caffeineActive
+        if (root.caffeineActive) {
             caffeineOn.running = true
         } else {
             caffeineOff.running = true
         }
     }
+
+    // Write-through using shorthand (only if config is ready)
+    onCaffeineActiveChanged: if (root.config) root.config.active = root.caffeineActive
 
     Process {
         id: caffeineOn
