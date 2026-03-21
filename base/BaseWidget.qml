@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import "../config" as Config
+import "../services" as Services
 
 Item {
     id: root
@@ -90,12 +91,17 @@ Item {
         }
     }
 
-    // Tooltip (shown on hover)
-    ToolTip {
-        id: tooltip
-        visible: root.tooltipText !== "" && mouseArea.containsMouse
-        text: root.tooltipText
-        delay: 500
+    // Tooltip handling via TooltipService
+    HoverHandler {
+        onHoveredChanged: {
+            if (root.tooltipText !== "") {
+                if (hovered) {
+                    Services.TooltipService.showText(root, root.tooltipText, "auto", 500)
+                } else {
+                    Services.TooltipService.hide()
+                }
+            }
+        }
     }
 
     // Methods
