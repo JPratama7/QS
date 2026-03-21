@@ -1,36 +1,37 @@
-import QtQuick
-import Quickshell
-import Quickshell.Hyprland
-import "../../config" as Config
 import "../../base" as Base
 import "../../components" as Components
+import "../../config" as Config
+import QtQuick
+import Quickshell.Wayland
 
 Base.BaseWidget {
     id: root
 
     property int maxWidth: 200
     property bool showAppName: true
+    readonly property Toplevel activeToplevel: ToplevelManager.activeToplevel
 
-    tooltipText: activeWindow ? activeWindow.title : "No active window"
+    tooltipText: root.activeToplevel ? root.activeToplevel.title : "No active window"
     implicitWidth: Math.min(titleText.implicitWidth + (Config.Theme.widgetPadding * 2), maxWidth)
-
-    readonly property var activeWindow: Hyprland.focusedWorkspace?.lastFocusedWindow
 
     Components.BarText {
         id: titleText
-        anchors.centerIn: parent
 
+        anchors.centerIn: parent
         text: {
-            if (!activeWindow) return ""
-            const title = activeWindow.title || ""
+            if (!root.activeToplevel)
+                return "";
+
+            const title = root.activeToplevel.title || "";
             // Truncate if too long
-            if (title.length > 30) {
-                return title.substring(0, 27) + "..."
-            }
-            return title
+            if (title.length > 30)
+                return title.substring(0, 27) + "...";
+
+            return title;
         }
         color: Config.Theme.fg
         fontSize: Config.Theme.fontSizeNormal
         maxWidth: root.maxWidth - (Config.Theme.widgetPadding * 2)
     }
+
 }
