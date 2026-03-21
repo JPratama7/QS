@@ -23,4 +23,18 @@ JsonObject {
     property int popupWidth: 320
     property int popupHeight: 400
     property bool popupAutoClose: true
+    // Layout configuration (migrated from JsonConfig)
+    property var layoutLeft: ["workspaces", "windowTitle"]
+    property var layoutCenter: []
+    property var layoutRight: ["systemMonitor", "network", "bluetooth", "battery", "audio", "brightness", "nightShift", "caffeine", "clock"]
+    // Widget-specific configurations
+    property JsonObject clockConfig
+    property JsonObject workspacesConfig
+
+    clockConfig: ClockConfig {
+    }
+
+    workspacesConfig: WorkspacesConfig {
+    }
+
 }

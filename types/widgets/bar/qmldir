@@ -2,3 +2,5 @@ Config 1.0 Config.qml
 Caffeine 1.0 Caffeine.qml
 NightShift 1.0 NightShift.qml
 Bar 1.0 Bar.qml
+ClockConfig 1.0 ClockConfig.qml
+WorkspacesConfig 1.0 WorkspacesConfig.qml
