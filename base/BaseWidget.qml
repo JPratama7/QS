@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import "../config" as Config
 import "../services" as Services
-import "BasePopup.qml"
 Item {
     id: root
 
@@ -10,14 +9,20 @@ Item {
     implicitWidth: contentRow.implicitWidth + (Config.Theme.widgetPadding * 2)
     implicitHeight: Config.Theme.componentSize
 
+    // Eager loading flag - widgets can set this to true to load immediately
+    // This is useful for widgets that need to be available before the bar is fully initialized
+    // Default is false to optimize performance by loading widgets on demand
+    property bool eagerLoad: false
+
     // Widget State
     property bool expanded: false
     property bool hasPopup: false
     property bool active: false
     property string tooltipText: ""
-    property BasePopup popupComponent: null
+    property Component popupComponent: null
     property bool showBackground: true
     property color containerColor: Config.Theme.widgetBg
+
 
     // Bar Position (inherited from parent or config)
     property int barPosition: Config.Config.position
@@ -33,6 +38,8 @@ Item {
 
     // Internal
     property bool _popupOpen: popupLoader.item !== null && popupLoader.item.visible
+    property bool _popupDestroyed: false  // Track if popup was manually destroyed
+    property bool _pendingOpen: false  // Track if we're waiting to open popup after load
 
     // Background
     Rectangle {
@@ -106,27 +113,56 @@ Item {
     // Popup Loader
     Loader {
         id: popupLoader
-        active: false
+        active: root.eagerLoad
         asynchronous: true
         sourceComponent: root.popupComponent
+
+        onLoaded: {
+            if (root._pendingOpen && item) {
+                item.open(root)
+                root.popupOpened()
+                root._pendingOpen = false
+            }
+        }
     }
 
     // Methods
     function openPopup(): void {
         if (!root.hasPopup || root.popupComponent === null) return
+        if (root._popupDestroyed) return  // Don't auto-load if destroyed
 
         popupLoader.active = true
         if (popupLoader.item) {
             popupLoader.item.open(root)
             root.popupOpened()
+        } else {
+            // Popup is loading asynchronously, open when ready
+            root._pendingOpen = true
         }
+    }
+
+    function loadPopup(): void {
+        if (!root.hasPopup || root.popupComponent === null) return
+        root._popupDestroyed = false
+        popupLoader.active = true
+    }
+
+    function destroyPopup(): void {
+        console.log("Destroying popup, item:", popupLoader.item)
+        root.closePopup()
+        root._popupDestroyed = true
+        popupLoader.active = false
+        console.log("After destroy - active:", popupLoader.active, "item:", popupLoader.item)
     }
 
     function closePopup(): void {
         if (popupLoader.item !== null && popupLoader.item.visible) {
             popupLoader.item.close()
-            popupLoader.active = false
             root.popupClosed()
+        }
+
+        if (!root.eagerLoad) {
+            popupLoader.active = false
         }
     }
 
