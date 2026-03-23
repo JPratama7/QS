@@ -15,7 +15,6 @@ Item {
     property bool vertical: false
     property bool inverted: false
 
-    signal valueChanged(real newValue)
 
     implicitWidth: vertical ? barHeight : barWidth
     implicitHeight: vertical ? barWidth : barHeight
