@@ -7,6 +7,7 @@ import QtQuick
 
 Base.BaseWidget {
     id: root
+    objectName: "SystemMonitor"
 
     property bool showGraph: false
     property bool showTemp: true

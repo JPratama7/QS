@@ -7,6 +7,7 @@ import Quickshell.Wayland
 
 Base.BaseWidget {
     id: root
+    objectName: "WindowTitle"
 
     property int maxWidth: 200
     property bool showAppName: true

@@ -7,6 +7,7 @@ import QtQuick
 
 Base.BaseWidget {
     id: root
+    objectName: "Network"
 
     tooltipText: {
         if (!Services.NetworkService.connected)

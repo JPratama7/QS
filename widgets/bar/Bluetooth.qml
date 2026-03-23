@@ -7,6 +7,7 @@ import QtQuick
 
 Base.BaseWidget {
     id: root
+    objectName: "Bluetooth"
 
     tooltipText: {
         if (!Services.BluetoothService.enabled)

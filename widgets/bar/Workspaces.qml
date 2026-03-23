@@ -8,6 +8,7 @@ import "../../components" as Components
 
 Base.BaseWidget {
     id: root
+    objectName: "Workspaces"
 
     // Fetch values from Config or fallback to defaults
     property var widgetConfig: Config.Config.getWidgetConfig("workspaces", {

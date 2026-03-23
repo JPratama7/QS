@@ -8,6 +8,7 @@ import "../../services" as Services
 
 Base.BaseWidget {
     id: root
+    objectName: "Caffeine"
 
     // Shorthand reference to StateStore path (may be undefined during init)
     readonly property var config: Services.StateStore.widgets?.bar?.caffeine || null

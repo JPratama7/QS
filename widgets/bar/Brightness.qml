@@ -7,6 +7,7 @@ import QtQuick
 
 Base.BaseWidget {
     id: root
+    objectName: "Brightness"
 
     tooltipText: {
         if (!Services.BrightnessService.available)

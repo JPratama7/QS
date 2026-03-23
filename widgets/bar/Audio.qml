@@ -7,6 +7,7 @@ import QtQuick
 
 Base.BaseWidget {
     id: root
+    objectName: "Audio"
 
     tooltipText: {
         if (!Services.AudioService.available)

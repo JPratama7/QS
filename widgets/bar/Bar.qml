@@ -6,6 +6,7 @@ import "../../components" as Components
 
 Item {
     id: barContent
+    objectName: "Bar"
 
     required property var screen
 

@@ -7,6 +7,7 @@ import QtQuick
 
 Base.BaseWidget {
     id: root
+    objectName: "Battery"
 
     tooltipText: {
         if (!Services.BatteryService.available)
