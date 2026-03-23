@@ -14,35 +14,43 @@ Base class for all bar widgets with popup support and mouse interactions.
 
 ### Layout
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `implicitWidth` | `int` | `contentRow.width + padding*2` | Auto-sized based on content |
-| `implicitHeight` | `int` | `Config.Theme.componentSize` | Fixed height matching bar |
+| Property         | Type  | Default                        | Description                 |
+| ---------------- | ----- | ------------------------------ | --------------------------- |
+| `implicitWidth`  | `int` | `contentRow.width + padding*2` | Auto-sized based on content |
+| `implicitHeight` | `int` | `Config.Theme.componentSize`   | Fixed height matching bar   |
 
 ### State
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `expanded` | `bool` | `false` | Widget expanded state |
-| `hasPopup` | `bool` | `false` | Enable popup functionality |
-| `active` | `bool` | `false` | Active/toggled visual state |
-| `showBackground` | `bool` | `true` | Toggle background visibility |
-| `_popupOpen` | `bool` (readonly) | - | True when popup is visible |
+| Property         | Type              | Default | Description                     |
+| ---------------- | ----------------- | ------- | ------------------------------- |
+| `expanded`       | `bool`            | `false` | Widget expanded state           |
+| `hasPopup`       | `bool` (readonly) | -       | True when popupComponent is set |
+| `active`         | `bool`            | `false` | Active/toggled visual state     |
+| `showBackground` | `bool`            | `true`  | Toggle background visibility    |
+| `_popupOpen`     | `bool` (readonly) | -       | True when popup is visible      |
 
 ### Popup
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `popupComponent` | `var` | `null` | Component to instantiate as popup |
-| `popupInstance` | `var` | `null` | Live popup instance (managed internally) |
+| Property         | Type        | Default   | Description                        |
+| ---------------- | ----------- | --------- | ---------------------------------- |
+| `popupComponent` | `Component` | `null`    | Component to instantiate as popup  |
+| `cachePolicy`    | `enum`      | `NoCache` | Popup caching behavior (see below) |
+
+#### Cache Policy Values
+
+| Value        | Load Timing        | Destroy Timing | Use Case                              |
+| ------------ | ------------------ | -------------- | ------------------------------------- |
+| `NoCache`    | On first open      | On every close | Lightweight popups, memory-conscious  |
+| `LazyCache`  | On first open      | Never          | Frequently used popups                |
+| `EagerCache` | On widget creation | Never          | Heavy popups needing instant response |
 
 ### Styling
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `containerColor` | `color` | `Config.Theme.widgetBg` | Background color override |
-| `tooltipText` | `string` | `""` | Tooltip text on hover |
-| `barPosition` | `int` | `Config.Config.position` | Bar position (inherited from parent or config) |
+| Property         | Type     | Default                  | Description                                    |
+| ---------------- | -------- | ------------------------ | ---------------------------------------------- |
+| `containerColor` | `color`  | `Config.Theme.widgetBg`  | Background color override                      |
+| `tooltipText`    | `string` | `""`                     | Tooltip text on hover                          |
+| `barPosition`    | `int`    | `Config.Config.position` | Bar position (inherited from parent or config) |
 
 ## Signals
 
@@ -59,10 +67,12 @@ signal popupClosed()      // Popup was closed
 ## Methods
 
 ```qml
-function openPopup(): void      // Open the popup if hasPopup is true
-function closePopup(): void     // Close the popup
-function togglePopup(): void    // Toggle popup open/closed
-function refresh(): void        // Override in child widgets to refresh data
+function openPopup(): void           // Open the popup if hasPopup is true
+function closePopup(): void          // Close the popup (destroys if NoCache)
+function togglePopup(): void         // Toggle popup open/closed
+function loadPopup(): void           // Force load popup (for LazyCache)
+function destroyPopup(): void        // Force destroy popup
+function refresh(): void             // Override in child widgets to refresh data
 function setActive(active: bool): void  // Set active state
 ```
 
@@ -75,31 +85,31 @@ Base.BaseWidget {
     id: myWidget
     hasPopup: true
     tooltipText: "My Widget"
-    
+
     // Set popup component
     popupComponent: MyPopupComponent
-    
+
     // Widget content
     Row {
         anchors.centerIn: parent
         spacing: 8
-        
+
         Rectangle {
             width: 16
             height: 16
             color: "#00ff00"
         }
-        
+
         Text {
             text: "Status"
             color: "#ffffff"
         }
     }
-    
+
     onClicked: {
         console.log("Widget clicked")
     }
-    
+
     onScrollUp: {
         volumeUp()
     }
@@ -122,33 +132,37 @@ Base.BaseWidget {
 
 ## Mouse Handling
 
-| Button | Signal | Action |
-|--------|--------|--------|
-| Left | `clicked()` | Opens popup if `hasPopup` is true |
-| Right | `rightClicked()` | Custom handling |
-| Middle | `middleClicked()` | Custom handling |
-| Scroll Up | `scrollUp()` | Custom handling |
-| Scroll Down | `scrollDown()` | Custom handling |
+| Button      | Signal            | Action                            |
+| ----------- | ----------------- | --------------------------------- |
+| Left        | `clicked()`       | Opens popup if `hasPopup` is true |
+| Right       | `rightClicked()`  | Custom handling                   |
+| Middle      | `middleClicked()` | Custom handling                   |
+| Scroll Up   | `scrollUp()`      | Custom handling                   |
+| Scroll Down | `scrollDown()`    | Custom handling                   |
 
 ## Popup Management
 
-Set `hasPopup: true` and assign a component:
+Assign a popup component and optionally set the cache policy:
 
 ```qml
 Base.BaseWidget {
-    hasPopup: true
     popupComponent: Component {
         Base.BasePopup {
             // Popup content
         }
     }
+
+    // Optional: control popup lifecycle
+    cachePolicy: BaseWidget.CachePolicy.LazyCache
 }
 ```
 
 The widget handles:
-- Lazy instantiation (only created when first opened)
+
+- On-demand instantiation based on cache policy
 - `openPopup()` / `closePopup()` / `togglePopup()` methods
 - Signal emission (`popupOpened`, `popupClosed`)
+- Automatic destruction for `NoCache` policy
 
 ## Tooltips
 
@@ -163,11 +177,11 @@ Base.BaseWidget {
 
 ## Background States
 
-| State | Condition | Background |
-|-------|-----------|------------|
-| Active | `active === true` | `Config.Theme.widgetBgActive` |
-| Hover | `mouseArea.containsMouse` | `Config.Theme.widgetBgHover` |
-| Default | - | `transparent` |
+| State   | Condition                 | Background                    |
+| ------- | ------------------------- | ----------------------------- |
+| Active  | `active === true`         | `Config.Theme.widgetBgActive` |
+| Hover   | `mouseArea.containsMouse` | `Config.Theme.widgetBgHover`  |
+| Default | -                         | `transparent`                 |
 
 Color transitions use `ColorAnimation` with `Config.Theme.animationNormal` duration.
 
