@@ -16,12 +16,14 @@ Item {
 
     // Widget State
     property bool expanded: false
-    property bool hasPopup: false
     property bool active: false
     property string tooltipText: ""
     property Component popupComponent: null
     property bool showBackground: true
     property color containerColor: Config.Theme.widgetBg
+
+    // Derived state
+    readonly property bool hasPopup: popupComponent !== null
 
 
     // Bar Position (inherited from parent or config)
@@ -37,7 +39,7 @@ Item {
     signal popupClosed()
 
     // Internal
-    property bool _popupOpen: popupLoader.item !== null && popupLoader.item.visible
+    property bool _popupOpen: popupLoader.item !== null && (popupLoader.item ? popupLoader.item.visible : false)
     property bool _popupDestroyed: false  // Track if popup was manually destroyed
     property bool _pendingOpen: false  // Track if we're waiting to open popup after load
 
@@ -80,7 +82,7 @@ Item {
         onClicked: function(mouse) {
             if (mouse.button === Qt.LeftButton) {
                 root.clicked()
-                if (root.hasPopup) root.togglePopup()
+                if (root.popupComponent !== null) root.togglePopup()
             } else if (mouse.button === Qt.RightButton) {
                 root.rightClicked()
             } else if (mouse.button === Qt.MiddleButton) {
@@ -128,7 +130,7 @@ Item {
 
     // Methods
     function openPopup(): void {
-        if (!root.hasPopup || root.popupComponent === null) return
+        if (!root.hasPopup) return
         if (root._popupDestroyed) return  // Don't auto-load if destroyed
 
         popupLoader.active = true
@@ -142,7 +144,7 @@ Item {
     }
 
     function loadPopup(): void {
-        if (!root.hasPopup || root.popupComponent === null) return
+        if (!root.hasPopup) return
         root._popupDestroyed = false
         popupLoader.active = true
     }
