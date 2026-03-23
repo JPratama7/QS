@@ -3,6 +3,7 @@ import "../../base" as Base
 import "../../components" as Components
 import "../../config" as Config
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 
 Base.BaseWidget {
@@ -14,35 +15,46 @@ Base.BaseWidget {
         "timeFormat": "HH:mm",
         "dateFormat": "dd/MM",
         "showDate": true,
-        "showSeconds": false
+        "showSeconds": false,
+        "showWeekNumbers": true,
+        "firstDayOfWeek": 1
     })
     property string timeFormat: widgetConfig.timeFormat
     property string dateFormat: widgetConfig.dateFormat
     property bool showDate: widgetConfig.showDate
     property bool showSeconds: widgetConfig.showSeconds
+    property bool showWeekNumbers: widgetConfig.showWeekNumbers ?? true
+    property int firstDayOfWeek: widgetConfig.firstDayOfWeek ?? 1
 
-    // Eagerly cache the calendar popup for instant response
-    cachePolicy: Base.BaseWidget.CachePolicy.EagerCache
+    cachePolicy: Base.BaseWidget.CachePolicy.LazyCache
 
     tooltipText: Qt.formatDateTime(new Date(), "dddd, MMMM d, yyyy")
     implicitWidth: clockRow.implicitWidth + (Config.Theme.widgetPadding * 2)
 
     popupComponent: Component {
         Base.BasePopup {
-            popupWidth: 320
-            popupHeight: 360
+            id: popupRoot
+            popupWidth: root.showWeekNumbers ? 340 : 320
+            popupHeight: 400
+
+            backgroundComponent: Component {
+                Rectangle {
+                    id: popupBackground
+                    radius: Config.Theme.paddingLarge
+                    color: Config.Theme.widgetBg
+                    border.width: 1
+                    border.color: Config.Theme.widgetBorder
+                }
+            }
 
             contentComponent: Item {
                 id: calendar
                 anchors.fill: parent
 
                 property date today: new Date()
+                property date currentTime: new Date()
                 property int viewMonth: today.getMonth()
                 property int viewYear: today.getFullYear()
-                readonly property int firstDayOfWeek: Qt.locale().firstDayOfWeek % 7
-                property var daysModel: []
-                property int hoveredIndex: -1
-                readonly property int navButtonSize: 32
 
                 function changeMonth(delta) {
                     const next = new Date(viewYear, viewMonth + delta, 1)
@@ -57,84 +69,40 @@ Base.BaseWidget {
                     viewMonth = current.getMonth()
                 }
 
-                function rebuildDaysModel() {
-                    const normalizedFirstDay = firstDayOfWeek
-                    const firstOfMonth = new Date(viewYear, viewMonth, 1)
-                    const lastOfMonth = new Date(viewYear, viewMonth + 1, 0)
-                    const daysInMonth = lastOfMonth.getDate()
-
-                    const leading = (firstOfMonth.getDay() - normalizedFirstDay + 7) % 7
-                    const prevMonth = new Date(viewYear, viewMonth, 0)
-                    const prevMonthDays = prevMonth.getDate()
-                    const result = []
-
-                    for (let i = 0; i < leading; i++) {
-                        const day = prevMonthDays - leading + 1 + i
-                        const date = new Date(viewYear, viewMonth - 1, day)
-                        result.push(createDayObject(date, false))
-                    }
-
-                    for (let day = 1; day <= daysInMonth; day++) {
-                        const date = new Date(viewYear, viewMonth, day)
-                        result.push(createDayObject(date, true))
-                    }
-
-                    const trailing = (7 - (result.length % 7)) % 7
-                    for (let i = 1; i <= trailing; i++) {
-                        const date = new Date(viewYear, viewMonth + 1, i)
-                        result.push(createDayObject(date, false))
-                    }
-
-                    daysModel = result
-                }
-
-                function createDayObject(date, inMonth) {
-                    const isToday = date.getFullYear() === calendar.today.getFullYear()
-                        && date.getMonth() === calendar.today.getMonth()
-                        && date.getDate() === calendar.today.getDate()
-                    return ({
-                        "day": date.getDate(),
-                        "month": date.getMonth(),
-                        "year": date.getFullYear(),
-                        "inMonth": inMonth,
-                        "today": isToday
-                    })
-                }
-
-                function qtDayFromZeroBased(day) {
-                    return day === 0 ? Qt.Sunday : day
-                }
-
-                function dayLabel(index) {
-                    const dayZero = (firstDayOfWeek + index) % 7
-                    const qtDay = qtDayFromZeroBased(dayZero)
-                    const name = Qt.locale().standaloneDayName(qtDay, Locale.ShortFormat)
-                    return name.length > 2 ? name.substring(0, 2).toUpperCase() : name.toUpperCase()
-                }
-
                 function monthLabel() {
                     return Qt.formatDate(new Date(viewYear, viewMonth, 1), "MMMM yyyy")
                 }
 
-                Component.onCompleted: rebuildDaysModel()
-                onViewMonthChanged: rebuildDaysModel()
-                onViewYearChanged: rebuildDaysModel()
-                onFirstDayOfWeekChanged: rebuildDaysModel()
-                onTodayChanged: {
-                    if (viewYear === today.getFullYear() && viewMonth === today.getMonth()) {
-                        rebuildDaysModel()
+                function getISOWeekNumber(date) {
+                    const target = new Date(date.valueOf())
+                    const dayNr = (date.getDay() + 6) % 7
+                    target.setDate(target.getDate() - dayNr + 3)
+                    const firstThursday = new Date(target.getFullYear(), 0, 4)
+                    const diff = target - firstThursday
+                    const oneWeek = 1000 * 60 * 60 * 24 * 7
+                    return 1 + Math.round(diff / oneWeek)
+                }
+
+                Timer {
+                    id: minuteTimer
+                    interval: 60000
+                    repeat: true
+                    running: true
+                    onTriggered: {
+                        calendar.today = new Date()
+                        calendar.currentTime = new Date()
                     }
                 }
 
                 Timer {
-                    interval: 60000
+                    id: secondTimer
+                    interval: 1000
                     repeat: true
                     running: true
-                    onTriggered: calendar.today = new Date()
+                    onTriggered: calendar.currentTime = new Date()
                 }
 
                 WheelHandler {
-                    id: monthWheelHandler
                     target: calendar
                     onWheel: function(event) {
                         if (event.angleDelta.y > 0) {
@@ -147,166 +115,314 @@ Base.BaseWidget {
                 }
 
                 ColumnLayout {
+                    id: mainLayout
                     anchors.fill: parent
-                    anchors.margins: Config.Theme.paddingLarge
-                    spacing: Config.Theme.spacingLarge
+                    anchors.margins: Config.Theme.padding
+                    spacing: Config.Theme.padding
 
+                    // Header Card - split into date and clock sections
                     RowLayout {
+                        id: headerRow
                         Layout.fillWidth: true
-                        spacing: Config.Theme.spacingLarge
+                        Layout.preferredHeight: 72
+                        Layout.minimumHeight: 72
+                        spacing: Config.Theme.padding
 
+                        // Date section
                         Rectangle {
-                            Layout.preferredWidth: calendar.navButtonSize
-                            Layout.preferredHeight: calendar.navButtonSize
-                            radius: calendar.navButtonSize / 2
-                            color: Config.Theme.widgetBg
-                            border.width: 1
-                            border.color: Config.Theme.widgetBorder
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: "‹"
-                                font.pixelSize: Config.Theme.fontSizeLarge
-                                font.family: Config.Theme.fontFamily
-                                color: Config.Theme.fg
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                onEntered: parent.color = Config.Theme.widgetBgHover
-                                onExited: parent.color = Config.Theme.widgetBg
-                                onClicked: calendar.changeMonth(-1)
-                            }
-                        }
-
-                        Text {
+                            id: dateSection
                             Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter
-                            horizontalAlignment: Text.AlignHCenter
-                            text: calendar.monthLabel()
-                            font.family: Config.Theme.fontFamily
-                            font.pixelSize: Config.Theme.fontSizeLarge
-                            font.bold: true
-                            color: Config.Theme.fg
-                        }
+                            Layout.fillHeight: true
+                            radius: Config.Theme.paddingLarge
+                            color: Config.Theme.accent
 
-                        Rectangle {
-                            Layout.preferredWidth: 60
-                            Layout.preferredHeight: calendar.navButtonSize
-                            radius: calendar.navButtonSize / 2
-                            color: Config.Theme.widgetBg
-                            border.width: 1
-                            border.color: Config.Theme.widgetBorder
-
-                            Text {
+                            ColumnLayout {
+                                id: dateLayout
                                 anchors.centerIn: parent
-                                text: "Today"
-                                font.family: Config.Theme.fontFamily
-                                font.pixelSize: Config.Theme.fontSizeSmall
-                                font.bold: true
-                                color: Config.Theme.accent
-                            }
+                                spacing: Config.Theme.spacing
 
-                            MouseArea {
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                onEntered: parent.color = Config.Theme.widgetBgHover
-                                onExited: parent.color = Config.Theme.widgetBg
-                                onClicked: calendar.resetToToday()
-                            }
-                        }
+                                Text {
+                                    id: dayNumberText
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: calendar.today.getDate()
+                                    font.family: Config.Theme.fontFamily
+                                    font.pixelSize: Config.Theme.fontSizeXLarge * 1.8
+                                    font.bold: true
+                                    color: Config.Theme.bg
+                                }
 
-                        Rectangle {
-                            Layout.preferredWidth: calendar.navButtonSize
-                            Layout.preferredHeight: calendar.navButtonSize
-                            radius: calendar.navButtonSize / 2
-                            color: Config.Theme.widgetBg
-                            border.width: 1
-                            border.color: Config.Theme.widgetBorder
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: "›"
-                                font.pixelSize: Config.Theme.fontSizeLarge
-                                font.family: Config.Theme.fontFamily
-                                color: Config.Theme.fg
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                onEntered: parent.color = Config.Theme.widgetBgHover
-                                onExited: parent.color = Config.Theme.widgetBg
-                                onClicked: calendar.changeMonth(1)
-                            }
-                        }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: Config.Theme.spacing
-
-                        Repeater {
-                            id: dayHeaderRepeater
-                            model: 7
-                            delegate: Text {
-                                required property int index
-                                Layout.fillWidth: true
-                                Layout.preferredWidth: 0
-                                horizontalAlignment: Text.AlignHCenter
-                                text: calendar.dayLabel(index)
-                                font.family: Config.Theme.fontFamily
-                                font.pixelSize: Config.Theme.fontSizeSmall
-                                font.bold: true
-                                color: Config.Theme.fgDark
-                            }
-                        }
-                    }
-
-                    GridLayout {
-                        id: daysGrid
-                        Layout.fillWidth: true
-                        columnSpacing: Config.Theme.spacing
-                        rowSpacing: Config.Theme.spacing
-                        columns: 7
-
-                        property real cellSize: (width - (columnSpacing * (columns - 1))) / columns
-
-                        Repeater {
-                            id: daysRepeater
-                            model: calendar.daysModel
-                            delegate: Item {
-                                id: dayItem
-                                required property var modelData
-                                required property int index
-                                Layout.preferredWidth: daysGrid.cellSize
-                                Layout.preferredHeight: daysGrid.cellSize
-
-                                Rectangle {
-                                    anchors.fill: parent
-                                    radius: Config.Theme.borderRadius
-                                    color: dayItem.modelData.today ? Config.Theme.accent : (calendar.hoveredIndex === dayItem.index && dayItem.modelData.inMonth ? Config.Theme.widgetBgHover : "transparent")
-                                    border.width: dayItem.modelData.today ? 0 : 1
-                                    border.color: Config.Theme.widgetBorder
-                                    opacity: dayItem.modelData.inMonth ? 1 : 0.45
+                                RowLayout {
+                                    id: monthYearRow
+                                    Layout.alignment: Qt.AlignHCenter
+                                    spacing: Config.Theme.spacing
 
                                     Text {
-                                        anchors.centerIn: parent
-                                        text: dayItem.modelData.day
+                                        id: monthNameText
+                                        text: Qt.locale().standaloneMonthName(calendar.today.getMonth(), Locale.LongFormat).toUpperCase()
+                                        font.family: Config.Theme.fontFamily
+                                        font.pixelSize: Config.Theme.fontSizeLarge
+                                        font.bold: true
+                                        color: Config.Theme.bg
+                                    }
+
+                                    Text {
+                                        id: yearText
+                                        text: calendar.today.getFullYear()
                                         font.family: Config.Theme.fontFamily
                                         font.pixelSize: Config.Theme.fontSizeNormal
-                                        font.bold: dayItem.modelData.today
-                                        color: dayItem.modelData.today ? Config.Theme.bg : (dayItem.modelData.inMonth ? Config.Theme.fg : Config.Theme.fgDark)
+                                        font.bold: true
+                                        color: Qt.alpha(Config.Theme.bg, 0.7)
+                                    }
+                                }
+                            }
+                        }
+
+                        // Clock section
+                        Rectangle {
+                            id: clockSection
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            radius: Config.Theme.paddingLarge
+                            color: Config.Theme.accent
+
+                            Column {
+                                id: digitalClock
+                                anchors.centerIn: parent
+                                spacing: 2
+
+                                Text {
+                                    id: timeDisplay
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: Qt.formatTime(calendar.currentTime, "hh:mm:ss")
+                                    font.family: Config.Theme.fontFamily
+                                    font.pixelSize: Config.Theme.fontSizeXLarge * 1.8
+                                    font.bold: true
+                                    color: Config.Theme.bg
+                                }
+
+                                Text {
+                                    id: ampmDisplay
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: Qt.formatTime(calendar.currentTime, "AP")
+                                    font.family: Config.Theme.fontFamily
+                                    font.pixelSize: Config.Theme.fontSizeNormal
+                                    font.bold: true
+                                    color: Qt.alpha(Config.Theme.bg, 0.8)
+                                }
+                            }
+                        }
+                    }
+
+                    // Month Card (caelestia-style with MonthGrid)
+                    Rectangle {
+                        id: monthCard
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.minimumHeight: 280
+                        color: Config.Theme.widgetBg
+                        radius: Config.Theme.paddingLarge
+
+                        ColumnLayout {
+                            id: monthLayout
+                            anchors.fill: parent
+                            anchors.margins: Config.Theme.paddingLarge
+                            spacing: Config.Theme.spacingLarge
+
+                            // Navigation row (caelestia-style)
+                            RowLayout {
+                                id: navigationRow
+                                Layout.fillWidth: true
+                                spacing: Config.Theme.spacing
+
+                                Components.CalendarIconButton {
+                                    id: prevMonthButton
+                                    icon: "←"
+                                    onClicked: calendar.changeMonth(-1)
+                                }
+
+                                Item {
+                                    id: monthYearContainer
+                                    Layout.fillWidth: true
+                                    implicitWidth: monthYearDisplay.implicitWidth + Config.Theme.padding * 2
+                                    implicitHeight: monthYearDisplay.implicitHeight + Config.Theme.padding
+
+                                    Rectangle {
+                                        id: todayButton
+                                        anchors.fill: parent
+                                        anchors.margins: -Config.Theme.spacing
+                                        radius: Config.Theme.borderRadius
+                                        color: todayMouseArea.containsMouse ? Qt.alpha(Config.Theme.accent, 0.1) : "transparent"
+                                        visible: !(calendar.viewMonth === calendar.today.getMonth() && calendar.viewYear === calendar.today.getFullYear())
+
+                                        Behavior on color {
+                                            ColorAnimation { duration: Config.Theme.animationFast }
+                                        }
+
+                                        MouseArea {
+                                            id: todayMouseArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: calendar.resetToToday()
+                                        }
+                                    }
+
+                                    Text {
+                                        id: monthYearDisplay
+                                        anchors.centerIn: parent
+                                        text: calendar.monthLabel()
+                                        font.family: Config.Theme.fontFamily
+                                        font.pixelSize: Config.Theme.fontSizeNormal
+                                        font.bold: true
+                                        font.capitalization: Font.Capitalize
+                                        color: Config.Theme.accent
                                     }
                                 }
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    onEntered: calendar.hoveredIndex = dayItem.index
-                                    onExited: calendar.hoveredIndex = -1
-                                    acceptedButtons: Qt.NoButton
+                                Components.CalendarIconButton {
+                                    id: nextMonthButton
+                                    icon: "→"
+                                    onClicked: calendar.changeMonth(1)
+                                }
+                            }
+
+                            RowLayout {
+                                id: dayNamesRow
+                                Layout.fillWidth: true
+                                spacing: Config.Theme.spacing
+
+                                DayOfWeekRow {
+                                    id: dayOfWeekRow
+                                    Layout.fillWidth: true
+                                    locale: monthGrid.locale
+
+                                    delegate: Text {
+                                        required property var model
+                                        horizontalAlignment: Text.AlignHCenter
+                                        text: model.shortName
+                                        font.family: Config.Theme.fontFamily
+                                        font.pixelSize: Config.Theme.fontSizeSmall
+                                        font.bold: true
+                                        color: (model.day === 0 || model.day === 6) ? Config.Theme.purple : Config.Theme.accent
+                                    }
+                                }
+                            }
+
+                            RowLayout {
+                                id: calendarGridRow
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                spacing: Config.Theme.spacing
+
+                                // Week numbers column
+                                ColumnLayout {
+                                    id: weekNumbersColumn
+                                    visible: root.showWeekNumbers
+                                    Layout.preferredWidth: 32
+                                    Layout.fillHeight: true
+                                    spacing: Config.Theme.spacing
+
+                                    property var weekNumbers: {
+                                        const weeks = []
+                                        const firstOfMonth = new Date(calendar.viewYear, calendar.viewMonth, 1)
+                                        const lastOfMonth = new Date(calendar.viewYear, calendar.viewMonth + 1, 0)
+                                        const daysInMonth = lastOfMonth.getDate()
+                                        const leading = (firstOfMonth.getDay() - root.firstDayOfWeek + 7) % 7
+                                        const numWeeks = Math.ceil((leading + daysInMonth) / 7)
+                                        for (let i = 0; i < numWeeks; i++) {
+                                            const dayIndex = i * 7 - leading + 1
+                                            const date = new Date(calendar.viewYear, calendar.viewMonth, dayIndex || 1)
+                                            weeks.push(calendar.getISOWeekNumber(date))
+                                        }
+                                        return weeks
+                                    }
+
+                                    Repeater {
+                                        id: weekNumbersRepeater
+                                        model: parent.weekNumbers
+                                        delegate: Item {
+                                            id: itemRoot
+                                            required property var modelData
+                                            Layout.preferredWidth: 32
+                                            Layout.fillHeight: true
+                                            Layout.preferredHeight: Config.Theme.fontSizeNormal + Config.Theme.padding
+
+                                            Text {
+                                                id: weekNumberText
+                                                anchors.centerIn: parent
+                                                text: itemRoot.modelData
+                                                font.family: Config.Theme.fontFamily
+                                                font.pixelSize: Config.Theme.fontSizeXSmall
+                                                color: Qt.alpha(Config.Theme.accent, 0.7)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Month grid (caelestia-style)
+                                MonthGrid {
+                                    id: monthGrid
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    month: calendar.viewMonth
+                                    year: calendar.viewYear
+                                    locale: Qt.locale()
+                                    spacing: Config.Theme.spacing
+
+                                    delegate: Item {
+                                        id: dayDelegate
+                                        required property var model
+
+                                        implicitWidth: implicitHeight
+                                        implicitHeight: dayText.implicitHeight + Config.Theme.padding
+
+                                        readonly property bool isToday: model.today
+                                        readonly property bool inMonth: model.month === monthGrid.month
+                                        readonly property bool isWeekend: {
+                                            const dayOfWeek = model.date.getUTCDay()
+                                            return dayOfWeek === 0 || dayOfWeek === 6
+                                        }
+
+                                        // Today indicator background (caelestia-style)
+                                        Rectangle {
+                                            id: todayIndicator
+                                            anchors.centerIn: parent
+                                            width: dayText.implicitWidth + Config.Theme.padding
+                                            height: dayText.implicitHeight + Config.Theme.padding
+                                            radius: Config.Theme.borderRadius
+                                            color: dayDelegate.isToday ? Config.Theme.accent : "transparent"
+                                            visible: dayDelegate.isToday
+
+                                            Behavior on scale {
+                                                NumberAnimation { duration: Config.Theme.animationNormal; easing.type: Easing.OutCubic }
+                                            }
+                                        }
+
+                                        Text {
+                                            id: dayText
+                                            anchors.centerIn: parent
+                                            horizontalAlignment: Text.AlignHCenter
+                                            text: monthGrid.locale.toString(model.day)
+                                            font.family: Config.Theme.fontFamily
+                                            font.pixelSize: Config.Theme.fontSizeNormal
+                                            font.bold: model.today
+                                            color: {
+                                                if (model.today) return Config.Theme.bg
+                                                if (!dayDelegate.inMonth) return Config.Theme.fgDark
+                                                if (dayDelegate.isWeekend) return Config.Theme.purple
+                                                return Config.Theme.fg
+                                            }
+                                            opacity: dayDelegate.inMonth ? 1 : 0.4
+                                        }
+
+                                        MouseArea {
+                                            id: dayMouseArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            acceptedButtons: Qt.MiddleButton
+                                            onClicked: calendar.resetToToday()
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -331,7 +447,7 @@ Base.BaseWidget {
 
         anchors.centerIn: parent
         anchors.verticalCenterOffset: 1 // Fine tune vertical center
-        spacing: 0
+        spacing: 1
 
         Components.BarText {
             id: timeText
