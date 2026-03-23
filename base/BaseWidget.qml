@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import "../config" as Config
 import "../services" as Services
-
+import "BasePopup.qml"
 Item {
     id: root
 
@@ -15,8 +15,7 @@ Item {
     property bool hasPopup: false
     property bool active: false
     property string tooltipText: ""
-    property var popupComponent: null
-    property var popupInstance: null
+    property BasePopup popupComponent: null
     property bool showBackground: true
     property color containerColor: Config.Theme.widgetBg
 
@@ -33,7 +32,7 @@ Item {
     signal popupClosed()
 
     // Internal
-    property bool _popupOpen: popupInstance !== null && popupInstance.visible
+    property bool _popupOpen: popupLoader.item !== null && popupLoader.item.visible
 
     // Background
     Rectangle {
@@ -104,21 +103,29 @@ Item {
         }
     }
 
+    // Popup Loader
+    Loader {
+        id: popupLoader
+        active: false
+        asynchronous: true
+        sourceComponent: root.popupComponent
+    }
+
     // Methods
     function openPopup(): void {
         if (!root.hasPopup || root.popupComponent === null) return
 
-        if (root.popupInstance === null) {
-            root.popupInstance = root.popupComponent.createObject(root)
+        popupLoader.active = true
+        if (popupLoader.item) {
+            popupLoader.item.open(root)
+            root.popupOpened()
         }
-
-        root.popupInstance.open(root)
-        root.popupOpened()
     }
 
     function closePopup(): void {
-        if (root.popupInstance !== null && root.popupInstance.visible) {
-            root.popupInstance.close()
+        if (popupLoader.item !== null && popupLoader.item.visible) {
+            popupLoader.item.close()
+            popupLoader.active = false
             root.popupClosed()
         }
     }
