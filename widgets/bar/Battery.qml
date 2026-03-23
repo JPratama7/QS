@@ -14,7 +14,6 @@ Base.BaseWidget {
 
         return Services.BatteryService.percentage + "% - " + Services.BatteryService.status;
     }
-    hasPopup: true
     implicitWidth: batteryRow.implicitWidth + (Config.Theme.widgetPadding * 2)
 
     Row {

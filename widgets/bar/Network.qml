@@ -17,7 +17,6 @@ Base.BaseWidget {
 
         return Services.NetworkService.interfaceName;
     }
-    hasPopup: true
     implicitWidth: networkRow.implicitWidth + (Config.Theme.widgetPadding * 2)
 
     popupComponent: Component {

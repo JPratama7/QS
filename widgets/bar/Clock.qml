@@ -20,9 +20,12 @@ Base.BaseWidget {
     property bool showDate: widgetConfig.showDate
     property bool showSeconds: widgetConfig.showSeconds
 
-    hasPopup: true
     tooltipText: Qt.formatDateTime(new Date(), "dddd, MMMM d, yyyy")
     implicitWidth: clockRow.implicitWidth + (Config.Theme.widgetPadding * 2)
+
+    Component.onCompleted: {
+        if (hasPopup) loadPopup()
+    }
 
     popupComponent: Component {
         Base.BasePopup {

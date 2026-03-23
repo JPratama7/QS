@@ -20,7 +20,6 @@ Base.BaseWidget {
         }
         return "Bluetooth: On (No devices)";
     }
-    hasPopup: true
     implicitWidth: bluetoothRow.implicitWidth + (Config.Theme.widgetPadding * 2)
     onClicked: {
         Services.BluetoothService.toggleBluetooth();

@@ -14,7 +14,6 @@ Base.BaseWidget {
 
         return (Services.AudioService.muted ? "Muted" : Services.AudioService.volume.toFixed(0) + "%");
     }
-    hasPopup: true
     implicitWidth: audioRow.implicitWidth + (Config.Theme.widgetPadding * 2)
 
     popupComponent: Component {
