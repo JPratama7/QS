@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import "../../base" as Base
 import "../../components" as Components
 import "../../config" as Config
