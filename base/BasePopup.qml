@@ -36,7 +36,6 @@ PopupWindow {
     color: "transparent"
     visible: false
 
-    property bool useContentSize: false
     property int contentPadding: Config.Theme.padding
 
 
@@ -117,7 +116,15 @@ PopupWindow {
     function close(): void {
         container.popupOpacity = 0
         container.popupScale = 0.9
-        root.visible = false
+        closeTimer.start()
+    }
+
+    Timer {
+        id: closeTimer
+        interval: root.animationDuration
+        onTriggered: {
+            root.visible = false
+        }
     }
 
     // PopupWindow anchor configuration
