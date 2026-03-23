@@ -7,6 +7,17 @@ import "../config" as Config
 PopupWindow {
     id: root
 
+    // Content
+    required property Component contentComponent
+    property Component backgroundComponent: Component {
+            Rectangle {
+                radius: 30
+                color: Config.Theme.popupBg
+                border.width: 1
+                border.color: Config.Theme.popupBorder
+            }
+    }
+
     // Popup Properties
     property var anchorWidget: null
     property int barPosition: Config.Config.position
@@ -25,107 +36,120 @@ PopupWindow {
     color: "transparent"
     visible: false
 
+    property bool useContentSize: false
+    property int contentPadding: Config.Theme.padding
+
+
     // Background with shadow
-    Rectangle {
-        id: background
+    Item {
+        id: container
         anchors.fill: parent
-        radius: Config.Theme.borderRadiusLarge
-        color: Config.Theme.popupBg
-        border.width: 1
-        border.color: Config.Theme.popupBorder
-
-        // Shadow effect
-        layer.enabled: true
-        layer.effect: Item {
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: -Config.Theme.shadowRadius
-                radius: background.radius + Config.Theme.shadowRadius
-                color: Config.Theme.shadowColor
-                opacity: Config.Theme.shadowOpacity
-                z: -1
+        
+        // Animation properties on container Item
+        property real popupOpacity: 1
+        property real popupScale: 1
+        
+        Behavior on popupOpacity {
+            NumberAnimation {
+                duration: root.animationDuration
+                easing.type: Easing.OutCubic
             }
         }
+        
+        Behavior on popupScale {
+            NumberAnimation {
+                duration: root.animationDuration
+                easing.type: Easing.OutCubic
+            }
+        }
+        
+        // Apply transforms
+        transform: [
+            Scale {
+                origin.x: root.popupWidth / 2
+                origin.y: root.popupHeight / 2
+                xScale: container.popupScale
+                yScale: container.popupScale
+            }
+        ]
+        opacity: container.popupOpacity
+        visible: root.visible
 
-        // Content container
-        Item {
-            id: content
+        // Background (optional, customizable)
+        Loader {
+            id: backgroundLoader
             anchors.fill: parent
-            anchors.margins: Config.Theme.paddingLarge
+            z: 0
+            active: root.backgroundComponent !== null
+            sourceComponent: root.backgroundComponent
         }
-    }
 
-    // Close on outside click
-    MouseArea {
-        anchors.fill: parent
-        z: -1
-        onPressed: function(mouse) {
-            if (autoClose) {
-                root.close()
+        // Content
+        Loader {
+            id: contentLoader
+            anchors.fill: parent
+            anchors.margins: 0
+            z: 1
+            sourceComponent: root.contentComponent
+        }
+
+        // Close on outside click
+        MouseArea {
+            anchors.fill: parent
+            z: 100
+            onPressed: function(mouse) {
+                if (root.autoClose) {
+                    root.close()
+                }
             }
-        }
-    }
-
-    // Animation on open/close
-    Behavior on opacity {
-        NumberAnimation {
-            duration: animationDuration
-            easing.type: Easing.OutCubic
-        }
-    }
-
-    Behavior on scale {
-        NumberAnimation {
-            duration: animationDuration
-            easing.type: Easing.OutCubic
         }
     }
 
     // Methods
     function open(widget: var): void {
         anchorWidget = widget
-        reposition()
-        visible = true
-        opacity = 1
-        scale = 1
+        root.visible = true
+        container.popupOpacity = 1
+        container.popupScale = 1
     }
 
     function close(): void {
-        opacity = 0
-        scale = 0.9
-        visible = false
+        container.popupOpacity = 0
+        container.popupScale = 0.9
+        root.visible = false
     }
 
-    function reposition(): void {
-        if (anchorWidget === null) return
-
-        const widgetPos = anchorWidget.mapToItem(null, 0, 0)
-        const barHeight = Config.Config.barSize
-
-        switch (barPosition) {
-            case Config.Config.Position.Top:
-                x = widgetPos.x + (anchorWidget.width / 2) - (popupWidth / 2)
-                y = barHeight + Config.Theme.spacing
-                break
-            case Config.Config.Position.Bottom:
-                x = widgetPos.x + (anchorWidget.width / 2) - (popupWidth / 2)
-                y = -popupHeight - Config.Theme.spacing
-                break
-            case Config.Config.Position.Left:
-                x = barHeight + Config.Theme.spacing
-                y = widgetPos.y + (anchorWidget.height / 2) - (popupHeight / 2)
-                break
-            case Config.Config.Position.Right:
-                x = -popupWidth - Config.Theme.spacing
-                y = widgetPos.y + (anchorWidget.height / 2) - (popupHeight / 2)
-                break
+    // PopupWindow anchor configuration
+    anchor {
+        item: anchorWidget ?? null
+        rect.x: anchorWidget ? (anchorWidget.width / 2) - (popupWidth / 2) : 0
+        rect.y: {
+            if (!anchorWidget) return 0
+            const barHeight = Config.Config.barSize
+            switch (barPosition) {
+                case Config.Config.Position.Top:
+                    return barHeight + Config.Theme.spacing
+                case Config.Config.Position.Bottom:
+                    return -popupHeight - Config.Theme.spacing
+                case Config.Config.Position.Left:
+                    return (anchorWidget.height / 2) - (popupHeight / 2)
+                case Config.Config.Position.Right:
+                    return (anchorWidget.height / 2) - (popupHeight / 2)
+                default:
+                    return barHeight + Config.Theme.spacing
+            }
         }
-
-        // Clamp to screen bounds
-        const screen = anchorWidget.Window.window?.screen
-        if (screen) {
-            x = Math.max(0, Math.min(x, screen.width - popupWidth))
-            y = Math.max(0, Math.min(y, screen.height - popupHeight))
+        edges: {
+            switch (barPosition) {
+                case Config.Config.Position.Left:
+                    return Qt.LeftEdge
+                case Config.Config.Position.Right:
+                    return Qt.RightEdge
+                case Config.Config.Position.Bottom:
+                    return Qt.BottomEdge
+                default:
+                    return Qt.TopEdge
+            }
         }
     }
 }
