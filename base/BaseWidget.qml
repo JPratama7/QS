@@ -5,14 +5,19 @@ import "../services" as Services
 Item {
     id: root
 
+    // Cache Policy Enum
+    enum CachePolicy {
+        NoCache,      // Load on demand, destroy on close
+        LazyCache,    // Load on first open, keep cached
+        EagerCache    // Load immediately, keep cached
+    }
+
     // Layout Properties
     implicitWidth: contentRow.implicitWidth + (Config.Theme.widgetPadding * 2)
     implicitHeight: Config.Theme.componentSize
 
-    // Eager loading flag - widgets can set this to true to load immediately
-    // This is useful for widgets that need to be available before the bar is fully initialized
-    // Default is false to optimize performance by loading widgets on demand
-    property bool eagerLoad: false
+    // Popup caching policy - controls when popup is loaded and destroyed
+    property int cachePolicy: BaseWidget.CachePolicy.NoCache
 
     // Widget State
     property bool expanded: false
@@ -40,7 +45,6 @@ Item {
 
     // Internal
     property bool _popupOpen: popupLoader.item !== null && (popupLoader.item ? popupLoader.item.visible : false)
-    property bool _popupDestroyed: false  // Track if popup was manually destroyed
     property bool _pendingOpen: false  // Track if we're waiting to open popup after load
 
     // Background
@@ -115,7 +119,7 @@ Item {
     // Popup Loader
     Loader {
         id: popupLoader
-        active: root.eagerLoad
+        active: root.cachePolicy === BaseWidget.CachePolicy.EagerCache
         asynchronous: true
         sourceComponent: root.popupComponent
 
@@ -131,9 +135,8 @@ Item {
     // Methods
     function openPopup(): void {
         if (!root.hasPopup) return
-        if (root._popupDestroyed) return  // Don't auto-load if destroyed
 
-        popupLoader.active = true
+        root.loadPopup()
         if (popupLoader.item) {
             popupLoader.item.open(root)
             root.popupOpened()
@@ -145,26 +148,22 @@ Item {
 
     function loadPopup(): void {
         if (!root.hasPopup) return
-        root._popupDestroyed = false
         popupLoader.active = true
     }
 
     function destroyPopup(): void {
-        console.log("Destroying popup, item:", popupLoader.item)
-        root.closePopup()
-        root._popupDestroyed = true
+        console.log("Popup Destroyed for widget: " + root.objectName)
         popupLoader.active = false
-        console.log("After destroy - active:", popupLoader.active, "item:", popupLoader.item)
     }
 
     function closePopup(): void {
-        if (popupLoader.item !== null && popupLoader.item.visible) {
+        if (popupLoader.item?.visible) {
             popupLoader.item.close()
             root.popupClosed()
         }
 
-        if (!root.eagerLoad) {
-            popupLoader.active = false
+        if (root.cachePolicy === BaseWidget.CachePolicy.NoCache) {
+            root.destroyPopup()
         }
     }
 
