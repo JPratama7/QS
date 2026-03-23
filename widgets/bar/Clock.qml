@@ -7,6 +7,7 @@ import QtQuick.Layouts
 
 Base.BaseWidget {
     id: root
+    objectName: "Clock"
 
     // Fetch values from Config or fallback to defaults
     property var widgetConfig: Config.Config.getWidgetConfig("clock", {
@@ -20,12 +21,11 @@ Base.BaseWidget {
     property bool showDate: widgetConfig.showDate
     property bool showSeconds: widgetConfig.showSeconds
 
+    // Eagerly cache the calendar popup for instant response
+    cachePolicy: Base.BaseWidget.CachePolicy.EagerCache
+
     tooltipText: Qt.formatDateTime(new Date(), "dddd, MMMM d, yyyy")
     implicitWidth: clockRow.implicitWidth + (Config.Theme.widgetPadding * 2)
-
-    Component.onCompleted: {
-        if (hasPopup) loadPopup()
-    }
 
     popupComponent: Component {
         Base.BasePopup {
