@@ -6,6 +6,7 @@ import "../config" as Config
 
 PopupWindow {
     id: root
+    objectName: "Tooltip"
 
     // Content properties
     property string text: ""

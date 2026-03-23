@@ -4,6 +4,7 @@ import "../config" as Config
 
 Item {
     id: root
+    objectName: "BarToggle"
 
     property bool checked: false
     property color checkedColor: Config.Theme.accent

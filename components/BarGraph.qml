@@ -4,6 +4,7 @@ import "../config" as Config
 
 Item {
     id: root
+    objectName: "BarGraph"
 
     property var values: []  // Array of values for the graph
     property int maxPoints: 30

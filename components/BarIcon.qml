@@ -4,6 +4,7 @@ import "../config" as Config
 
 Item {
     id: root
+    objectName: "BarIcon"
 
     property string icon: ""
     property color color: Config.Theme.fg

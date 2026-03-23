@@ -4,6 +4,7 @@ import "../config" as Config
 
 Item {
     id: root
+    objectName: "BarProgress"
 
     property real value: 0.5
     property real minValue: 0

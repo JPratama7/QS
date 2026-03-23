@@ -4,6 +4,7 @@ import "../config" as Config
 
 Rectangle {
     id: root
+    objectName: "CalendarIconButton"
 
     property string icon: ""
     property bool hovering: false

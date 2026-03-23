@@ -4,6 +4,7 @@ import "../config" as Config
 
 Item {
     id: root
+    objectName: "BarTooltip"
 
     property string text: ""
     property bool visible: false

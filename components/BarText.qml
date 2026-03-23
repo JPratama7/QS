@@ -4,6 +4,7 @@ import "../config" as Config
 
 Item {
     id: root
+    objectName: "BarText"
 
     property string text: ""
     property color color: Config.Theme.fg

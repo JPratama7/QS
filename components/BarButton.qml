@@ -5,6 +5,7 @@ import "../base" as Base
 
 Base.BaseComponent {
     id: root
+    objectName: "BarButton"
 
     property string icon: ""
     property string text: ""

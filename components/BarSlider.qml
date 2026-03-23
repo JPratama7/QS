@@ -4,6 +4,7 @@ import "../config" as Config
 
 Item {
     id: root
+    objectName: "BarSlider"
 
     property real value: 0.5
     property real minValue: 0
