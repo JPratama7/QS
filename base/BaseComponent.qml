@@ -16,7 +16,7 @@ Item {
     property color backgroundActive: Config.Theme.widgetBgActive
 
     // State Properties
-    property bool hovered: hoverHandler.containsMouse ?? false
+    property bool hovered: hoverHandler.hovered ?? false
     property bool pressed: pressHandler.pressed ?? false
     property bool disabled: false
     property bool active: false
@@ -38,6 +38,8 @@ Item {
         if (hovered) return backgroundHover
         return background
     }
+    
+    readonly property real _opacityDisable:  Config.Theme.opacityDisabled 
 
     // Background Rectangle
     Rectangle {
@@ -84,33 +86,19 @@ Item {
         }
     }
 
-    // Update scale based on state
-    states: [
-        State {
-            name: "hovered"
-            when: root.hovered && !root.pressed && !root.disabled
-            PropertyChanges {
-                target: root
-                scale: root.scaleOnHover
-            }
-        },
-        State {
-            name: "pressed"
-            when: root.pressed && !root.disabled
-            PropertyChanges {
-                target: root
-                scale: root.scaleOnPress
-            }
-        },
-        State {
-            name: "disabled"
-            when: root.disabled
-            PropertyChanges {
-                target: root
-                opacity: Config.Theme.opacityDisabled
-            }
-        }
-    ]
+    // Scale binding (animated via Behavior on scale)
+    Binding on scale {
+        when: !root.disabled
+        value: root.pressed ? root.scaleOnPress : (root.hovered ? root.scaleOnHover : 1.0)
+        restoreMode: Binding.RestoreBinding
+    }
+
+    // Opacity binding for disabled state
+    Binding on opacity {
+        when: root.disabled
+        value: root._opacityDisable
+        restoreMode: Binding.RestoreBinding
+    }
 
     // Helper Methods
     function animateTo(target: var, property: string, value: var): void {
