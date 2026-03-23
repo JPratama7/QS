@@ -97,8 +97,9 @@ PopupWindow {
         MouseArea {
             anchors.fill: parent
             z: 100
-            onPressed: function(mouse) {
-                if (root.autoClose) {
+            propagateComposedEvents: true
+            onReleased: function(mouse) {
+                if (root.autoClose && !mouse.accepted) {
                     root.close()
                 }
             }
