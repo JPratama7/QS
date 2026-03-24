@@ -13,7 +13,7 @@ Base.BasePopup {
     // Override contentPadding to remove popup padding
     contentPadding: 0
 
-    property var trayItem: null
+    property SystemTrayItem trayItem: null
     property var anchorItem: null
     property var menu: trayItem?.menu || null
     property real anchorX: 0
@@ -149,7 +149,7 @@ Base.BasePopup {
                 height: menuItem.modelData?.isBackButton ? 28 : (menuItem.modelData?.isSeparator ? 8 : 28)
                 color: itemMouseArea.containsMouse ? Config.Theme.widgetBgHover : "transparent"
                 radius: 0
-                visible: !menuItem.modelData?.isSeparator
+                visible: true
 
                 // Back button content
                 Row {
@@ -229,21 +229,10 @@ Base.BasePopup {
                                 menuStack.pop();
                             } else if (menuItem.modelData.hasChildren) {
                                 try {
-                                    // Safe access to children with comprehensive null checks
-                                    let subItems = [];
-                                    if (menuItem.modelData.children) {
-                                        if (menuItem.modelData.children.values && typeof menuItem.modelData.children.values === 'object') {
-                                            subItems = [...menuItem.modelData.children.values];
-                                        } else if (Array.isArray(menuItem.modelData.children)) {
-                                            subItems = [...menuItem.modelData.children];
-                                        }
-                                    }
-                                    
                                     const subMenuInstance = subMenuComponent.createObject(menuStack, {
                                         handle: menuItem.modelData,
                                         isSubMenu: true
                                     });
-                                    
                                     if (subMenuInstance) {
                                         menuStack.push(subMenuInstance);
                                     } else {
@@ -253,17 +242,16 @@ Base.BasePopup {
                                     console.error("Error creating submenu:", error, "for item:", menuItem.modelData);
                                 }
                             } else {
-                                // Safe trigger of menu item action
-                                try {
-                                    if (typeof menuItem.modelData.triggered === 'function') {
+                                // Only trigger for regular menu items (not submenus)
+                                if (menuItem.modelData && !menuItem.modelData.isSeparator && !menuItem.modelData.hasChildren) {
+                                    try {
                                         menuItem.modelData.triggered();
-                                    } else {
-                                        console.warn("Menu item triggered is not a function:", menuItem.modelData);
+                                    } catch (error) {
+                                        console.error("Error triggering menu item:", error);
                                     }
-                                } catch (error) {
-                                    console.error("Error triggering menu item:", error, "for item:", menuItem.modelData);
                                 }
-                                root.hideMenu();
+                                // Use visible=false instead of close() to avoid QEventLoop crash
+                                root.close();
                             }
                         }
                     }
