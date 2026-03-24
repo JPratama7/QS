@@ -153,7 +153,6 @@ Item {
     }
 
     function destroyPopup(): void {
-        console.log("Popup Destroyed for widget: " + root.objectName)
         popupLoader.active = false
     }
 
