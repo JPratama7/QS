@@ -77,7 +77,7 @@ Singleton {
     // Layout Configuration - Bind to StateStore with fallback defaults
     property var layoutLeft: root.storeConfig?.layoutLeft ?? ["workspaces", "windowTitle"]
     property var layoutCenter: root.storeConfig?.layoutCenter ?? []
-    property var layoutRight: root.storeConfig?.layoutRight ?? ["systemMonitor", "network", "bluetooth", "battery", "audio", "brightness", "nightShift", "caffeine", "clock"]
+    property var layoutRight: root.storeConfig?.layoutRight ?? ["systemMonitor", "network", "bluetooth", "battery", "audio", "brightness", "nightShift", "caffeine", "tray", "clock"]
 
     // Layout helper object for compatibility
     readonly property var layout: ({
