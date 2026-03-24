@@ -11,3 +11,7 @@ NightShift 1.0 NightShift.qml
 SystemMonitor 1.0 SystemMonitor.qml
 WindowTitle 1.0 WindowTitle.qml
 Workspaces 1.0 Workspaces.qml
+Tray 1.0 Tray.qml
+TrayItem 1.0 TrayItem.qml
+TrayDrawerPanel 1.0 TrayDrawerPanel.qml
+TrayMenu 1.0 TrayMenu.qml
