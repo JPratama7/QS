@@ -82,6 +82,7 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+        propagateComposedEvents: true
 
         onClicked: function(mouse) {
             if (mouse.button === Qt.LeftButton) {
