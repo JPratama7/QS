@@ -43,10 +43,18 @@ PopupWindow {
     Item {
         id: container
         anchors.fill: parent
+
+        focus: true
         
         // Animation properties on container Item
         property real popupOpacity: 1
         property real popupScale: 1
+
+        Keys.onEscapePressed: {
+            if (root.autoClose) {
+                root.close()
+            }
+        }
         
         Behavior on popupOpacity {
             NumberAnimation {
@@ -96,9 +104,9 @@ PopupWindow {
         MouseArea {
             anchors.fill: parent
             z: 100
-            propagateComposedEvents: true
-            onReleased: function(mouse) {
-                if (root.autoClose && !mouse.accepted) {
+            enabled: root.visible
+            onClicked: function(mouse) {
+                if (root.autoClose) {
                     root.close()
                 }
             }
@@ -109,6 +117,7 @@ PopupWindow {
     function open(widget: var): void {
         anchorWidget = widget
         root.visible = true
+        container.forceActiveFocus()  // Add this
         container.popupOpacity = 1
         container.popupScale = 1
     }
