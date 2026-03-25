@@ -19,6 +19,8 @@ Item {
     // Popup caching policy - controls when popup is loaded and destroyed
     property int cachePolicy: BaseWidget.CachePolicy.NoCache
 
+    property real scaling: 1.0
+
     // Widget State
     property bool expanded: false
     property bool active: false
