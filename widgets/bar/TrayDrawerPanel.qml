@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 
+import "../../types/widgets/bar" as BarTypes
 import QtQuick
 import Quickshell
 import Quickshell.Services.SystemTray
@@ -11,13 +12,14 @@ import "../../services" as Services
 Base.BasePopup {
     id: root
 
+    required property BarTypes.Sizes sizes
     property var drawerItems: []
     signal itemMenuRequested(item: var, anchor: Item)
 
     popupWidth: columnWidth + (Config.Theme.padding * 2)
     popupHeight: columnHeight + (Config.Theme.padding * 2)
 
-    readonly property int cellSize: Config.Theme.iconSize + Config.Theme.padding
+    readonly property int cellSize: root.sizes.icon + Config.Theme.padding
     readonly property int itemsPerRow: 1
     readonly property int rows: drawerItems.length
     readonly property int columnWidth: cellSize
@@ -56,8 +58,8 @@ Base.BasePopup {
                 IconImage {
                     id: iconImage
                     anchors.centerIn: parent
-                    width: Config.Theme.iconSize
-                    height: Config.Theme.iconSize
+                    width: root.sizes.icon
+                    height: root.sizes.icon
                     asynchronous: true
 
                     source: {

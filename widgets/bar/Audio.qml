@@ -1,4 +1,6 @@
 pragma ComponentBehavior: Bound
+
+import "../../types/widgets/bar" as BarTypes
 import "../../base" as Base
 import "../../components" as Components
 import "../../config" as Config
@@ -8,6 +10,8 @@ import QtQuick
 Base.BaseWidget {
     id: root
     objectName: "Audio"
+
+    required property BarTypes.Sizes sizes
 
     tooltipText: {
         if (!Services.AudioService.available)
@@ -29,7 +33,7 @@ Base.BaseWidget {
                 Text {
                     text: "Audio"
                     font.family: Config.Theme.fontFamily
-                    font.pixelSize: Config.Theme.fontSizeLarge
+                    font.pixelSize: root.sizes.textLarge
                     font.bold: true
                     color: Config.Theme.fg
                 }
@@ -44,14 +48,14 @@ Base.BaseWidget {
                         Components.BarIcon {
                             icon: Services.AudioService.getIcon()
                             color: Services.AudioService.getColor()
-                            size: Config.Theme.iconSizeLarge
+                            size: root.sizes.iconLarge
                         }
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: Services.AudioService.muted ? "Muted" : Services.AudioService.volume.toFixed(0) + "%"
                             font.family: Config.Theme.fontFamily
-                            font.pixelSize: Config.Theme.fontSizeNormal
+                            font.pixelSize: root.sizes.text
                             color: Config.Theme.fg
                         }
                     }
@@ -98,14 +102,14 @@ Base.BaseWidget {
             anchors.verticalCenter: parent.verticalCenter
             icon: Services.AudioService.getIcon()
             color: Services.AudioService.getColor()
-            size: Config.Theme.iconSize
+            size: root.sizes.icon
         }
 
         Components.BarText {
             anchors.verticalCenter: parent.verticalCenter
             text: Services.AudioService.volume.toFixed(0) + "%"
             color: Config.Theme.fg
-            fontSize: Config.Theme.fontSizeSmall
+            fontSize: root.sizes.textSmall
             visible: Services.AudioService.available && !Services.AudioService.muted
         }
 

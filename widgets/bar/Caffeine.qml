@@ -1,6 +1,9 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell.Io
+
+
+import "../../types/widgets/bar" as BarTypes
 import "../../config" as Config
 import "../../base" as Base
 import "../../components" as Components
@@ -9,6 +12,8 @@ import "../../services" as Services
 Base.BaseWidget {
     id: root
     objectName: "Caffeine"
+
+    required property BarTypes.Sizes sizes
 
     // Shorthand reference to StateStore path (may be undefined during init)
     readonly property var config: Services.StateStore.widgets?.bar?.caffeine || null
@@ -36,7 +41,7 @@ Base.BaseWidget {
         anchors.centerIn: parent
         icon: root.caffeineActive ? "󰅪" : "󰅩"
         color: root.caffeineActive ? Config.Theme.bgDark : Config.Theme.fg
-        size: Config.Theme.iconSize
+        size: root.sizes.icon
     }
 
     onClicked: {

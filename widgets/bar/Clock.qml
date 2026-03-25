@@ -1,4 +1,6 @@
 pragma ComponentBehavior: Bound
+
+import "../../types/widgets/bar" as BarTypes
 import "../../base" as Base
 import "../../components" as Components
 import "../../config" as Config
@@ -9,6 +11,8 @@ import QtQuick.Layouts
 Base.BaseWidget {
     id: root
     objectName: "Clock"
+
+    required property BarTypes.Sizes sizes
 
     // Fetch values from Config or fallback to defaults
     property var widgetConfig: Config.Config.getWidgetConfig("clock", {
@@ -146,7 +150,7 @@ Base.BaseWidget {
                                     Layout.alignment: Qt.AlignHCenter
                                     text: calendar.today.getDate()
                                     font.family: Config.Theme.fontFamily
-                                    font.pixelSize: Config.Theme.fontSizeXLarge * 1.8
+                                    font.pixelSize: root.sizes.textXLarge * 1.8
                                     font.bold: true
                                     color: Config.Theme.bg
                                 }
@@ -160,7 +164,7 @@ Base.BaseWidget {
                                         id: monthNameText
                                         text: Qt.locale().standaloneMonthName(calendar.today.getMonth(), Locale.LongFormat).toUpperCase()
                                         font.family: Config.Theme.fontFamily
-                                        font.pixelSize: Config.Theme.fontSizeLarge
+                                        font.pixelSize: root.sizes.textLarge
                                         font.bold: true
                                         color: Config.Theme.bg
                                     }
@@ -169,7 +173,7 @@ Base.BaseWidget {
                                         id: yearText
                                         text: calendar.today.getFullYear()
                                         font.family: Config.Theme.fontFamily
-                                        font.pixelSize: Config.Theme.fontSizeNormal
+                                        font.pixelSize: root.sizes.text
                                         font.bold: true
                                         color: Qt.alpha(Config.Theme.bg, 0.7)
                                     }
@@ -195,7 +199,7 @@ Base.BaseWidget {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: Qt.formatTime(calendar.currentTime, "hh:mm:ss")
                                     font.family: Config.Theme.fontFamily
-                                    font.pixelSize: Config.Theme.fontSizeXLarge * 1.8
+                                    font.pixelSize: root.sizes.textXLarge * 1.8
                                     font.bold: true
                                     color: Config.Theme.bg
                                 }
@@ -205,7 +209,7 @@ Base.BaseWidget {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: Qt.formatTime(calendar.currentTime, "AP")
                                     font.family: Config.Theme.fontFamily
-                                    font.pixelSize: Config.Theme.fontSizeNormal
+                                    font.pixelSize: root.sizes.text
                                     font.bold: true
                                     color: Qt.alpha(Config.Theme.bg, 0.8)
                                 }
@@ -272,7 +276,7 @@ Base.BaseWidget {
                                         anchors.centerIn: parent
                                         text: calendar.monthLabel()
                                         font.family: Config.Theme.fontFamily
-                                        font.pixelSize: Config.Theme.fontSizeNormal
+                                        font.pixelSize: root.sizes.text
                                         font.bold: true
                                         font.capitalization: Font.Capitalize
                                         color: Config.Theme.accent
@@ -301,7 +305,7 @@ Base.BaseWidget {
                                         horizontalAlignment: Text.AlignHCenter
                                         text: model.shortName
                                         font.family: Config.Theme.fontFamily
-                                        font.pixelSize: Config.Theme.fontSizeSmall
+                                        font.pixelSize: root.sizes.textSmall
                                         font.bold: true
                                         color: (model.day === 0 || model.day === 6) ? Config.Theme.purple : Config.Theme.accent
                                     }
@@ -345,14 +349,14 @@ Base.BaseWidget {
                                             required property var modelData
                                             Layout.preferredWidth: 32
                                             Layout.fillHeight: true
-                                            Layout.preferredHeight: Config.Theme.fontSizeNormal + Config.Theme.padding
+                                            Layout.preferredHeight: Config.Config.textSize + Config.Theme.padding
 
                                             Text {
                                                 id: weekNumberText
                                                 anchors.centerIn: parent
                                                 text: itemRoot.modelData
                                                 font.family: Config.Theme.fontFamily
-                                                font.pixelSize: Config.Theme.fontSizeXSmall
+                                                font.pixelSize: root.sizes.textXSmall
                                                 color: Qt.alpha(Config.Theme.accent, 0.7)
                                             }
                                         }
@@ -404,7 +408,7 @@ Base.BaseWidget {
                                             horizontalAlignment: Text.AlignHCenter
                                             text: monthGrid.locale.toString(model.day)
                                             font.family: Config.Theme.fontFamily
-                                            font.pixelSize: Config.Theme.fontSizeNormal
+                                            font.pixelSize: root.sizes.text
                                             font.bold: model.today
                                             color: {
                                                 if (model.today) return Config.Theme.bg
@@ -454,7 +458,7 @@ Base.BaseWidget {
 
             text: Qt.formatDateTime(new Date(), root.timeFormat)
             color: Config.Theme.warning
-            fontSize: Config.Theme.fontSizeSmall
+            fontSize: root.sizes.textSmall
             bold: true
             anchors.horizontalCenter: parent.horizontalCenter
         }
@@ -464,7 +468,7 @@ Base.BaseWidget {
 
             text: Qt.formatDateTime(new Date(), root.dateFormat)
             color: Config.Theme.warning
-            fontSize: Config.Theme.fontSizeXSmall
+            fontSize: root.sizes.textXSmall
             visible: root.showDate
             anchors.horizontalCenter: parent.horizontalCenter
         }

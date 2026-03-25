@@ -163,14 +163,14 @@ Base.BasePopup {
                     Text {
                         text: "◀"
                         color: Config.Theme.fg
-                        font.pixelSize: Config.Theme.fontSizeSmall
+                        font.pixelSize: Config.Config.textSizeSmall
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Text {
                         text: "Back"
                         color: Config.Theme.fg
-                        font.pixelSize: Config.Theme.fontSizeSmall
+                        font.pixelSize: Config.Config.textSizeSmall
                         font.family: Config.Theme.fontFamily
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -195,14 +195,14 @@ Base.BasePopup {
                         visible: menuItem.modelData?.checkState !== Qt.Unchecked
                         text: menuItem.modelData?.checkState === Qt.Checked ? "✓" : "○"
                         color: Config.Theme.fg
-                        font.pixelSize: Config.Theme.fontSizeSmall
+                        font.pixelSize: Config.Config.textSizeSmall
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Text {
                         text: menuItem.modelData?.text || ""
                         color: menuItem.modelData?.enabled ? Config.Theme.fg : Config.Theme.fgMuted
-                        font.pixelSize: Config.Theme.fontSizeSmall
+                        font.pixelSize: Config.Config.textSizeSmall
                         font.family: Config.Theme.fontFamily
                         elide: Text.ElideRight
                         anchors.verticalCenter: parent.verticalCenter
@@ -212,7 +212,7 @@ Base.BasePopup {
                         visible: menuItem.modelData?.hasChildren ?? false
                         text: " ▶"
                         color: Config.Theme.fgDark
-                        font.pixelSize: Config.Theme.fontSizeSmall
+                        font.pixelSize: Config.Config.textSizeSmall
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }

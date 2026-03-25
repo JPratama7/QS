@@ -1,4 +1,5 @@
 pragma ComponentBehavior: Bound
+import "../../types/widgets/bar" as BarTypes
 import "../../base" as Base
 import "../../components" as Components
 import "../../config" as Config
@@ -8,6 +9,8 @@ import Quickshell.Wayland
 Base.BaseWidget {
     id: root
     objectName: "WindowTitle"
+
+    required property BarTypes.Sizes sizes
 
     property int maxWidth: 200
     property bool showAppName: true
@@ -32,7 +35,7 @@ Base.BaseWidget {
             return title;
         }
         color: Config.Theme.fg
-        fontSize: Config.Theme.fontSizeNormal
+        fontSize: root.sizes.text
         maxWidth: root.maxWidth - (Config.Theme.widgetPadding * 2)
     }
 

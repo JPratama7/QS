@@ -1,4 +1,5 @@
 pragma ComponentBehavior: Bound
+import "../../types/widgets/bar" as BarTypes
 import "../../base" as Base
 import "../../components" as Components
 import "../../config" as Config
@@ -8,6 +9,8 @@ import QtQuick
 Base.BaseWidget {
     id: root
     objectName: "SystemMonitor"
+
+    required property BarTypes.Sizes sizes
 
     property bool showGraph: false
     property bool showTemp: true
@@ -28,7 +31,7 @@ Base.BaseWidget {
                 Text {
                     text: "System Monitor"
                     font.family: Config.Theme.fontFamily
-                    font.pixelSize: Config.Theme.fontSizeLarge
+                    font.pixelSize: root.sizes.textLarge
                     font.bold: true
                     color: Config.Theme.fg
                 }
@@ -43,13 +46,13 @@ Base.BaseWidget {
                         Components.BarIcon {
                             icon: "󰻠"
                             color: Config.Theme.graphCpu
-                            size: Config.Theme.iconSize
+                            size: root.sizes.icon
                         }
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: "CPU: " + Services.SystemService.cpuUsage.toFixed(1) + "%"
                             font.family: Config.Theme.fontFamily
-                            font.pixelSize: Config.Theme.fontSizeNormal
+                            font.pixelSize: root.sizes.text
                             color: Config.Theme.fg
                         }
                     }
@@ -73,13 +76,13 @@ Base.BaseWidget {
                         Components.BarIcon {
                             icon: "󰍛"
                             color: Config.Theme.graphRam
-                            size: Config.Theme.iconSize
+                            size: root.sizes.icon
                         }
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: "RAM: " + Services.SystemService.ramUsage.toFixed(1) + "% (" + Services.SystemService.formatBytes(Services.SystemService.ramUsed * 1024) + " / " + Services.SystemService.formatBytes(Services.SystemService.ramTotal * 1024) + ")"
                             font.family: Config.Theme.fontFamily
-                            font.pixelSize: Config.Theme.fontSizeNormal
+                            font.pixelSize: root.sizes.text
                             color: Config.Theme.fg
                         }
                     }
@@ -99,13 +102,13 @@ Base.BaseWidget {
                     Components.BarIcon {
                         icon: "󰔏"
                         color: Services.SystemService.cpuTemp > 70 ? Config.Theme.error : Config.Theme.graphTemp
-                        size: Config.Theme.iconSize
+                        size: root.sizes.icon
                     }
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: "Temp: " + Services.SystemService.formatTemp(Services.SystemService.cpuTemp)
                         font.family: Config.Theme.fontFamily
-                        font.pixelSize: Config.Theme.fontSizeNormal
+                        font.pixelSize: root.sizes.text
                         color: Config.Theme.fg
                     }
                 }
@@ -128,14 +131,14 @@ Base.BaseWidget {
                 anchors.verticalCenter: parent.verticalCenter
                 icon: "󰓅" // CPU icon
                 color: Config.Theme.warning
-                size: Config.Theme.iconSize
+                size: root.sizes.icon
             }
 
             Components.BarText {
                 anchors.verticalCenter: parent.verticalCenter
                 text: Services.SystemService.cpuUsage.toFixed(1) + "%"
                 color: Config.Theme.warning
-                fontSize: Config.Theme.fontSizeSmall
+                fontSize: root.sizes.textSmall
                 visible: root.showPercent
             }
 
@@ -151,14 +154,14 @@ Base.BaseWidget {
                 anchors.verticalCenter: parent.verticalCenter
                 icon: "󰔏" // Temp icon
                 color: Config.Theme.warning
-                size: Config.Theme.iconSize
+                size: root.sizes.icon
             }
 
             Components.BarText {
                 anchors.verticalCenter: parent.verticalCenter
                 text: Services.SystemService.formatTemp(Services.SystemService.cpuTemp)
                 color: Config.Theme.warning
-                fontSize: Config.Theme.fontSizeSmall
+                fontSize: root.sizes.textSmall
             }
 
         }
@@ -172,14 +175,14 @@ Base.BaseWidget {
                 anchors.verticalCenter: parent.verticalCenter
                 icon: "󰍛" // RAM icon
                 color: Config.Theme.warning
-                size: Config.Theme.iconSize
+                size: root.sizes.icon
             }
 
             Components.BarText {
                 anchors.verticalCenter: parent.verticalCenter
                 text: (Services.SystemService.ramUsage / 100 * 16).toFixed(1) + "G"
                 color: Config.Theme.warning
-                fontSize: Config.Theme.fontSizeSmall
+                fontSize: root.sizes.textSmall
                 visible: root.showPercent
             }
 

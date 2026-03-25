@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 
+import "../../types/widgets/bar" as BarTypes
 import QtQuick
 import Quickshell.Hyprland
 import "../../config" as Config
@@ -9,6 +10,8 @@ import "../../components" as Components
 Base.BaseWidget {
     id: root
     objectName: "Workspaces"
+
+    required property BarTypes.Sizes sizes
 
     // Fetch values from Config or fallback to defaults
     property var widgetConfig: Config.Config.getWidgetConfig("workspaces", {

@@ -1,4 +1,6 @@
 pragma ComponentBehavior: Bound
+
+import "../../types/widgets/bar" as BarTypes
 import "../../base" as Base
 import "../../components" as Components
 import "../../config" as Config
@@ -8,6 +10,8 @@ import QtQuick
 Base.BaseWidget {
     id: root
     objectName: "Network"
+
+    required property BarTypes.Sizes sizes
 
     tooltipText: {
         if (!Services.NetworkService.connected)
@@ -32,7 +36,7 @@ Base.BaseWidget {
                 Text {
                     text: "Network"
                     font.family: Config.Theme.fontFamily
-                    font.pixelSize: Config.Theme.fontSizeLarge
+                    font.pixelSize: root.sizes.textLarge
                     font.bold: true
                     color: Config.Theme.fg
                 }
@@ -59,7 +63,7 @@ Base.BaseWidget {
                                 Components.BarIcon {
                                     icon: modelData.isWifi ? Services.NetworkService.getSignalIcon(Services.NetworkService.signalStrength) : Services.NetworkService.getEthernetIcon()
                                     color: Config.Theme.cyan
-                                    size: Config.Theme.iconSizeLarge
+                                    size: root.sizes.iconLarge
                                 }
 
                                 Column {
@@ -67,13 +71,13 @@ Base.BaseWidget {
                                     Text {
                                         text: modelData.connection || modelData.device
                                         font.family: Config.Theme.fontFamily
-                                        font.pixelSize: Config.Theme.fontSizeNormal
+                                        font.pixelSize: root.sizes.text
                                         color: Config.Theme.fg
                                     }
                                     Text {
                                         text: modelData.type.toUpperCase()
                                         font.family: Config.Theme.fontFamily
-                                        font.pixelSize: Config.Theme.fontSizeSmall
+                                        font.pixelSize: root.sizes.textSmall
                                         color: Config.Theme.fgDark
                                     }
                                 }
@@ -87,7 +91,7 @@ Base.BaseWidget {
                     visible: !Services.NetworkService.connected
                     text: "No active connections"
                     font.family: Config.Theme.fontFamily
-                    font.pixelSize: Config.Theme.fontSizeNormal
+                    font.pixelSize: root.sizes.text
                     color: Config.Theme.fgMuted
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -115,14 +119,14 @@ Base.BaseWidget {
                 return Services.NetworkService.getEthernetIcon();
             }
             color: Services.NetworkService.connected ? Config.Theme.cyan : Config.Theme.fgMuted
-            size: Config.Theme.iconSize
+            size: root.sizes.icon
         }
 
         Components.BarText {
             anchors.verticalCenter: parent.verticalCenter
             text: Services.NetworkService.ssid || Services.NetworkService.interfaceName
             color: Config.Theme.fg
-            fontSize: Config.Theme.fontSizeSmall
+            fontSize: root.sizes.textSmall
             visible: Services.NetworkService.connected && text !== ""
         }
 

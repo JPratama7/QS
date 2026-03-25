@@ -1,4 +1,6 @@
 pragma ComponentBehavior: Bound
+
+import "../../types/widgets/bar" as BarTypes
 import QtQuick
 import QtQuick.Layouts
 import "../../config" as Config
@@ -9,6 +11,18 @@ Item {
     objectName: "Bar"
 
     required property var screen
+
+    // Sizes configuration passed to widgets
+    readonly property BarTypes.Sizes sizes: BarTypes.Sizes {
+        icon: Config.Config.iconSize
+        iconLarge: Config.Config.iconSizeLarge
+        iconSmall: Config.Config.iconSizeSmall
+        text: Config.Config.textSize
+        textSmall: Config.Config.textSizeSmall
+        textLarge: Config.Config.textSizeLarge
+        textXLarge: Config.Config.textSizeXLarge
+        textXSmall: Config.Config.textSizeXSmall
+    }
 
     anchors.fill: parent
     anchors.margins: Config.Theme.barPadding
@@ -24,9 +38,15 @@ Item {
             bgColor: loader.item ? loader.item.containerColor : Config.Theme.widgetBg
 
             Loader {
+                asynchronous: true
+                visible: status == Loader.Ready
+                
                 id: loader
 
-                source: delegateRoot.modelData.charAt(0).toUpperCase() + delegateRoot.modelData.slice(1) + ".qml"
+                Component.onCompleted: {
+                    const widgetName = delegateRoot.modelData.charAt(0).toUpperCase() + delegateRoot.modelData.slice(1);
+                    loader.setSource(widgetName + ".qml", { sizes: barContent.sizes });
+                }
                 onLoaded: {
                     if (item.hasOwnProperty("showBackground"))
                         item.showBackground = false;

@@ -1,4 +1,6 @@
 pragma ComponentBehavior: Bound
+
+import "../../types/widgets/bar" as BarTypes
 import "../../base" as Base
 import "../../components" as Components
 import "../../config" as Config
@@ -8,6 +10,8 @@ import QtQuick
 Base.BaseWidget {
     id: root
     objectName: "Battery"
+
+    required property BarTypes.Sizes sizes
 
     tooltipText: {
         if (!Services.BatteryService.available)
@@ -27,14 +31,14 @@ Base.BaseWidget {
             anchors.verticalCenter: parent.verticalCenter
             icon: Services.BatteryService.getIcon()
             color: Services.BatteryService.getColor()
-            size: Config.Theme.iconSize
+            size: root.sizes.icon
         }
 
         Components.BarText {
             anchors.verticalCenter: parent.verticalCenter
             text: Services.BatteryService.percentage + "%"
             color: Config.Theme.fg
-            fontSize: Config.Theme.fontSizeSmall
+            fontSize: root.sizes.textSmall
             visible: Services.BatteryService.available
         }
 

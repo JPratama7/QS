@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 
+import "../../types/widgets/bar" as BarTypes
 import QtQuick
 import Quickshell
 import Quickshell.Services.SystemTray
@@ -10,11 +11,12 @@ import "../../services" as Services
 Item {
     id: root
 
+    required property BarTypes.Sizes sizes
     required property SystemTrayItem modelData
     property bool showTooltip: true
 
-    implicitWidth: Config.Theme.iconSize
-    implicitHeight: Config.Theme.iconSize
+    implicitWidth: root.sizes.icon
+    implicitHeight: root.sizes.icon
 
     IconImage {
         id: iconImage

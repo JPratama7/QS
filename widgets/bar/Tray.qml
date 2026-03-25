@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 
+import "../../types/widgets/bar" as BarTypes
 import QtQuick
 import Quickshell.Services.SystemTray
 import "../../base" as Base
@@ -9,6 +10,8 @@ import "../../config" as Config
 Base.BaseWidget {
     id: root
     objectName: "Tray"
+
+    required property BarTypes.Sizes sizes
 
     cachePolicy: Base.BaseWidget.CachePolicy.NoCache
 
@@ -130,6 +133,7 @@ Base.BaseWidget {
     popupComponent: Component {
         TrayDrawerPanel {
             id: drawerPanel
+            sizes: root.sizes
             drawerItems: root.drawerItems
             onItemMenuRequested: function(item, anchor) {
                 root.showMenu(item, anchor);
@@ -156,6 +160,7 @@ Base.BaseWidget {
 
             TrayItem {
                 id: inlineItem
+                sizes: root.sizes
                 modelData: modelData
                 showTooltip: true
                 onMenuRequested: function(mouse) {
@@ -172,7 +177,7 @@ Base.BaseWidget {
             visible: root.drawerEnabled && root.drawerItems.length > 0
             icon: root._popupOpen ? "󰅀" : "󰅂"  // Chevron up/down
             color: Config.Theme.fgDark
-            size: Config.Theme.iconSize
+            size: root.sizes.icon
 
             MouseArea {
                 anchors.fill: parent
