@@ -8,7 +8,7 @@ Item {
 
     property string text: ""
     property color color: Config.Theme.fg
-    property int fontSize: Config.Theme.fontSizeNormal
+    property int fontSize: Config.Config.textSize
     property string fontFamily: Config.Theme.fontFamily
     property bool bold: false
     property int maxWidth: -1

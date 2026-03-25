@@ -8,7 +8,7 @@ Item {
 
     property string icon: ""
     property color color: Config.Theme.fg
-    property int size: Config.Theme.iconSize
+    property int size: Config.Config.iconSize
     property string fontFamily: Config.Theme.fontFamily
 
     implicitWidth: iconMetrics.width

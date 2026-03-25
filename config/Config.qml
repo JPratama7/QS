@@ -79,6 +79,16 @@ Singleton {
     property var layoutCenter: root.storeConfig?.layoutCenter ?? []
     property var layoutRight: root.storeConfig?.layoutRight ?? ["systemMonitor", "network", "bluetooth", "battery", "audio", "brightness", "nightShift", "caffeine", "tray", "clock"]
 
+    // Sizes Configuration - Bind to StateStore with fallback defaults
+    property int iconSize: root.storeConfig?.sizes?.icon ?? 14
+    property int iconSizeLarge: root.storeConfig?.sizes?.iconLarge ?? 18
+    property int iconSizeSmall: root.storeConfig?.sizes?.iconSmall ?? 12
+    property int textSize: root.storeConfig?.sizes?.text ?? 11
+    property int textSizeSmall: root.storeConfig?.sizes?.textSmall ?? 10
+    property int textSizeLarge: root.storeConfig?.sizes?.textLarge ?? 13
+    property int textSizeXLarge: root.storeConfig?.sizes?.textXLarge ?? 15
+    property int textSizeXSmall: root.storeConfig?.sizes?.textXSmall ?? 8
+
     // Layout helper object for compatibility
     readonly property var layout: ({
         left: layoutLeft,
@@ -89,6 +99,14 @@ Singleton {
     onLayoutLeftChanged: if (root.storeConfig) root.storeConfig.layoutLeft = layoutLeft
     onLayoutCenterChanged: if (root.storeConfig) root.storeConfig.layoutCenter = layoutCenter
     onLayoutRightChanged: if (root.storeConfig) root.storeConfig.layoutRight = layoutRight
+    onIconSizeChanged: if (root.storeConfig?.sizes) root.storeConfig.sizes.icon = iconSize
+    onIconSizeLargeChanged: if (root.storeConfig?.sizes) root.storeConfig.sizes.iconLarge = iconSizeLarge
+    onIconSizeSmallChanged: if (root.storeConfig?.sizes) root.storeConfig.sizes.iconSmall = iconSizeSmall
+    onTextSizeChanged: if (root.storeConfig?.sizes) root.storeConfig.sizes.text = textSize
+    onTextSizeSmallChanged: if (root.storeConfig?.sizes) root.storeConfig.sizes.textSmall = textSizeSmall
+    onTextSizeLargeChanged: if (root.storeConfig?.sizes) root.storeConfig.sizes.textLarge = textSizeLarge
+    onTextSizeXLargeChanged: if (root.storeConfig?.sizes) root.storeConfig.sizes.textXLarge = textSizeXLarge
+    onTextSizeXSmallChanged: if (root.storeConfig?.sizes) root.storeConfig.sizes.textXSmall = textSizeXSmall
 
     // Helper Functions
     readonly property bool isHorizontal: position === Config.Position.Top || position === Config.Position.Bottom
