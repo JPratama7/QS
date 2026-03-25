@@ -31,11 +31,15 @@ JsonObject {
     // Widget-specific configurations
     property JsonObject clockConfig
     property JsonObject workspacesConfig
+    property Sizes sizes
 
     clockConfig: ClockConfig {
     }
 
     workspacesConfig: WorkspacesConfig {
+    }
+
+    sizes: Sizes {
     }
 
 }
