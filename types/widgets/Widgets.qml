@@ -4,7 +4,7 @@ import Quickshell.Io
 import "bar"
 
 JsonObject {
-    property JsonObject bar
+    property Bar bar
 
     bar: Bar {
     }

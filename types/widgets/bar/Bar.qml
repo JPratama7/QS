@@ -3,9 +3,9 @@ import QtQuick
 import Quickshell.Io
 
 JsonObject {
-    property JsonObject config
-    property JsonObject caffeine
-    property JsonObject nightShift
+    property Config config
+    property Caffeine caffeine
+    property NightShift nightShift
 
     config: Config {}
     caffeine: Caffeine {}
