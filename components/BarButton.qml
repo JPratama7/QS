@@ -11,27 +11,12 @@ Base.BaseComponent {
     property string text: ""
     property color iconColor: foreground
     property int iconSize: Config.Theme.iconSize
-    property bool showBackground: true
 
     signal clicked()
 
-    implicitWidth: iconText.implicitWidth + (Config.Theme.widgetPadding * 2)
-    implicitHeight: Config.Theme.componentSize
-
-    // Background (optional)
-    Rectangle {
-        anchors.fill: parent
-        radius: Config.Theme.borderRadius
-        color: root.showBackground ? root.currentBackground : "transparent"
-        visible: root.showBackground
-
-        Behavior on color {
-            ColorAnimation {
-                duration: root.animationDuration
-                easing.type: Easing.OutCubic
-            }
-        }
-    }
+    // Bind to base class size property
+    size: Config.Theme.componentSize
+    Binding on implicitWidth { value: iconText.implicitWidth + (Config.Theme.widgetPadding * 2) }
 
     // Icon and Text
     Row {
