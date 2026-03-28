@@ -1,0 +1,2 @@
+module utils
+singleton AppIcon 1.0 AppIcon.qml
