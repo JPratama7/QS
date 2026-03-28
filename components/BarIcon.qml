@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import Quickshell.Widgets
 import "../config" as Config
 
 Item {
@@ -10,22 +11,38 @@ Item {
     property color color: Config.Theme.fg
     property int size: Config.Config.iconSize
     property string fontFamily: Config.Theme.fontFamily
+    property string iconPath: ""
 
     implicitWidth: iconMetrics.width
     implicitHeight: iconMetrics.height
 
-    Text {
-        id: iconLabel
+    Loader {
+        id: iconLoader
         anchors.centerIn: parent
-        text: root.icon
-        font.family: root.fontFamily
-        font.pixelSize: root.size
-        color: root.color
+        sourceComponent: root.icon !== "" ? textIcon : (root.iconPath !== "" ? imageIcon : null)
+    }
 
-        Behavior on color {
-            ColorAnimation {
-                duration: Config.Theme.animationNormal
+    Component {
+        id: textIcon
+        Text {
+            text: root.icon
+            font.family: root.fontFamily
+            font.pixelSize: root.size
+            color: root.color
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: Config.Theme.animationNormal
+                }
             }
+        }
+    }
+
+    Component {
+        id: imageIcon
+        IconImage {
+            source: root.iconPath
+            implicitSize: Config.Config.iconSize
         }
     }
 
