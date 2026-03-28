@@ -3,6 +3,7 @@ import "../../types/widgets/bar" as BarTypes
 import "../../base" as Base
 import "../../components" as Components
 import "../../config" as Config
+import "../../utils" as Utils
 import QtQuick
 import Quickshell.Wayland
 
@@ -17,12 +18,30 @@ Base.BaseWidget {
     readonly property Toplevel activeToplevel: ToplevelManager.activeToplevel
 
     tooltipText: root.activeToplevel ? root.activeToplevel.title : "No active window"
-    implicitWidth: Math.min(titleText.implicitWidth + (Config.Theme.widgetPadding * 2), maxWidth)
+    Binding on implicitWidth { value: Math.min(titleText.implicitWidth + (Config.Theme.widgetPadding * 2), root.maxWidth) }
+
+    Components.BarIcon {
+        id: barIcon
+        anchors.left: parent.left
+        anchors.leftMargin: Config.Theme.widgetPadding
+        anchors.verticalCenter: parent.verticalCenter
+        iconPath: {
+            if (root.activeToplevel == null) {
+                return Utils.AppIcon.iconForAppId("application-x-executable")
+            }
+            if (root.activeToplevel.appId == null) {
+                return Utils.AppIcon.iconForAppId("", "application-x-executable")
+            }
+
+            return Utils.AppIcon.iconForAppId(root.activeToplevel.appId, "application-x-executable")
+        }
+    }
 
     Components.BarText {
         id: titleText
 
-        anchors.centerIn: parent
+        anchors.left: barIcon.right
+        anchors.leftMargin: Config.Theme.widgetPadding * 2
         text: {
             if (!root.activeToplevel)
                 return "";
@@ -40,3 +59,4 @@ Base.BaseWidget {
     }
 
 }
+
