@@ -4,15 +4,14 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "config" as Config
-import "services" as Services
 import "widgets/bar" as BarWidgets
 
 // Main shell configuration
 Scope {
     id: root
 
-    // Force StateStore initialization early
-    readonly property var stateStore: Services.StateStore
+    // Force Config initialization early
+    readonly property var config: Config.Config
 
     Component.onCompleted: {
         Qt.application.name = "QuickshellBar";
