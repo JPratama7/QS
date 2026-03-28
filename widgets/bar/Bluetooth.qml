@@ -25,7 +25,7 @@ Base.BaseWidget {
         }
         return "Bluetooth: On (No devices)";
     }
-    implicitWidth: bluetoothRow.implicitWidth + (Config.Theme.widgetPadding * 2)
+    Binding on implicitWidth { value: bluetoothRow.implicitWidth + (Config.Theme.widgetPadding * 2) }
     onClicked: {
         Services.BluetoothService.toggleBluetooth();
     }

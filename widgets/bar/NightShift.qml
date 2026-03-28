@@ -13,8 +13,8 @@ Base.BaseWidget {
 
     required property BarTypes.Sizes sizes
 
-    // Shorthand reference to StateStore path (may be undefined during init)
-    readonly property var config: Services.StateStore.widgets?.bar?.nightShift || null
+    // Shorthand reference to Config state path (may be undefined during init)
+    readonly property var config: Config.Config.storeFileView.state.widgets?.bar?.nightShift || null
 
     // Bind to config for clean internal access with fallback defaults
     property bool nightModeActive: root.config?.active ?? false
@@ -33,7 +33,7 @@ Base.BaseWidget {
 
     tooltipText: root.nightModeActive ? "Night Mode: On (" + root.temperature + "K)" : "Night Mode: Off"
 
-    implicitWidth: nightIcon.implicitWidth + (Config.Theme.widgetPadding * 2)
+    Binding on implicitWidth { value: nightIcon.implicitWidth + (Config.Theme.widgetPadding * 2) }
 
     Components.BarIcon {
         id: nightIcon
@@ -57,9 +57,9 @@ Base.BaseWidget {
     }
 
     // Write-through using shorthand (only if config is ready)
-    onNightModeActiveChanged: if (root.config) root.config.active = root.nightModeActive
-    onTemperatureChanged: if (root.config) root.config.temperature = root.temperature
-    onTransitionDurationChanged: if (root.config) root.config.transitionDuration = root.transitionDuration
+    onNightModeActiveChanged: if (root.config) { root.config.active = root.nightModeActive; Config.Config.storeFileView.saveState() }
+    onTemperatureChanged: if (root.config) { root.config.temperature = root.temperature; Config.Config.storeFileView.saveState() }
+    onTransitionDurationChanged: if (root.config) { root.config.transitionDuration = root.transitionDuration; Config.Config.storeFileView.saveState() }
 
     Process {
         id: nightModeOn

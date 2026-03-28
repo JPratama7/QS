@@ -25,7 +25,7 @@ Base.BaseWidget {
     property bool showNames: widgetConfig.showNames
 
     tooltipText: "Workspaces"
-    implicitWidth: workspaceRow.implicitWidth + (Config.Theme.widgetPadding * 2)
+    Binding on implicitWidth { value: workspaceRow.implicitWidth + (Config.Theme.widgetPadding * 2) }
 
     // Workspace row
     Row {
@@ -61,8 +61,8 @@ Base.BaseWidget {
                 readonly property string cachedIcon: root.getWorkspaceIcon(modelData)
                 readonly property bool isFocused: modelData === Hyprland.focusedWorkspace
 
-                implicitWidth: shouldShow && workspaceLoader.item ? (workspaceLoader.item as Item).implicitWidth : 0
-                implicitHeight: shouldShow && workspaceLoader.item ? (workspaceLoader.item as Item).implicitHeight : Config.Theme.componentSize
+                Binding on implicitWidth { value: shouldShow && workspaceLoader.item ? (workspaceLoader.item as Item).implicitWidth : 0 }
+                Binding on implicitHeight { value: shouldShow && workspaceLoader.item ? (workspaceLoader.item as Item).implicitHeight : Config.Theme.componentSize }
 
                 // Lazily Load Component
                 Loader {
@@ -105,7 +105,6 @@ Base.BaseWidget {
                                 text: workspaceContent.wsId.toString()
                                 icon: workspaceContent.wsIcon
                                 iconColor: workspaceContent.wsColor
-                                showBackground: false
 
                                 onClicked: {
                                     Hyprland.dispatch("workspace " + workspaceContent.wsId)

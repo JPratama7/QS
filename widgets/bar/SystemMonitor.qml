@@ -17,7 +17,7 @@ Base.BaseWidget {
     property bool showPercent: true
 
     tooltipText: "CPU: " + Services.SystemService.cpuUsage.toFixed(0) + "% | RAM: " + Services.SystemService.ramUsage.toFixed(0) + "% | Temp: " + Services.SystemService.formatTemp(Services.SystemService.cpuTemp)
-    implicitWidth: monitorRow.implicitWidth + (Config.Theme.widgetPadding * 2)
+    Binding on implicitWidth { value: monitorRow.implicitWidth + (Config.Theme.widgetPadding * 2) }
 
     popupComponent: Component {
         Base.BasePopup {

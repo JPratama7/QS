@@ -33,7 +33,7 @@ Base.BaseWidget {
     cachePolicy: Base.BaseWidget.CachePolicy.LazyCache
 
     tooltipText: Qt.formatDateTime(new Date(), "dddd, MMMM d, yyyy")
-    implicitWidth: clockRow.implicitWidth + (Config.Theme.widgetPadding * 2)
+    Binding on implicitWidth { value: clockRow.implicitWidth + (Config.Theme.widgetPadding * 2) }
 
     popupComponent: Component {
         Base.BasePopup {
@@ -377,7 +377,8 @@ Base.BaseWidget {
                                         id: dayDelegate
                                         required property var model
 
-                                        implicitWidth: implicitHeight
+                                        // Square cells based on text heigh
+                                        implicitWidth: dayText.implicitHeight + Config.Theme.padding
                                         implicitHeight: dayText.implicitHeight + Config.Theme.padding
 
                                         readonly property bool isToday: model.today

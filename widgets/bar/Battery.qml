@@ -19,7 +19,7 @@ Base.BaseWidget {
 
         return Services.BatteryService.percentage + "% - " + Services.BatteryService.status;
     }
-    implicitWidth: batteryRow.implicitWidth + (Config.Theme.widgetPadding * 2)
+    Binding on implicitWidth { value: batteryRow.implicitWidth + (Config.Theme.widgetPadding * 2) }
 
     Row {
         id: batteryRow

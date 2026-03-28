@@ -95,7 +95,7 @@ Base.BaseWidget {
     // Visibility based on having items
     visible: root.filteredItems.length > 0 || root.drawerItems.length > 0
 
-    implicitWidth: trayRow.implicitWidth + (Config.Theme.widgetPadding * 2)
+    Binding on implicitWidth { value: trayRow.implicitWidth + (Config.Theme.widgetPadding * 2) }
 
     // Drawer toggle button
     function toggleDrawer(): void {

@@ -15,8 +15,8 @@ Base.BaseWidget {
 
     required property BarTypes.Sizes sizes
 
-    // Shorthand reference to StateStore path (may be undefined during init)
-    readonly property var config: Services.StateStore.widgets?.bar?.caffeine || null
+    // Shorthand reference to Config state path (may be undefined during init)
+    readonly property var config: Config.Config.storeFileView.state.widgets?.bar?.caffeine || null
 
     // Bind to config for clean internal access with fallback default
     property bool caffeineActive: root.config?.active ?? false
@@ -34,7 +34,7 @@ Base.BaseWidget {
 
     tooltipText: root.caffeineActive ? "Caffeine: On (Sleep prevented)" : "Caffeine: Off"
 
-    implicitWidth: caffeineIcon.implicitWidth + (Config.Theme.widgetPadding * 2)
+    Binding on implicitWidth { value: caffeineIcon.implicitWidth + (Config.Theme.widgetPadding * 2) }
 
     Components.BarIcon {
         id: caffeineIcon
@@ -58,7 +58,7 @@ Base.BaseWidget {
     }
 
     // Write-through using shorthand (only if config is ready)
-    onCaffeineActiveChanged: if (root.config) root.config.active = root.caffeineActive
+    onCaffeineActiveChanged: if (root.config) { root.config.active = root.caffeineActive; Config.Config.storeFileView.saveState() }
 
     Process {
         id: caffeineOn

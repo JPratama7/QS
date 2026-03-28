@@ -19,7 +19,7 @@ Base.BaseWidget {
 
         return Services.BrightnessService.brightness.toFixed(0) + "%";
     }
-    implicitWidth: brightnessRow.implicitWidth + (Config.Theme.widgetPadding * 2)
+    Binding on implicitWidth { value: brightnessRow.implicitWidth + (Config.Theme.widgetPadding * 2) }
     onScrollUp: {
         Services.BrightnessService.setBrightness(Services.BrightnessService.brightness + 5);
     }

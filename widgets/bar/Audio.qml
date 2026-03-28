@@ -19,7 +19,7 @@ Base.BaseWidget {
 
         return (Services.AudioService.muted ? "Muted" : Services.AudioService.volume.toFixed(0) + "%");
     }
-    implicitWidth: audioRow.implicitWidth + (Config.Theme.widgetPadding * 2)
+    Binding on implicitWidth { value: audioRow.implicitWidth + (Config.Theme.widgetPadding * 2) }
 
     popupComponent: Component {
         Base.BasePopup {

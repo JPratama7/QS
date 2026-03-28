@@ -22,7 +22,7 @@ Base.BaseWidget {
 
         return Services.NetworkService.interfaceName;
     }
-    implicitWidth: networkRow.implicitWidth + (Config.Theme.widgetPadding * 2)
+    Binding on implicitWidth { value: networkRow.implicitWidth + (Config.Theme.widgetPadding * 2) }
 
     popupComponent: Component {
         Base.BasePopup {
