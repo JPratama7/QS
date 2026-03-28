@@ -14,8 +14,8 @@ Rectangle {
     color: bgColor
     radius: height / 2 // Dynamically maintain a perfect pill shape
 
-    implicitWidth: container.implicitWidth + (horizontalPadding * 2)
-    implicitHeight: container.implicitHeight + (verticalPadding * 2)
+    Binding on implicitWidth { value: container.implicitWidth + (root.horizontalPadding * 2) }
+    Binding on implicitHeight { value: container.implicitHeight + (root.verticalPadding * 2) }
 
     Column {
         id: container
