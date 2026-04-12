@@ -1,4 +1,5 @@
 module bar
 BarContentWindow BarContentWindow.qml
+BarTriggerZone BarTriggerZone.qml
 BarView BarView.qml
 BarLayout BarLayout.qml

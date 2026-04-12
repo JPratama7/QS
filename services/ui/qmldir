@@ -1,2 +1,3 @@
 module ui
-singleton ScreenRegistryService ScreenRegistryService.qml
+singleton ScreenRegistry ScreenRegistry.qml
+singleton BarVisibility BarVisibility.qml

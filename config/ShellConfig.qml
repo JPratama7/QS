@@ -1,29 +1,28 @@
 pragma Singleton
 
 import QtQuick
-import QtQml
 
 QtObject {
     id: config
 
     // Bar configuration
-    readonly property int barHeight: Defaults.barHeight
-    readonly property string barEdge: Defaults.barEdge
-    readonly property string barDisplayMode: Defaults.barDisplayMode
+    readonly property int barHeight: PersistentConfig.adapter.barHeight
+    readonly property string barEdge: PersistentConfig.adapter.barEdge
+    readonly property string barDisplayMode: PersistentConfig.adapter.barDisplayMode
 
     // Auto-hide trigger configuration
-    readonly property int triggerZoneHeight: Defaults.triggerZoneHeight
+    readonly property int triggerZoneHeight: PersistentConfig.adapter.triggerZoneHeight
 
     // Launcher configuration
-    readonly property int launcherWidth: Defaults.launcherWidth
-    readonly property int launcherMaxResults: Defaults.launcherMaxResults
+    readonly property int launcherWidth: PersistentConfig.adapter.launcherWidth
+    readonly property int launcherMaxResults: PersistentConfig.adapter.launcherMaxResults
 
     // Popup configuration
-    readonly property int popupEdgeMargin: Defaults.popupEdgeMargin
+    readonly property int popupEdgeMargin: PersistentConfig.adapter.popupEdgeMargin
 
     // Primary screen name — used by ScreenContext.isPrimary
-    readonly property string primaryScreen: Defaults.primaryScreen
+    readonly property string primaryScreen: PersistentConfig.adapter.primaryScreen
 
     // Screen exclusion list (regex patterns)
-    readonly property var excludedScreens: []
+    readonly property var excludedScreens: PersistentConfig.adapter.excludedScreens
 }

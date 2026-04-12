@@ -12,4 +12,5 @@ QtObject {
 
     readonly property string barEdge: ShellConfig.barEdge
     readonly property int barHeight: ShellConfig.barHeight
+    readonly property string barDisplayMode: ShellConfig.barDisplayMode
 }

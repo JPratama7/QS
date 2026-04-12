@@ -8,5 +8,6 @@ Item {
 
     BarLayout {
         anchors.fill: parent
+        screenName: context.name
     }
 }

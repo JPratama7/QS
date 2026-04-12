@@ -1,0 +1,2 @@
+module compositor
+singleton Compositor Compositor.qml

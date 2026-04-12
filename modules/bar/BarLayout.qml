@@ -1,9 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../config"
+import "widgets"
 
 RowLayout {
     id: barLayout
+
+    required property string screenName
 
     anchors.fill: parent
     anchors.leftMargin: Theme.paddingNormal
@@ -17,27 +20,13 @@ RowLayout {
         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
         spacing: Theme.spacingSmall
 
-        Text {
-            text: "☰"
-            color: Theme.foregroundColor
-            font.pixelSize: Theme.fontSizeNormal
-            font.family: Theme.fontFamily
+        WorkspacesWidget {
+            screenName: barLayout.screenName
         }
 
-        Text {
-            text: "Workspaces"
-            color: Theme.mutedColor
-            font.pixelSize: Theme.fontSizeSmall
-            font.family: Theme.fontFamily
-        }
-
-        Text {
-            text: "Active Window"
-            color: Theme.mutedColor
-            font.pixelSize: Theme.fontSizeSmall
-            font.family: Theme.fontFamily
+        ActiveWindowWidget {
+            screenName: barLayout.screenName
             Layout.fillWidth: true
-            elide: Text.ElideRight
         }
     }
 
@@ -80,7 +69,7 @@ RowLayout {
         }
 
         Text {
-            text: "🔔"
+            text: "&#128276;"
             color: Theme.mutedColor
             font.pixelSize: Theme.fontSizeSmall
             font.family: Theme.fontFamily
@@ -94,7 +83,7 @@ RowLayout {
         }
 
         Text {
-            text: "⏻"
+            text: "&#9211;"
             color: Theme.foregroundColor
             font.pixelSize: Theme.fontSizeNormal
             font.family: Theme.fontFamily

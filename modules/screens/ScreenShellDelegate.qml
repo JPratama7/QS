@@ -10,4 +10,8 @@ Item {
     BarContentWindow {
         context: delegate.context
     }
+
+    BarTriggerZone {
+        context: delegate.context
+    }
 }
