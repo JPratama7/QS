@@ -7,8 +7,8 @@ QtObject {
     id: service
 
     readonly property string compositorType: {
-        if (Hyprland.eventSocketPath) return "hyprland";
-        return "generic";
+        if (Hyprland.eventSocketPath) return "Hyprland";
+        return "Generic";
     }
 
     property var _backend: null

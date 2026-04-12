@@ -1,10 +1,7 @@
-pragma Singleton
-
 import QtQuick
-import Quickshell
 import Quickshell.Hyprland
 
-Singleton {
+QtObject {
     id: backend
 
     readonly property string name: "hyprland"
@@ -56,6 +53,6 @@ Singleton {
     }
 
     function switchWorkspace(screenName: string, workspaceId: int): void {
-        Hyprland.dispatch("workspace", String(workspaceId));
+        Hyprland.dispatch("workspace " + String(workspaceId));
     }
 }
