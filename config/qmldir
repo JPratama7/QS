@@ -1,0 +1,4 @@
+module config
+singleton Defaults Defaults.qml
+singleton ShellConfig ShellConfig.qml
+singleton Theme Theme.qml

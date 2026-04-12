@@ -1,0 +1,4 @@
+module bar
+BarContentWindow BarContentWindow.qml
+BarView BarView.qml
+BarLayout BarLayout.qml
