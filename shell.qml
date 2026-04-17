@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import "config"
 import "services/ui"
+import "services/system"
 import "modules/screens"
 
 ShellRoot {
