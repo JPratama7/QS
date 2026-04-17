@@ -1,9 +1,10 @@
 pragma Singleton
 
 import QtQuick
+import Quickshell
 import Quickshell.Hyprland
 
-QtObject {
+Singleton {
     id: service
 
     readonly property string compositorType: {

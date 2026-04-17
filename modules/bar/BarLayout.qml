@@ -31,14 +31,9 @@ RowLayout {
     }
 
     // Center zone: clock/date
-    Text {
+    ClockWidget {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-        text: "Clock"
-        color: Theme.foregroundColor
-        font.pixelSize: Theme.fontSizeNormal
-        font.family: Theme.fontFamily
-        verticalAlignment: Text.AlignVCenter
     }
 
     // Right zone: network, volume, battery, notification, tray, session
@@ -47,26 +42,11 @@ RowLayout {
         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
         spacing: Theme.spacingSmall
 
-        Text {
-            text: "Net"
-            color: Theme.mutedColor
-            font.pixelSize: Theme.fontSizeSmall
-            font.family: Theme.fontFamily
-        }
+        NetworkWidget {}
 
-        Text {
-            text: "Vol"
-            color: Theme.mutedColor
-            font.pixelSize: Theme.fontSizeSmall
-            font.family: Theme.fontFamily
-        }
+        VolumeWidget {}
 
-        Text {
-            text: "Bat"
-            color: Theme.mutedColor
-            font.pixelSize: Theme.fontSizeSmall
-            font.family: Theme.fontFamily
-        }
+        BatteryWidget {}
 
         Text {
             text: "&#128276;"

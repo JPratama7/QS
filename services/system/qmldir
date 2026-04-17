@@ -1,0 +1,4 @@
+module services.system
+singleton Audio Audio.qml
+singleton Network Network.qml
+singleton Power Power.qml
