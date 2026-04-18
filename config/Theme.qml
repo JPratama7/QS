@@ -20,6 +20,9 @@ QtObject {
     readonly property int fontSizeNormal: 13
     readonly property int fontSizeLarge: 15
 
+    // Icon sizes
+    readonly property int iconSizeSmall: 16
+
     // Spacing
     readonly property int paddingSmall: 4
     readonly property int paddingNormal: 8
