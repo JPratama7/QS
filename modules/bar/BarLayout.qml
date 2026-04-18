@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import "../../config"
 import "widgets"
 
@@ -9,6 +10,7 @@ RowLayout {
     id: barLayout
 
     required property string screenName
+    required property PanelWindow barWindow
 
     anchors.fill: parent
     anchors.leftMargin: Theme.paddingNormal
@@ -57,11 +59,9 @@ RowLayout {
             font.family: Theme.fontFamily
         }
 
-        Text {
-            text: "Tray"
-            color: Theme.mutedColor
-            font.pixelSize: Theme.fontSizeSmall
-            font.family: Theme.fontFamily
+        TrayWidget {
+            screenName: barLayout.screenName
+            barWindow: barLayout.barWindow
         }
 
         Text {
