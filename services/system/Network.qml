@@ -19,10 +19,6 @@ Singleton {
     readonly property bool wifiEnabled: Networking.wifiEnabled
     readonly property bool wifiHardwareEnabled: Networking.wifiHardwareEnabled
 
-    on_SsidChanged: {
-        console.log(root._ssid);
-    }
-
     Component.onCompleted: {
         root.resolveDevice();
     }
@@ -52,7 +48,6 @@ Singleton {
         let anyDevice = null;
 
         for (const dev of devs.values) {
-            console.log("Device:", dev, "Connected:", dev.state);
             if (dev.connected) {
                 if (!anyDevice)
                     anyDevice = dev;
