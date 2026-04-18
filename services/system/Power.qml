@@ -24,14 +24,10 @@ Singleton {
     }
 
     Connections {
-        target: UPower
-        function onDisplayDeviceChanged() {
+        target: root.displayDevice
+        function onReadyChanged() {
             root.resolveDevice();
         }
-    }
-
-    Connections {
-        target: root.displayDevice
         function onIsPresentChanged() {
             root.updatePowerState();
         }
@@ -64,7 +60,7 @@ Singleton {
         }
 
         root._present = true;
-        root._percent = Math.round(root.displayDevice.percentage);
+        root._percent = Math.round(root.displayDevice.percentage * 100);
         root._charging = root.displayDevice.state === UPowerDeviceState.Charging;
     }
 
