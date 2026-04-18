@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.SystemTray
 import "../../types"
+import "../../config"
 
 Singleton {
     id: root
@@ -25,9 +26,11 @@ Singleton {
         TrayMenuRequest {}
     }
 
-    // Exposes the live list of system tray items, re-evaluated when the item list changes
+    // Exposes the live list of system tray items, filtered by hidden IDs config
     readonly property list<SystemTrayItem> items: {
         const all = SystemTray.items.values;
-        return all ? all.filter(item => item != null) : [];
+        if (!all) return [];
+        const hidden = ShellConfig.trayHiddenIds;
+        return all.filter(item => item != null && !hidden.includes(item.id));
     }
 }
