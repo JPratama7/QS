@@ -25,4 +25,8 @@ QtObject {
 
     // Screen exclusion list (regex patterns)
     readonly property var excludedScreens: PersistentConfig.adapter.excludedScreens
+
+    // Tray configuration
+    readonly property var trayHiddenIds: PersistentConfig.adapter.trayHiddenIds
+    readonly property int trayMenuMaxHeight: PersistentConfig.adapter.trayMenuMaxHeight
 }

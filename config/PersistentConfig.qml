@@ -24,6 +24,8 @@ FileView {
         property int launcherMaxResults: Defaults.launcherMaxResults
         property int popupEdgeMargin: Defaults.popupEdgeMargin
         property var excludedScreens: []
+        property var trayHiddenIds: Defaults.trayHiddenIds
+        property int trayMenuMaxHeight: Defaults.trayMenuMaxHeight
     }
 
     onAdapterUpdated: writeAdapter()

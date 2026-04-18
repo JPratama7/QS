@@ -23,4 +23,8 @@ QtObject {
 
     // Popup defaults
     readonly property int popupEdgeMargin: 8
+
+    // Tray defaults
+    readonly property var trayHiddenIds: []
+    readonly property int trayMenuMaxHeight: 400
 }
