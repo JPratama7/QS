@@ -21,6 +21,10 @@ Singleton {
     readonly property real volume: _volume
     readonly property bool muted: _muted
 
+    Component.onCompleted: {
+        root.resolveSink();
+    }
+
     Connections {
         target: Pipewire
         function onReadyChanged() {
@@ -41,7 +45,6 @@ Singleton {
 
     Connections {
         target: root.sink
-        enabled: !!root.sink
         function onReadyChanged() {
             if (root.sink.ready) {
                 root.updateAudioState();
@@ -50,7 +53,8 @@ Singleton {
     }
 
     Connections {
-        target: root.sink?.audio ?? null
+        enabled: root.sink != null && root.sink.audio != null
+        target: root?.sink?.audio ?? null
         function onVolumeChanged() {
             root._volume = root.sink.audio.volume;
         }
@@ -73,10 +77,9 @@ Singleton {
             return;
         }
 
-        // Fallback: find first sink with audio interface from nodes
+        // Find first sink with audio interface from nodes
         if (Pipewire.nodes) {
-            for (var i = 0; i < Pipewire.nodes.values.length; i++) {
-                const node = Pipewire.nodes.values[i];
+            for (const node of Pipewire.nodes.values) {
                 if (node && node.isSink && node.audio) {
                     root.sink = node;
                     return;
