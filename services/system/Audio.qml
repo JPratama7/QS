@@ -1,4 +1,5 @@
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
@@ -54,7 +55,7 @@ Singleton {
 
     Connections {
         enabled: root.sink != null && root.sink.audio != null
-        target: root?.sink?.audio ?? null
+        target: root.sink ? root.sink.audio : null
         function onVolumeChanged() {
             root._volume = root.sink.audio.volume;
         }
