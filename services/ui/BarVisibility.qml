@@ -14,9 +14,8 @@ Singleton {
     readonly property var states: {
         const result = {};
         const screens = Quickshell.screens;
-        for (let i = 0; i < screens.length; i++) {
-            const name = screens[i].name;
-            result[name] = {
+        for (const screen of screens) {
+            result[screen.name] = {
                 "displayMode": ShellConfig.barDisplayMode,
                 "hovered": false,
                 "popupOpen": false,
