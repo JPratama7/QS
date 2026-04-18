@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Services.SystemTray
 import "../../../config"
 import "../../../services/system"
+import "../../../services/ui"
 
 Item {
     id: widget
@@ -50,8 +51,9 @@ Item {
                         const item = trayItem.modelData;
                         if (mouse.button === Qt.RightButton || item.onlyMenu || item.hasMenu) {
                             if (item.hasMenu) {
-                                const pos = trayItem.mapToItem(null, 0, trayItem.height);
-                                item.display(widget.barWindow, pos.x, pos.y);
+                                const pos = trayItem.mapToItem(null, 0, 0);
+                                Tray.setActiveRequest(item, pos.x, pos.y);
+                                ShellUI.openPopup(widget.screenName, "tray");
                             }
                         } else {
                             item.activate();

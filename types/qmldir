@@ -1,2 +1,3 @@
 module types
 ScreenContext ScreenContext.qml
+TrayMenuRequest TrayMenuRequest.qml
