@@ -9,11 +9,26 @@ Item {
     id: root
 
     required property var menuHandle
+    onMenuHandleChanged: root.frozenHeight = 0
 
     readonly property int menuWidth: 220
 
     implicitWidth: menuWidth
-    implicitHeight: stack.currentItem ? stack.currentItem.implicitHeight : 0
+    property int frozenHeight: 0
+    implicitHeight: (stack.depth > 1 && stack.currentItem) ? stack.currentItem.implicitHeight : (frozenHeight > 0 ? frozenHeight : (stack.currentItem ? stack.currentItem.implicitHeight : 0))
+
+    Connections {
+        target: stack
+        function onCurrentItemChanged() {
+            if (stack.depth === 1 && stack.currentItem) {
+                // Use callLater to ensure implicitHeight is computed after page content is loaded
+                Qt.callLater(() => {
+                    if (stack.currentItem && stack.depth === 1)
+                        root.frozenHeight = stack.currentItem.implicitHeight;
+                });
+            }
+        }
+    }
 
     Rectangle {
         anchors.fill: parent

@@ -6,6 +6,7 @@ import Quickshell.Services.SystemTray
 import "../../../config"
 import "../../../services/system"
 import "../../../services/ui"
+import "../../popups"
 
 Item {
     id: widget
@@ -53,7 +54,7 @@ Item {
                             if (item.hasMenu) {
                                 const pos = trayItem.mapToItem(null, 0, 0);
                                 Tray.setActiveRequest(item, pos.x, pos.y);
-                                ShellUI.openPopup(widget.screenName, "tray");
+                                ShellUI.openPopup(widget.screenName, "tray", trayMenuComponent, pos.x);
                             }
                         } else {
                             item.activate();
@@ -61,6 +62,13 @@ Item {
                     }
                 }
             }
+        }
+    }
+
+    Component {
+        id: trayMenuComponent
+        TrayMenu {
+            menuHandle: Tray.activeRequest ? Tray.activeRequest.item.menu : null
         }
     }
 }

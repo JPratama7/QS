@@ -7,50 +7,42 @@ import Quickshell
 Singleton {
     id: root
 
-    // Per-screen active popup id, empty string means none open
-    readonly property var _activePopup: ({})
+    // Tracks which screens have an open popup — used only by closeAllPopups()
+    property var _openScreens: ({})
 
     // Launcher open state (screen name of the screen showing the launcher, or "")
     property string _launcherScreen: ""
 
-    signal activePopupChanged(screenName: string)
+    // Emitted when a widget requests a popup — carries the component to render and anchor X
+    signal popupRequested(screenName: string, popupId: string, component: var, anchorX: int)
+
+    // Emitted when a popup should close
+    signal popupClosed(screenName: string)
 
     readonly property string launcherScreen: _launcherScreen
 
-    // Returns true if any popup is open on the given screen
-    function isPopupOpen(screenName: string): bool {
-        return !!root._activePopup[screenName];
-    }
-
-    // Returns the active popup id for a screen (empty string if none)
-    function activePopup(screenName: string): string {
-        return root._activePopup[screenName] ?? "";
-    }
-
-    // Open a named popup on a screen, closing any existing one first
-    function openPopup(screenName: string, popupId: string): void {
-        if (root._activePopup[screenName] === popupId)
-            return;
-        root._activePopup[screenName] = popupId;
-        root.activePopupChanged(screenName);
+    // Open a named popup on a screen with the component to render and optional anchor X position
+    function openPopup(screenName: string, popupId: string, component: var, anchorX: int): void {
+        root._openScreens[screenName] = true;
+        root.popupRequested(screenName, popupId, component, anchorX);
     }
 
     // Close the active popup on a screen
     function closePopup(screenName: string): void {
-        if (!root._activePopup[screenName])
+        if (!root._openScreens[screenName])
             return;
-        delete root._activePopup[screenName];
-        root.activePopupChanged(screenName);
+        delete root._openScreens[screenName];
+        root.popupClosed(screenName);
     }
 
     // Close all open popups across all screens
     function closeAllPopups(): void {
-        const keys = Object.keys(root._activePopup);
+        const keys = Object.keys(root._openScreens);
         if (keys.length === 0)
             return;
         for (const key of keys) {
-            delete root._activePopup[key];
-            root.activePopupChanged(key);
+            delete root._openScreens[key];
+            root.popupClosed(key);
         }
     }
 

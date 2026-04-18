@@ -4,7 +4,6 @@ import QtQuick
 import Quickshell
 import "../../types"
 import "../../services/ui"
-import "../../services/system"
 
 PopupWindow {
     id: popupWindow
@@ -17,7 +16,9 @@ PopupWindow {
     anchor.window: popupWindow.barWindow
     anchor.rect.y: popupWindow.context.barHeight
 
-    anchor.rect.x: Tray.activeRequest ? Tray.activeRequest.anchorX : 0
+    // Horizontal anchor — set via popupRequested signal metadata
+    property int anchorX: 0
+    anchor.rect.x: popupWindow.anchorX
 
     // qmllint disable missing-property
     implicitWidth: popupContent.item ? popupContent.item.implicitWidth : 0
@@ -27,44 +28,40 @@ PopupWindow {
     // Dismiss on click outside
     grabFocus: true
 
-    property string activePopupId: ""
+    property var activeComponent: null
 
-    visible: popupWindow.activePopupId !== ""
+    visible: popupWindow.activeComponent !== null
 
     color: "transparent"
 
     Loader {
         id: popupContent
         anchors.fill: parent
-
-        readonly property string activeId: popupWindow.activePopupId
-
-        sourceComponent: {
-            if (activeId === "tray") return trayMenuComponent;
-            return null;
-        }
-    }
-
-    Component {
-        id: trayMenuComponent
-        TrayMenu {
-            menuHandle: Tray.activeRequest ? Tray.activeRequest.item.menu : null
-        }
+        sourceComponent: popupWindow.activeComponent
     }
 
     Connections {
         target: ShellUI
-        function onActivePopupChanged(screenName: string) {
+
+        function onPopupRequested(screenName: string, popupId: string, component: var, anchorX: int) {
             if (screenName !== popupWindow.context.name)
                 return;
-            popupWindow.activePopupId = ShellUI.activePopup(screenName);
-            BarVisibility.setPopupOpen(screenName, popupWindow.activePopupId !== "");
+            popupWindow.anchorX = anchorX;
+            popupWindow.activeComponent = component;
+            BarVisibility.setPopupOpen(screenName, true);
+        }
+
+        function onPopupClosed(screenName: string) {
+            if (screenName !== popupWindow.context.name)
+                return;
+            popupWindow.activeComponent = null;
+            BarVisibility.setPopupOpen(screenName, false);
         }
     }
 
     onVisibleChanged: {
         if (!visible) {
-            popupWindow.activePopupId = "";
+            popupWindow.activeComponent = null;
             ShellUI.closePopup(popupWindow.context.name);
         }
     }
