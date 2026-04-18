@@ -52,5 +52,6 @@ ShellWindow {
         id: barView
         anchors.fill: parent
         context: barWindow.context
+        barWindow: barWindow
     }
 }
