@@ -2,11 +2,22 @@ import QtQuick
 import "../../../config"
 import "../../../services/system"
 
-Text {
+Item {
     id: widget
 
-    text: Network.connected ? Network.ssid : "Off"
-    color: Network.connected ? Theme.foregroundColor : Theme.mutedColor
-    font.pixelSize: Theme.fontSizeSmall
-    font.family: Theme.fontFamily
+    implicitWidth: text.implicitWidth
+    implicitHeight: text.implicitHeight
+
+    Text {
+        id: text
+        text: Network.connected ? Network.ssid : "Off"
+        color: Network.connected ? Theme.foregroundColor : Theme.mutedColor
+        font.pixelSize: Theme.fontSizeSmall
+        font.family: Theme.fontFamily
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: Network.toggleWifi()
+    }
 }
