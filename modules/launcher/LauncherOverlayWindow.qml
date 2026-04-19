@@ -38,11 +38,14 @@ PanelWindow {
         onClicked: (mouse) => {
             // Only close if click is outside the launcher view area
             const viewRect = mapFromItem(launcherView, 0, 0);
-            if (mouse.x < viewRect.x || mouse.x > viewRect.x + launcherView.width ||
-                mouse.y < viewRect.y || mouse.y > viewRect.y + launcherView.height) {
+            const outside = (mouse.x < viewRect.x || mouse.x > viewRect.x + launcherView.width ||
+                            mouse.y < viewRect.y || mouse.y > viewRect.y + launcherView.height);
+            if (outside) {
                 Launcher.close();
+                mouse.accepted = false; // Pass through to underlying window
+            } else {
+                mouse.accepted = true; // Consume clicks inside launcher
             }
-            mouse.accepted = false;
         }
     }
 
