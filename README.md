@@ -1,0 +1,185 @@
+# Quickshell Desktop
+
+A lightweight, compositor-agnostic Wayland desktop shell built on [Quickshell](https://quickshell.org/).
+
+## Features
+
+- **Per-monitor system bar** with widgets:
+  - Workspace indicator
+  - Active window title
+  - Clock/date
+  - Network, volume, battery indicators
+  - System tray
+  - Session/power menu
+- **Overlay application launcher** with:
+  - Desktop entry search
+  - Keyboard navigation
+  - Fuzzy matching
+- **Auto-hide support** with edge trigger zones
+- **Multi-monitor** with hotplug handling (MVP)
+- **Compositor-agnostic**
+
+## Requirements
+
+- Linux with Wayland compositor
+- Quickshell (see [installation](https://quickshell.org/docs/master/install/))
+- Qt 6.5+
+
+## Installation
+
+1. Install Quickshell:
+   ```bash
+   # Arch Linux (AUR)
+   yay -S quickshell-git
+
+   # NixOS
+   nix profile install github:outfoxxed/quickshell
+   ```
+
+2. Clone this repository:
+   ```bash
+   git clone <repo-url> ~/.config/quickshell/my-shell
+   ```
+
+3. Run:
+   ```bash
+   quickshell -p ~/.config/quickshell/my-shell
+   ```
+
+## Configuration
+
+Edit `config.json` in the shell directory:
+
+```json
+{
+  "primaryScreen": "",
+  "barHeight": 32,
+  "barDisplayMode": "visible",
+  "barEdge": "top",
+  "excludedScreens": []
+}
+```
+
+### Display Modes
+
+| Mode | Behavior |
+|------|----------|
+| `visible` | Always visible, reserves screen space |
+| `auto_hide` | Hidden by default, appears on edge hover |
+| `hidden` | Never visible |
+| `non_exclusive` | Visible but doesn't reserve space |
+
+### Excluding Screens
+
+Exclude screens by name pattern (regex):
+
+```json
+{
+  "excludedScreens": ["^HDMI-", "Virtual-1"]
+}
+```
+
+## Launcher Keybind
+
+### Hyprland
+
+Add to `~/.config/hypr/hyprland.conf`:
+
+```ini
+bind = SUPER, R, exec, qs ipc call shell toggleLauncher
+```
+
+### Sway
+
+Add to `~/.config/sway/config`:
+
+```
+bindsym $mod+r exec qs ipc call shell toggleLauncher
+```
+
+### Other Compositors
+
+Use your compositor's keybind configuration to execute:
+
+```bash
+qs ipc call shell toggleLauncher
+```
+
+## IPC Commands
+
+Control the shell via IPC:
+
+```bash
+# Toggle launcher
+qs ipc call shell toggleLauncher
+
+# Open launcher on specific screen
+qs ipc call shell openLauncher DP-1
+
+# Close launcher
+qs ipc call shell closeLauncher
+
+# Check if launcher is open
+qs ipc call shell isLauncherOpen
+```
+
+## Architecture
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed architecture documentation.
+
+### Key Components
+
+```
+shell.qml              # Root composition
+config/                # Configuration singletons
+modules/               # UI modules (bar, launcher, popups)
+services/              # Business logic services
+  ui/                  # UI coordination
+  compositor/          # Compositor abstraction
+  launcher/            # Launcher logic
+  system/              # System services
+```
+
+## Development
+
+### Running for Development
+
+```bash
+# Kill any running instance
+quickshell kill
+
+# Run with live reload
+quickshell -p /path/to/shell
+```
+
+### File Structure
+
+See [AGENTS.md](./AGENTS.md) for development guidelines and conventions.
+
+### Adding Widgets
+
+1. Create widget in `modules/bar/widgets/`
+2. Register in `modules/bar/qmldir`
+3. Add to `BarLayout.qml` in appropriate zone (left/center/right)
+
+### Adding Launcher Providers
+
+1. Create provider in `services/launcher/providers/`
+2. Implement `search(query)` and `activate(data)`
+3. Self-register via `LauncherProviderRegistry.register()`
+
+## Documentation
+
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - System architecture
+- [AGENTS.md](./AGENTS.md) - Development guidelines
+- [docs/IMPLEMENTATION-NOTES.md](./docs/IMPLEMENTATION-NOTES.md) - Implementation decisions
+- [docs/Quickshell-Desktop-DESIGN-v2.md](./docs/Quickshell-Desktop-DESIGN-v2.md) - Design document
+
+## License
+
+MIT
+
+## Credits
+
+- Built on [Quickshell](https://quickshell.org/)
+- Inspired by reference shells in the Quickshell ecosystem
