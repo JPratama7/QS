@@ -1,0 +1,4 @@
+module services.launcher
+singleton Launcher Launcher.qml
+singleton LauncherProviderRegistry LauncherProviderRegistry.qml
+ApplicationsProvider providers/ApplicationsProvider.qml

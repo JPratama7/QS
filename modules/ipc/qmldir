@@ -1,0 +1,3 @@
+module ipc
+Ipc Ipc.qml
+Launcher Launcher.qml

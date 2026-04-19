@@ -1,6 +1,8 @@
 module services.system
 singleton AppIcons AppIcons.qml
 singleton Audio Audio.qml
+singleton Notification Notification.qml
 singleton Network Network.qml
 singleton Power Power.qml
+singleton SessionActions SessionActions.qml
 singleton Tray Tray.qml
