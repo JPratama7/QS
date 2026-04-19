@@ -24,6 +24,10 @@ RowLayout {
         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
         spacing: Theme.spacingSmall
 
+        LauncherButton {
+            screenName: barLayout.screenName
+        }
+
         WorkspacesWidget {
             screenName: barLayout.screenName
         }
@@ -52,23 +56,16 @@ RowLayout {
 
         BatteryWidget {}
 
-        Text {
-            text: "&#128276;"
-            color: Theme.mutedColor
-            font.pixelSize: Theme.fontSizeSmall
-            font.family: Theme.fontFamily
-        }
+        NotificationIndicatorWidget {}
 
         TrayWidget {
             screenName: barLayout.screenName
             barWindow: barLayout.barWindow
         }
 
-        Text {
-            text: "&#9211;"
-            color: Theme.foregroundColor
-            font.pixelSize: Theme.fontSizeNormal
-            font.family: Theme.fontFamily
+        SessionMenuButton {
+            screenName: barLayout.screenName
+            barWindow: barLayout.barWindow
         }
     }
 }
