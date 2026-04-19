@@ -1,0 +1,5 @@
+module launcher
+LauncherOverlayWindow LauncherOverlayWindow.qml
+LauncherView LauncherView.qml
+LauncherSearchField LauncherSearchField.qml
+LauncherResultsList LauncherResultsList.qml
