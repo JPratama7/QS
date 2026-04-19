@@ -1,5 +1,7 @@
 module popups
+ConfirmActionDialog ConfirmActionDialog.qml
 PopupMenuWindow PopupMenuWindow.qml
+SessionMenu SessionMenu.qml
 TrayMenu TrayMenu.qml
 TrayMenuItem TrayMenuItem.qml
 TrayMenuPage TrayMenuPage.qml
