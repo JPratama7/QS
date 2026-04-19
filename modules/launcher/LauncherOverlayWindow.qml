@@ -44,10 +44,4 @@ PanelWindow {
         width: 500
         height: Math.min(implicitHeight, parent.height - 100)
     }
-
-    onVisibleChanged: {
-        if (!visible) {
-            Launcher.close();
-        }
-    }
 }
