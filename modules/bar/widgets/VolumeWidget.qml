@@ -12,10 +12,6 @@ Item {
 
     readonly property real _volumePercent: Math.round(Audio.volume * 100)
 
-    Component.onCompleted: {
-        console.log("VolumeWidget loaded, volume:", Audio.volume, "muted:", Audio.muted)
-    }
-    
     Text {
         id: text
         text: Audio.muted ? "Mute" : widget._volumePercent + "%"

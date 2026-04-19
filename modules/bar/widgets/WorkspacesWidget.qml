@@ -18,8 +18,11 @@ Item {
         return 0;
     }
 
-    implicitWidth: row.implicitWidth
-    implicitHeight: row.implicitHeight
+    // Hide if compositor doesn't support workspaces
+    visible: workspaces.length > 0
+
+    implicitWidth: visible ? row.implicitWidth : 0
+    implicitHeight: visible ? row.implicitHeight : 0
 
     Row {
         id: row

@@ -33,7 +33,7 @@ Item {
         IconImage {
             width: Theme.iconSizeSmall
             height: Theme.iconSizeSmall
-            source: AppIcons.iconForAppId(widget.activeWindow ? widget.activeWindow.appId: "")
+            source: AppIcons.iconForAppId(widget.activeWindow?.appId ?? "")
         }
 
         Text {
