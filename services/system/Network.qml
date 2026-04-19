@@ -58,7 +58,6 @@ Singleton {
         }
 
         root.device = wifiDevice || anyDevice;
-        console.log(root.device)
         root.updateNetworkState();
     }
 
