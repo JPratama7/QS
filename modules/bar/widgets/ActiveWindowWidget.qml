@@ -2,25 +2,47 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "../../../services/compositor"
+import "../../../services/system"
 import "../../../config"
+
+import Quickshell.Widgets
 
 Item {
     id: widget
 
     required property string screenName
 
-    readonly property var activeWindow: Compositor.activeWindowForScreen(screenName)
+    property var activeWindow: null
     readonly property string windowTitle: activeWindow ? activeWindow.title : ""
 
-    implicitWidth: text.implicitWidth
-    implicitHeight: text.implicitHeight
+    Connections {
+        target: Compositor
+        function onActiveToplevelChanged(data: var){
+            widget.activeWindow = data;
+        }
+    }
 
-    Text {
-        id: text
-        text: widget.windowTitle || "No active window"
-        font.pixelSize: Theme.fontSizeSmall
-        color: Theme.foregroundColor
-        elide: Text.ElideRight
-        width: 200
+
+    implicitWidth: row.implicitWidth
+    implicitHeight: row.implicitHeight
+
+    Row {
+        id: row
+        spacing: Theme.spacingSmall
+
+        IconImage {
+            width: Theme.iconSizeSmall
+            height: Theme.iconSizeSmall
+            source: AppIcons.iconForAppId(widget.activeWindow ? widget.activeWindow.appId: "")
+        }
+
+        Text {
+            id: text
+            text: widget.windowTitle || "No active window"
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+            elide: Text.ElideRight
+            width: 200
+        }
     }
 }

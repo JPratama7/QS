@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQml
 import Quickshell.Hyprland
 
 QtObject {
@@ -12,7 +13,6 @@ QtObject {
         const focused = Hyprland.focusedMonitor;
         return focused ? focused.name : "";
     }
-
     function workspacesForScreen(screenName: string): var {
         const workspaces = Hyprland.workspaces?.values;
         if (!workspaces) return [];
@@ -34,6 +34,7 @@ QtObject {
             return {
                 "title": active.title,
                 "class": active.workspace?.name ?? "",
+                "monitor": active.monitor,
                 "pid": 0
             };
         }
