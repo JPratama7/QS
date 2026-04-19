@@ -34,7 +34,16 @@ PanelWindow {
     // Click-outside-to-close
     MouseArea {
         anchors.fill: parent
-        onClicked: Launcher.close()
+        propagateComposedEvents: true
+        onClicked: (mouse) => {
+            // Only close if click is outside the launcher view area
+            const viewRect = mapFromItem(launcherView, 0, 0);
+            if (mouse.x < viewRect.x || mouse.x > viewRect.x + launcherView.width ||
+                mouse.y < viewRect.y || mouse.y > viewRect.y + launcherView.height) {
+                Launcher.close();
+            }
+            mouse.accepted = false;
+        }
     }
 
     // Centered launcher view

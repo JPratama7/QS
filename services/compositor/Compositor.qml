@@ -41,22 +41,22 @@ Singleton {
     signal activeToplevelChanged(data: Toplevel)
 
     function focusedScreenName(): string {
-        return backend.focusedScreenName();
+        return backend ? backend.focusedScreenName() : "";
     }
 
     function workspacesForScreen(screenName: string): var {
-        return backend.workspacesForScreen(screenName);
+        return backend ? backend.workspacesForScreen(screenName) : [];
     }
 
     function activeWindowForScreen(screenName: string): var {
-        return backend.activeWindowForScreen(screenName);
+        return backend ? backend.activeWindowForScreen(screenName) : null;
     }
 
     function screenHasFullscreen(screenName: string): bool {
-        return backend.screenHasFullscreen(screenName);
+        return backend ? backend.screenHasFullscreen(screenName) : false;
     }
 
     function switchWorkspace(screenName: string, workspaceId: int): void {
-        backend.switchWorkspace(screenName, workspaceId);
+        if (backend) backend.switchWorkspace(screenName, workspaceId);
     }
 }

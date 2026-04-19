@@ -4,6 +4,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import "../../config"
+import "../../services/compositor"
 
 Singleton {
     id: service
@@ -19,7 +20,8 @@ Singleton {
                 "displayMode": ShellConfig.barDisplayMode,
                 "hovered": false,
                 "popupOpen": false,
-                "forceVisible": false
+                "forceVisible": false,
+                "fullscreen": false
             };
         }
         return result;
@@ -51,9 +53,17 @@ Singleton {
         service.statesChanged();
     }
 
+    function setFullscreen(screenName: string, value: bool): void {
+        if (states[screenName]) states[screenName].fullscreen = value;
+        service.statesChanged();
+    }
+
     function effectiveVisible(screenName: string): bool {
         const state = states[screenName];
         if (!state) return true;
+
+        // Hide bar when fullscreen app is active (unless popup is open)
+        if (state.fullscreen && !state.popupOpen) return false;
 
         if (state.displayMode === "visible") return true;
         if (state.displayMode === "auto_hide") {
@@ -95,6 +105,20 @@ Singleton {
             _hideTimers[screenName].stop();
             _hideTimers[screenName].destroy();
             delete _hideTimers[screenName];
+        }
+    }
+
+    Connections {
+        target: Compositor
+
+        function onActiveToplevelChanged(): void {
+            const screens = Quickshell.screens;
+            for (const screen of screens) {
+                const fullscreen = Compositor.screenHasFullscreen(screen.name);
+                if (service.states[screen.name] && service.states[screen.name].fullscreen !== fullscreen) {
+                    service.setFullscreen(screen.name, fullscreen);
+                }
+            }
         }
     }
 }

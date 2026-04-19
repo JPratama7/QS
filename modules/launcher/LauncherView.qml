@@ -23,9 +23,12 @@ Item {
     }
 
     Rectangle {
+        z: -1
         anchors.fill: parent
         color: Theme.surfaceColor
         radius: Theme.radiusNormal
+        border.width: 1
+        border.color: Qt.alpha(Theme.foregroundColor, 0.1)
     }
 
     Column {

@@ -10,6 +10,8 @@ Rectangle {
     implicitHeight: searchInput.implicitHeight + Theme.paddingSmall * 2
     radius: Theme.radiusSmall
     color: Theme.backgroundColor
+    border.width: 1
+    border.color: Qt.alpha(Theme.foregroundColor, 0.15)
 
     function clear(): void {
         searchInput.text = "";
