@@ -19,6 +19,10 @@ Singleton {
     // Emitted when a popup should close
     signal popupClosed(screenName: string)
 
+    // Emitted when launcher opens/closes on a screen
+    signal launcherOpened(screenName: string)
+    signal launcherClosed()
+
     readonly property string launcherScreen: _launcherScreen
 
     // Open a named popup on a screen with the component to render and optional anchor X position
@@ -46,13 +50,15 @@ Singleton {
         }
     }
 
-    // Launcher open/close — placeholder for Task 5.4
+    // Launcher open/close
     function openLauncher(screenName: string): void {
         root._launcherScreen = screenName;
+        root.launcherOpened(screenName);
     }
 
     function closeLauncher(): void {
         root._launcherScreen = "";
+        root.launcherClosed();
     }
 
     function isLauncherOpen(): bool {
