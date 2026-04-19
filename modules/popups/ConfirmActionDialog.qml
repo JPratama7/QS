@@ -51,7 +51,7 @@ Rectangle {
                     id: confirmLabel
                     anchors.centerIn: parent
                     text: "Confirm"
-                    color: Theme.foregroundColor
+                    color: confirmArea.containsMouse ? Theme.surfaceColor : Theme.foregroundColor
                     font.pixelSize: Theme.fontSizeSmall
                     font.family: Theme.fontFamily
                 }
