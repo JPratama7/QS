@@ -13,10 +13,6 @@ Singleton {
     readonly property int percent: present ? Math.round(UPower.displayDevice.percentage * 100) : 0
     readonly property bool charging: present ? UPower.displayDevice.state === UPowerDeviceState.Charging : false
 
-    onPercentChanged: {
-        console.log("Power is " + percent + "%")
-    }
-
     function shutdown(): void {
         // Stub - requires logind D-Bus call
     }
