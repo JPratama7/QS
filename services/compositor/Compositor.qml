@@ -4,6 +4,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Wayland
 
 Singleton {
     id: service
@@ -30,6 +31,14 @@ Singleton {
 
     readonly property var backend: _backend
     readonly property string backendName: _backend ? _backend.name : "none"
+
+    readonly property Toplevel topLevel: ToplevelManager.activeToplevel
+
+    onTopLevelChanged: {
+        service.activeToplevelChanged(service.topLevel);
+    }
+
+    signal activeToplevelChanged(data: Toplevel)
 
     function focusedScreenName(): string {
         return backend.focusedScreenName();
