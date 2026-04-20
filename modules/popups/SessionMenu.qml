@@ -14,7 +14,15 @@ Item {
     implicitHeight: column.implicitHeight + Theme.paddingNormal * 2
 
     // Pending action waiting for confirmation
-    property string pendingAction: ""
+    readonly property string pendingAction: root._pendingAction
+    readonly property bool isDestructive: root._isDestructive
+
+
+    // Internal state for confirmation dialog
+    property bool _confirmDialog: false
+    property string _pendingAction: ""
+    property string _pendingLabel: ""
+    property bool _isDestructive: false
 
     Rectangle {
         anchors.fill: parent
@@ -22,6 +30,31 @@ Item {
         radius: Theme.radiusNormal
         border.width: 1
         border.color: Qt.alpha(Theme.foregroundColor, 0.1)
+    }
+
+    function openDialog(label: string, action: string, destructive: bool) {
+        root._confirmDialog = true;
+        root._pendingLabel = label;
+        root._pendingAction = action;
+        root._isDestructive = destructive;
+    }
+
+    function closeDialog() {
+        root._confirmDialog = false;
+        root._pendingLabel = "";
+        root._pendingAction = "";
+        root._isDestructive = false;
+    }
+
+    function executePendingAction() {
+        console.log(root.pendingAction);
+        console.log(root.isDestructive);
+        if (root.pendingAction === "") {
+            return;
+        }
+        SessionActions.execute(root.pendingAction);
+        root.closeDialog();
+        ShellUI.closeAllPopups();
     }
 
     Column {
@@ -36,11 +69,31 @@ Item {
 
         Repeater {
             model: [
-                { action: "lock",     label: "\uD83D\uDD12  Lock",     destructive: false },
-                { action: "suspend",  label: "\uD83D\uDCA4  Suspend",  destructive: false },
-                { action: "logout",   label: "\u{1F6AA}  Log Out",    destructive: true  },
-                { action: "reboot",   label: "\uD83D\uDD04  Reboot",   destructive: true  },
-                { action: "shutdown", label: "\u23FB  Shut Down", destructive: true  }
+                {
+                    action: "lock",
+                    label: "\uD83D\uDD12  Lock",
+                    destructive: false
+                },
+                {
+                    action: "suspend",
+                    label: "\uD83D\uDCA4  Suspend",
+                    destructive: false
+                },
+                {
+                    action: "logout",
+                    label: "\u{1F6AA}  Log Out",
+                    destructive: true
+                },
+                {
+                    action: "reboot",
+                    label: "\uD83D\uDD04  Reboot",
+                    destructive: true
+                },
+                {
+                    action: "shutdown",
+                    label: "\u23FB  Shut Down",
+                    destructive: true
+                }
             ]
 
             delegate: Rectangle {
@@ -49,9 +102,7 @@ Item {
                 width: column.width
                 height: actionLabel.implicitHeight + Theme.paddingSmall * 2
                 radius: Theme.radiusSmall
-                color: actionArea.containsMouse
-                    ? Qt.alpha(actionRow.modelData.destructive ? Theme.errorColor : Theme.accentColor, 0.15)
-                    : "transparent"
+                color: actionArea.containsMouse ? Qt.alpha(actionRow.modelData.destructive ? Theme.errorColor : Theme.accentColor, 0.15) : "transparent"
 
                 Text {
                     id: actionLabel
@@ -71,12 +122,7 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
-                        if (actionRow.modelData.destructive) {
-                            root.pendingAction = actionRow.modelData.action;
-                        } else {
-                            SessionActions.execute(actionRow.modelData.action);
-                            ShellUI.closeAllPopups();
-                        }
+                        root.openDialog(actionRow.modelData.label, actionRow.modelData.action, actionRow.modelData.destructive);
                     }
                 }
             }
@@ -86,17 +132,15 @@ Item {
     // Inline confirmation — shown when a destructive action is pending
     ConfirmActionDialog {
         anchors.fill: parent
-        visible: root.pendingAction !== ""
-        action: root.pendingAction
+        visible: root._confirmDialog
+        action: "Are you sure you want to " + root._pendingLabel
 
         onConfirmed: {
-            SessionActions.execute(root.pendingAction);
-            root.pendingAction = "";
-            ShellUI.closeAllPopups();
+            root.executePendingAction();
         }
 
         onCancelled: {
-            root.pendingAction = "";
+            root.closeDialog();
         }
     }
 }

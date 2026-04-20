@@ -11,15 +11,6 @@ Rectangle {
     signal confirmed()
     signal cancelled()
 
-    readonly property string actionLabel: {
-        switch (dialog.action) {
-            case "logout":   return "Log Out";
-            case "reboot":   return "Reboot";
-            case "shutdown": return "Shut Down";
-            default:         return dialog.action;
-        }
-    }
-
     color: Theme.surfaceColor
     radius: Theme.radiusNormal
 
@@ -31,7 +22,8 @@ Rectangle {
         Text {
             width: parent.width
             horizontalAlignment: Text.AlignHCenter
-            text: dialog.actionLabel + "?"
+            wrapMode: Text.WordWrap
+            text: dialog.action + "?"
             color: Theme.errorColor
             font.pixelSize: Theme.fontSizeNormal
             font.family: Theme.fontFamily
