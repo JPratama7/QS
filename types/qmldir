@@ -1,4 +1,5 @@
 module types
 LauncherResult LauncherResult.qml
 ScreenContext ScreenContext.qml
+ScreenState ScreenState.qml
 TrayMenuRequest TrayMenuRequest.qml

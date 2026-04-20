@@ -40,10 +40,12 @@ ShellWindow {
     HoverHandler {
         id: barHover
         onHoveredChanged: {
-            BarVisibility.setHovered(barWindow.context.name, hovered);
             if (hovered) {
+                BarVisibility.hoverEnter(barWindow.context.name);
                 BarVisibility.cancelHide(barWindow.context.name);
                 BarVisibility.setForceVisible(barWindow.context.name, true);
+            } else {
+                BarVisibility.hoverLeave(barWindow.context.name);
             }
         }
     }
