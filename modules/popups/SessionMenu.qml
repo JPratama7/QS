@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import "../../config"
 import "../../services/system"
-import "../../services/ui"
 
 Item {
     id: root
@@ -46,7 +45,6 @@ Item {
         root._pendingAction = "";
         root._pendingLabel = "";
         root._isDestructive = false;
-        Qt.callLater(() => ShellUI.closePopup(root.screenName));
     }
 
     function executePendingAction() {
@@ -137,6 +135,7 @@ Item {
 
         onConfirmed: {
             root.executePendingAction();
+            root.closeDialog();
         }
 
         onCancelled: {
