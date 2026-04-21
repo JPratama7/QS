@@ -32,9 +32,9 @@ Singleton {
             interval: service.hideDelayMs
             repeat: false
             onTriggered: {
-                console.log("inside timer");
-                if (service.screenStates[screenName]) {
-                    service.screenStates[screenName].forceVisible = false;
+                const state = service.screenStates[screenName];
+                if (state && !state.hovered && !state.popupOpen) {
+                    state.forceVisible = false;
                 }
                 service.destroyTimer(screenName);
             }
@@ -127,8 +127,6 @@ Singleton {
         const timer = hideTimerComponent.createObject(service, {
             screenName: screenName
         });
-        console.log("popup close");
-
         _hideTimers[screenName] = timer;
         timer.start();
     }

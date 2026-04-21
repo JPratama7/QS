@@ -42,6 +42,10 @@ Item {
     }
 
     function closeDialog() {
+        root._confirmDialog = false;
+        root._pendingAction = "";
+        root._pendingLabel = "";
+        root._isDestructive = false;
         Qt.callLater(() => ShellUI.closePopup(root.screenName));
     }
 
