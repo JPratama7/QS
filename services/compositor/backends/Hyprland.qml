@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQml
 import Quickshell.Hyprland
+import "../../../types"
 
 QtObject {
     id: backend
@@ -13,15 +14,22 @@ QtObject {
         const focused = Hyprland.focusedMonitor;
         return focused ? focused.name : "";
     }
+
+    function activeWorkspaceIdForScreen(screenName: string): int {
+        const monitor = Hyprland.monitors.values.find(m => m.name === screenName);
+        return monitor ? monitor.activeWorkspace?.id ?? 0 : 0;
+    }
+
     function workspacesForScreen(screenName: string): var {
         const workspaces = Hyprland.workspaces?.values;
         if (!workspaces) return [];
 
-        return workspaces.map(ws => ({
+        const monitor = Hyprland.monitors.values.find(monitor => monitor.name === screenName);
+        return workspaces.filter(ws => ws.monitor === monitor).map(ws => ({
             "id": ws.id,
             "name": ws.name,
             "monitor": ws.monitor,
-            "windows": ws.windows
+            "windows": ws.windows,
         }));
     }
 

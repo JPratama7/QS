@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import "../../types"
 
 Singleton {
     id: service
@@ -42,6 +43,10 @@ Singleton {
 
     function focusedScreenName(): string {
         return backend ? backend.focusedScreenName() : "";
+    }
+
+    function activeWorkspaceIdForScreen(screenName: string): int {
+        return backend ? backend.activeWorkspaceIdForScreen(screenName) : 0;
     }
 
     function workspacesForScreen(screenName: string): var {

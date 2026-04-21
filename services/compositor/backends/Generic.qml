@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import "../../../types"
 
 QtObject {
     id: backend
@@ -10,6 +11,10 @@ QtObject {
 
     function focusedScreenName(): string {
         return "";
+    }
+
+    function activeWorkspaceIdForScreen(screenName: string): int {
+        return 0;
     }
 
     function workspacesForScreen(screenName: string): var {
