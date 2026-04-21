@@ -17,8 +17,13 @@ Item {
         context: delegate.context
     }
 
-    BarTriggerZone {
-        context: delegate.context
+    Loader {
+        id: triggerZoneLoader
+        active: delegate.context.barDisplayMode === "auto_hide"
+
+        sourceComponent: BarTriggerZone {
+            context: delegate.context
+        }
     }
 
     PopupMenuWindow {

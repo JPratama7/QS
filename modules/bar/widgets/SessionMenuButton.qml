@@ -35,6 +35,8 @@ Item {
 
     Component {
         id: sessionMenuComponent
-        SessionMenu {}
+        SessionMenu {
+            screenName: widget.screenName
+        }
     }
 }

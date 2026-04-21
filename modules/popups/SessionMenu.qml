@@ -8,6 +8,8 @@ import "../../services/ui"
 Item {
     id: root
 
+    required property string screenName
+
     readonly property int menuWidth: 180
 
     implicitWidth: menuWidth
@@ -40,21 +42,15 @@ Item {
     }
 
     function closeDialog() {
-        root._confirmDialog = false;
-        root._pendingLabel = "";
-        root._pendingAction = "";
-        root._isDestructive = false;
+        Qt.callLater(() => ShellUI.closePopup(root.screenName));
     }
 
     function executePendingAction() {
-        console.log(root.pendingAction);
-        console.log(root.isDestructive);
         if (root.pendingAction === "") {
             return;
         }
-        SessionActions.execute(root.pendingAction);
-        root.closeDialog();
-        ShellUI.closeAllPopups();
+        const action = root.pendingAction;
+        Qt.callLater(() => SessionActions.execute(action));
     }
 
     Column {

@@ -48,21 +48,23 @@ PopupWindow {
                 return;
             popupWindow.anchorX = anchorX;
             popupWindow.activeComponent = component;
-            BarVisibility.setPopupOpen(screenName, true);
+            BarVisibility.popupOpen(screenName);
         }
 
         function onPopupClosed(screenName: string) {
             if (screenName !== popupWindow.context.name)
                 return;
             popupWindow.activeComponent = null;
-            BarVisibility.setPopupOpen(screenName, false);
+            BarVisibility.popupClose(screenName);
         }
     }
 
+    // Detect external dismissal (click outside, Escape, focus loss)
+    // When visible becomes false while activeComponent is set, notify ShellUI
+    // ShellUI will emit popupClosed signal, triggering our onPopupClosed handler
     onVisibleChanged: {
-        if (!visible) {
-            popupWindow.activeComponent = null;
-            ShellUI.closePopup(popupWindow.context.name);
+        if (!visible && activeComponent !== null) {
+            ShellUI.closePopup(context.name);
         }
     }
 }
