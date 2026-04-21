@@ -5,119 +5,157 @@ import QtQuick
 import Quickshell
 import "../../config"
 import "../../services/compositor"
+import "../../types"
 
 Singleton {
     id: service
 
     property int hideDelayMs: 300
 
-    // Per-screen visibility state, keyed by screen name
-    readonly property var states: {
-        const result = {};
-        const screens = Quickshell.screens;
-        for (const screen of screens) {
-            result[screen.name] = {
-                "displayMode": ShellConfig.barDisplayMode,
-                "hovered": false,
-                "popupOpen": false,
-                "forceVisible": false,
-                "fullscreen": false
-            };
-        }
-        return result;
+    // Screen states - ScreenState instances keyed by screen name
+    property var screenStates: ({})
+
+    // Hide timers keyed by screen name
+    readonly property var _hideTimers: ({})
+
+    // ScreenState component for type-safe instantiation
+    Component {
+        id: screenStateComponent
+        ScreenState {}
     }
 
-    function displayMode(screenName: string): string {
-        if (states[screenName]) return states[screenName].displayMode;
-        return ShellConfig.barDisplayMode;
-    }
-
-    function setHovered(screenName: string, value: bool): void {
-        if (states[screenName]) states[screenName].hovered = value;
-        service.statesChanged();
-        if (!value && service.effectiveVisible(screenName)) {
-            service.scheduleHide(screenName);
+    // Timer component - type-safe, no string interpolation
+    Component {
+        id: hideTimerComponent
+        Timer {
+            property string screenName
+            interval: service.hideDelayMs
+            repeat: false
+            onTriggered: {
+                console.log("inside timer");
+                if (service.screenStates[screenName]) {
+                    service.screenStates[screenName].forceVisible = false;
+                }
+                service.destroyTimer(screenName);
+            }
         }
     }
 
-    function setPopupOpen(screenName: string, value: bool): void {
-        if (states[screenName]) states[screenName].popupOpen = value;
-        service.statesChanged();
-        if (!value && service.effectiveVisible(screenName)) {
-            service.scheduleHide(screenName);
+    function destroyTimer(screenName: string): void {
+        const timer = _hideTimers[screenName];
+        if (!timer) {
+            return;
         }
+        timer.stop();
+        timer.destroy();
+        delete _hideTimers[screenName];
+    }
+
+    function initScreenStates(): void {
+        const states = {};
+        for (const screen of Quickshell.screens) {
+            states[screen.name] = screenStateComponent.createObject(service, {
+                displayMode: ShellConfig.barDisplayMode
+            });
+        }
+        screenStates = states;
+    }
+
+    Component.onCompleted: {
+        initScreenStates();
+    }
+
+    // Convenience getter for consumers
+    function effectiveVisible(screenName: string): bool {
+        const state = screenStates[screenName];
+        return state ? state.effectiveVisible : true;
+    }
+
+    function hoverEnter(screenName: string): void {
+        const state = screenStates[screenName];
+        if (!state) {
+            return;
+        }
+        state.hovered = true;
+    }
+
+    function hoverLeave(screenName: string): void {
+        const state = screenStates[screenName];
+        if (!state) {
+            return;
+        }
+        state.hovered = false;
+        scheduleHide(screenName);
+    }
+
+    function popupOpen(screenName: string): void {
+        const state = screenStates[screenName];
+        if (!state) {
+            return;
+        }
+        state.popupOpen = true;
+    }
+
+    function popupClose(screenName: string): void {
+        const state = screenStates[screenName];
+        if (!state) {
+            return;
+        }
+        state.popupOpen = false;
+        scheduleHide(screenName);
     }
 
     function setForceVisible(screenName: string, value: bool): void {
-        if (states[screenName]) states[screenName].forceVisible = value;
-        service.statesChanged();
+        const state = screenStates[screenName];
+        if (!state) {
+            return;
+        }
+        state.forceVisible = value;
     }
 
     function setFullscreen(screenName: string, value: bool): void {
-        if (states[screenName]) states[screenName].fullscreen = value;
-        service.statesChanged();
-    }
-
-    function effectiveVisible(screenName: string): bool {
-        const state = states[screenName];
-        if (!state) return true;
-
-        // Hide bar when fullscreen app is active (unless popup is open)
-        if (state.fullscreen && !state.popupOpen) return false;
-
-        if (state.displayMode === "visible") return true;
-        if (state.displayMode === "auto_hide") {
-            return state.hovered || state.popupOpen || state.forceVisible;
+        const state = screenStates[screenName];
+        if (!state) {
+            return;
         }
-        if (state.displayMode === "hidden") return false;
-        return false; // Safe default for unrecognized modes
+        state.fullscreen = value;
     }
-
-    // Per-screen hide timers
-    readonly property var _hideTimers: ({})
 
     function scheduleHide(screenName: string): void {
-        // Cancel and destroy existing timer if any
-        if (_hideTimers[screenName]) {
-            _hideTimers[screenName].stop();
-            _hideTimers[screenName].destroy();
-            delete _hideTimers[screenName];
-        }
+        destroyTimer(screenName);
 
-        const timer = Qt.createQmlObject(
-            "import QtQuick; Timer { interval: " + service.hideDelayMs + "; repeat: false; onTriggered: { service.setForceVisible('" + screenName + "', false); service._cleanTimer('" + screenName + "'); } }",
-            service,
-            "hideTimer-" + screenName
-        );
+        const timer = hideTimerComponent.createObject(service, {
+            screenName: screenName
+        });
+        console.log("popup close");
+
         _hideTimers[screenName] = timer;
         timer.start();
     }
 
-    function _cleanTimer(screenName: string): void {
-        if (_hideTimers[screenName]) {
-            _hideTimers[screenName].destroy();
-            delete _hideTimers[screenName];
-        }
-    }
-
     function cancelHide(screenName: string): void {
-        if (_hideTimers[screenName]) {
-            _hideTimers[screenName].stop();
-            _hideTimers[screenName].destroy();
-            delete _hideTimers[screenName];
-        }
+        destroyTimer(screenName);
     }
 
     Connections {
         target: Compositor
 
         function onActiveToplevelChanged(): void {
-            const screens = Quickshell.screens;
-            for (const screen of screens) {
-                const fullscreen = Compositor.screenHasFullscreen(screen.name);
-                if (service.states[screen.name] && service.states[screen.name].fullscreen !== fullscreen) {
-                    service.setFullscreen(screen.name, fullscreen);
+            for (const screen of Quickshell.screens) {
+                const state = service.screenStates[screen.name];
+                if (state) {
+                    state.fullscreen = Compositor.screenHasFullscreen(screen.name);
                 }
+            }
+        }
+    }
+
+    Connections {
+        target: ShellConfig
+
+        function onBarDisplayModeChanged(): void {
+            for (const screenName in service.screenStates) {
+                service.screenStates[screenName].displayMode = ShellConfig.barDisplayMode;
             }
         }
     }

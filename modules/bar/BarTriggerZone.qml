@@ -40,8 +40,6 @@ ShellWindow {
                 BarVisibility.hoverEnter(triggerZone.context.name);
                 BarVisibility.cancelHide(triggerZone.context.name);
                 BarVisibility.setForceVisible(triggerZone.context.name, true);
-            } else {
-                BarVisibility.hoverLeave(triggerZone.context.name);
             }
         }
     }
