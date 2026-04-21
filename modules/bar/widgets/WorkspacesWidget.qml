@@ -10,13 +10,7 @@ Item {
     required property string screenName
 
     readonly property var workspaces: Compositor.workspacesForScreen(screenName)
-    readonly property int activeWorkspaceId: {
-        const list = workspaces;
-        for (let i = 0; i < list.length; i++) {
-            if (list[i].monitor === screenName) return list[i].id;
-        }
-        return 0;
-    }
+    readonly property int activeWorkspaceId: Compositor.activeWorkspaceIdForScreen(screenName)
 
     // Hide if compositor doesn't support workspaces
     visible: workspaces.length > 0
@@ -29,24 +23,25 @@ Item {
         spacing: Theme.spacingSmall
 
         Repeater {
-            model: 10
+            model: widget.workspaces
             delegate: Rectangle {
-                required property int index
+                id: delegated
+                required property var modelData
                 width: 20
                 height: 20
                 radius: Theme.radiusSmall
-                color: index + 1 === widget.activeWorkspaceId ? Theme.accentColor : Theme.surfaceColor
+                color: modelData.id === widget.activeWorkspaceId ? Theme.accentColor : Theme.surfaceColor
 
                 Text {
                     anchors.centerIn: parent
-                    text: index + 1
+                    text: delegated.modelData.id
                     font.pixelSize: Theme.fontSizeSmall
-                    color: index + 1 === widget.activeWorkspaceId ? Theme.backgroundColor : Theme.foregroundColor
+                    color: delegated.modelData.id === widget.activeWorkspaceId ? Theme.backgroundColor : Theme.foregroundColor
                 }
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: Compositor.switchWorkspace(widget.screenName, index + 1)
+                    onClicked: Compositor.switchWorkspace(widget.screenName, delegated.modelData.id)
                 }
             }
         }
