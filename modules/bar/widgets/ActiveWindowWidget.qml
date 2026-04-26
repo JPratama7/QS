@@ -14,11 +14,31 @@ Item {
 
     property var activeWindow: null
     readonly property string windowTitle: activeWindow ? activeWindow.title : ""
+    property int maxTextWidth: 200
+
+    function applyActiveWindowConfig(): void {
+        const widgetsConfig = ShellConfig.barWidgetsConfig()
+        const activeWindowConfig = widgetsConfig.activeWindow || {}
+        const configuredMaxTextWidth = activeWindowConfig.maxTextWidth
+
+        maxTextWidth = (typeof configuredMaxTextWidth === "number" && configuredMaxTextWidth > 0)
+            ? configuredMaxTextWidth
+            : Defaults.bar.widgets.activeWindow.maxTextWidth
+    }
+
+    Component.onCompleted: applyActiveWindowConfig()
 
     Connections {
         target: Compositor
         function onActiveToplevelChanged(data: var){
             widget.activeWindow = data;
+        }
+    }
+
+    Connections {
+        target: ShellConfig
+        function onBarChanged(): void {
+            widget.applyActiveWindowConfig()
         }
     }
 
@@ -42,7 +62,7 @@ Item {
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.foregroundColor
             elide: Text.ElideRight
-            width: 200
+            width: widget.maxTextWidth
         }
     }
 }
