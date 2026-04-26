@@ -31,29 +31,31 @@ Item {
         barWindow: barWindow
     }
 
-        Loader {
-            id: launcherLoader
-            active: false
+    Loader {
+        id: launcherLoader
+        active: false
 
-            sourceComponent: LauncherOverlayWindow {
-                screenName: delegate.context.name
-            }
+        sourceComponent: LauncherOverlayWindow {
+            screenName: delegate.context.name
+        }
 
-            onLoaded: {
-                item.visible = true
-                item.reset()
-            }
+        onLoaded: {
+            item.visible = true;
+            item.reset();
+        }
 
-            Connections {
-                target: ShellUI
-                function onLauncherOpened(screenName: string): void {
-                    if (screenName === delegate.context.name) {
-                        launcherLoader.active = true
-                    }
+        Connections {
+            target: ShellUI
+            function onLauncherOpened(screenName: string): void {
+                if (screenName === delegate.context.name) {
+                    launcherLoader.active = true;
                 }
-                function onLauncherClosed(): void {
-                    launcherLoader.active = false
+            }
+            function onLauncherClosed(): void {
+                if (launcherLoader.active) {
+                    launcherLoader.active = false;
                 }
             }
         }
+    }
 }
