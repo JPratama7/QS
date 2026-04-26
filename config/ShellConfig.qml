@@ -29,4 +29,16 @@ QtObject {
     // Tray configuration
     readonly property var trayHiddenIds: PersistentConfig.adapter.trayHiddenIds
     readonly property int trayMenuMaxHeight: PersistentConfig.adapter.trayMenuMaxHeight
+
+    // Bar widget layout configuration
+    readonly property var barWidgetLayout: PersistentConfig.adapter.barWidgetLayout
+    readonly property var barWidgetLayoutPerScreen: PersistentConfig.adapter.barWidgetLayoutPerScreen
+
+    function barWidgetLayoutForScreen(screenName: string): var {
+        const perScreen = PersistentConfig.adapter.barWidgetLayoutPerScreen
+        if (perScreen && perScreen[screenName]) {
+            return perScreen[screenName]
+        }
+        return PersistentConfig.adapter.barWidgetLayout
+    }
 }

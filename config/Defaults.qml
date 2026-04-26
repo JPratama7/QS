@@ -27,4 +27,12 @@ QtObject {
     // Tray defaults
     readonly property var trayHiddenIds: []
     readonly property int trayMenuMaxHeight: 400
+
+    // Bar widget layout defaults
+    readonly property var barWidgetLayout: {
+        "left": ["launcher", "workspaces", "activeWindow"],
+        "center": ["clock"],
+        "right": ["network", "volume", "battery", "notifications", "tray", "session"]
+    }
+    readonly property var barWidgetLayoutPerScreen: {}
 }

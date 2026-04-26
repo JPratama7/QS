@@ -12,6 +12,10 @@ FileView {
 
     onFileChanged: reload()
 
+    Component.onCompleted: {
+        reload()
+    }
+
     JsonAdapter {
         id: adapter
 
@@ -26,11 +30,12 @@ FileView {
         property var excludedScreens: []
         property var trayHiddenIds: Defaults.trayHiddenIds
         property int trayMenuMaxHeight: Defaults.trayMenuMaxHeight
+        property var barWidgetLayout: Defaults.barWidgetLayout
+        property var barWidgetLayoutPerScreen: Defaults.barWidgetLayoutPerScreen
     }
 
     onAdapterUpdated: writeAdapter()
 
     onLoadFailed: writeAdapter()
 
-    Component.onCompleted: reload()
 }
