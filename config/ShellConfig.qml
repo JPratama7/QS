@@ -9,6 +9,7 @@ QtObject {
     readonly property int barHeight: PersistentConfig.adapter.barHeight
     readonly property string barEdge: PersistentConfig.adapter.barEdge
     readonly property string barDisplayMode: PersistentConfig.adapter.barDisplayMode
+    readonly property var bar: PersistentConfig.adapter.bar
 
     // Auto-hide trigger configuration
     readonly property int triggerZoneHeight: PersistentConfig.adapter.triggerZoneHeight
@@ -33,6 +34,11 @@ QtObject {
     // Bar widget layout configuration
     readonly property var barWidgetLayout: PersistentConfig.adapter.barWidgetLayout
     readonly property var barWidgetLayoutPerScreen: PersistentConfig.adapter.barWidgetLayoutPerScreen
+
+    function barWidgetsConfig(): var {
+        const barConfig = PersistentConfig.adapter.bar || {}
+        return barConfig.widgets || {}
+    }
 
     function normalizedBarWidgetLayout(layout: var): var {
         const source = layout || {}

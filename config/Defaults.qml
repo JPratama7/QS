@@ -13,6 +13,20 @@ QtObject {
     readonly property int barHeight: 32
     readonly property string barEdge: "top"
     readonly property string barDisplayMode: "visible"
+    readonly property var bar: {
+        "tooltip": {
+            "enabled": true,
+            "delayMs": 300
+        },
+        "widgets": {
+            "workspaces": {
+                "showText": true
+            },
+            "activeWindow": {
+                "maxTextWidth": 200
+            }
+        }
+    }
 
     // Auto-hide trigger defaults
     readonly property int triggerZoneHeight: 4

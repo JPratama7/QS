@@ -23,6 +23,7 @@ FileView {
         property int barHeight: Defaults.barHeight
         property string barEdge: Defaults.barEdge
         property string barDisplayMode: Defaults.barDisplayMode
+        property var bar: Defaults.bar
         property int triggerZoneHeight: Defaults.triggerZoneHeight
         property int launcherWidth: Defaults.launcherWidth
         property int launcherMaxResults: Defaults.launcherMaxResults
