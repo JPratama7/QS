@@ -34,11 +34,38 @@ QtObject {
     readonly property var barWidgetLayout: PersistentConfig.adapter.barWidgetLayout
     readonly property var barWidgetLayoutPerScreen: PersistentConfig.adapter.barWidgetLayoutPerScreen
 
+    function normalizedBarWidgetLayout(layout: var): var {
+        const source = layout || {}
+        const seen = ({})
+
+        function uniqueZone(zone: string): var {
+            const zoneWidgets = source[zone] || []
+            const result = []
+
+            for (const widgetId of zoneWidgets) {
+                if (typeof widgetId !== "string" || widgetId === "")
+                    continue
+                if (seen[widgetId])
+                    continue
+                seen[widgetId] = true
+                result.push(widgetId)
+            }
+
+            return result
+        }
+
+        return {
+            "left": uniqueZone("left"),
+            "center": uniqueZone("center"),
+            "right": uniqueZone("right")
+        }
+    }
+
     function barWidgetLayoutForScreen(screenName: string): var {
         const perScreen = PersistentConfig.adapter.barWidgetLayoutPerScreen
-        if (perScreen && perScreen[screenName]) {
-            return perScreen[screenName]
-        }
-        return PersistentConfig.adapter.barWidgetLayout
+        const layout = (perScreen && perScreen[screenName])
+            ? perScreen[screenName]
+            : PersistentConfig.adapter.barWidgetLayout
+        return config.normalizedBarWidgetLayout(layout)
     }
 }
