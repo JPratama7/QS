@@ -85,8 +85,13 @@ Singleton {
 
     // Launcher open/close
     function openLauncher(screenName: string): void {
-        // Close all popups first
-        root.closeAllPopups();
+        if (root._launcherScreen === screenName) {
+            return;
+        }
+        if (root._launcherScreen !== "") {
+            root.closeLauncher()
+        }
+
         root._launcherScreen = screenName;
         root.launcherOpened(screenName);
     }
