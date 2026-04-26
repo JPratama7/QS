@@ -1,12 +1,11 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import "../../config"
 import "widgets"
 
-RowLayout {
+Item {
     id: barLayout
 
     required property string screenName
@@ -16,56 +15,145 @@ RowLayout {
     anchors.leftMargin: Theme.paddingNormal
     anchors.rightMargin: Theme.paddingNormal
 
-    spacing: Theme.spacingNormal
+    function widgetComponentForId(id: string): Component {
+        switch (id) {
+        case "launcher":
+            return launcherComp;
+        case "workspaces":
+            return workspacesComp;
+        case "activeWindow":
+            return activeWindowComp;
+        case "clock":
+            return clockComp;
+        case "network":
+            return networkComp;
+        case "volume":
+            return volumeComp;
+        case "battery":
+            return batteryComp;
+        case "notifications":
+            return notificationsComp;
+        case "tray":
+            return trayComp;
+        case "session":
+            return sessionComp;
+        }
+        return null;
+    }
 
-    // Left zone: launcher button, workspaces, active window title
-    RowLayout {
-        Layout.fillHeight: true
-        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-        spacing: Theme.spacingSmall
+    function widgetLayoutForZone(zone: string): var {
+        const layout = ShellConfig.barWidgetLayoutForScreen(barLayout.screenName);
+        return layout[zone] || [];
+    }
 
+    // Widget components - shared, no Loader inside
+    Component {
+        id: launcherComp
         LauncherButton {
             screenName: barLayout.screenName
         }
-
+    }
+    Component {
+        id: workspacesComp
         WorkspacesWidget {
             screenName: barLayout.screenName
         }
-
+    }
+    Component {
+        id: activeWindowComp
         ActiveWindowWidget {
             screenName: barLayout.screenName
-            Layout.fillWidth: true
         }
     }
-
-    // Center zone: clock/date
-    ClockWidget {
-        Layout.fillHeight: true
-        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+    Component {
+        id: clockComp
+        ClockWidget {}
     }
-
-    // Right zone: network, volume, battery, notification, tray, session
-    RowLayout {
-        Layout.fillHeight: true
-        Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-        spacing: Theme.spacingSmall
-
+    Component {
+        id: networkComp
         NetworkWidget {}
-
+    }
+    Component {
+        id: volumeComp
         VolumeWidget {}
-
+    }
+    Component {
+        id: batteryComp
         BatteryWidget {}
-
+    }
+    Component {
+        id: notificationsComp
         NotificationIndicatorWidget {}
-
+    }
+    Component {
+        id: trayComp
         TrayWidget {
             screenName: barLayout.screenName
             barWindow: barLayout.barWindow
         }
-
+    }
+    Component {
+        id: sessionComp
         SessionMenuButton {
             screenName: barLayout.screenName
             barWindow: barLayout.barWindow
+        }
+    }
+
+    // Left zone
+    Row {
+        id: leftZone
+
+        height: parent.height
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: Theme.spacingSmall
+
+        Repeater {
+            model: barLayout.widgetLayoutForZone("left")
+            Loader {
+                required property var modelData
+                sourceComponent: barLayout.widgetComponentForId(modelData)
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+    }
+
+    // Center zone
+    Row {
+        id: centerZone
+
+        height: parent.height
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: Theme.spacingSmall
+
+        Repeater {
+            model: barLayout.widgetLayoutForZone("center")
+            Loader {
+                required property var modelData
+                sourceComponent: barLayout.widgetComponentForId(modelData)
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+    }
+
+    // Right zone
+    Row {
+        id: rightZone
+
+        height: parent.height
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: Theme.spacingSmall
+
+        Repeater {
+            model: barLayout.widgetLayoutForZone("right")
+            Loader {
+                required property var modelData
+                sourceComponent: barLayout.widgetComponentForId(modelData)
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
     }
 }
