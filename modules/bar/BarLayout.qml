@@ -19,12 +19,12 @@ Item {
     function showTooltip(widgetItem: Item): void {
         // qmllint disable missing-property
         if (widgetItem && widgetItem.tooltipComponent) {
-            TooltipService.show(widgetItem, widgetItem.tooltipComponent, barLayout.screenName, barLayout.barWindow)
+            Tooltip.show(widgetItem, widgetItem.tooltipComponent, barLayout.screenName, barLayout.barWindow)
         }
     }
 
     function hideTooltip(): void {
-        TooltipService.hide()
+        Tooltip.hide()
     }
 
     function widgetComponentForId(id: string): Component {
