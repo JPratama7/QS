@@ -14,6 +14,14 @@ Item {
     required property string screenName
     required property PanelWindow barWindow
 
+    property Component tooltipComponent: Component {
+        Text {
+            text: "System Tray"
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+        }
+    }
+
     implicitWidth: trayRow.implicitWidth
     implicitHeight: trayRow.implicitHeight
 

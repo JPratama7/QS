@@ -9,6 +9,14 @@ Item {
 
     required property string screenName
 
+    property Component tooltipComponent: Component {
+        Text {
+            text: "Workspaces"
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+        }
+    }
+
     readonly property var workspaces: Compositor.workspacesForScreen(screenName)
     readonly property int activeWorkspaceId: Compositor.activeWorkspaceIdForScreen(screenName)
     property var workspacesConfig: ({})

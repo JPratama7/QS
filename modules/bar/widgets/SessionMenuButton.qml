@@ -12,6 +12,14 @@ Item {
     required property string screenName
     required property PanelWindow barWindow
 
+    property Component tooltipComponent: Component {
+        Text {
+            text: "Session"
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+        }
+    }
+
     implicitWidth: label.implicitWidth
     implicitHeight: label.implicitHeight
 

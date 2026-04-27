@@ -12,6 +12,14 @@ Item {
 
     required property string screenName
 
+    property Component tooltipComponent: Component {
+        Text {
+            text: widget.windowTitle || "No active window"
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+        }
+    }
+
     property var activeWindow: null
     readonly property string windowTitle: activeWindow ? activeWindow.title : ""
     property int maxTextWidth: 200

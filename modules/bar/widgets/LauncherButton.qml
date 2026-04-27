@@ -9,6 +9,14 @@ Item {
 
     required property string screenName
 
+    property Component tooltipComponent: Component {
+        Text {
+            text: "Launcher"
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+        }
+    }
+
     implicitWidth: label.implicitWidth + Theme.paddingSmall * 2
     implicitHeight: label.implicitHeight + Theme.paddingSmall * 2
 

@@ -6,6 +6,14 @@ import "../../../config"
 Text {
     id: widget
 
+    property Component tooltipComponent: Component {
+        Text {
+            text: "Clock"
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+        }
+    }
+
     property int _seconds: 0
 
     function formatTime(): string {

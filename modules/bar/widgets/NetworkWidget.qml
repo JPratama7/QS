@@ -7,6 +7,14 @@ import "../../../services/system"
 Item {
     id: widget
 
+    property Component tooltipComponent: Component {
+        Text {
+            text: Network.connected ? "WiFi: " + Network.ssid : "WiFi: Off"
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+        }
+    }
+
     implicitWidth: text.implicitWidth
     implicitHeight: text.implicitHeight
 

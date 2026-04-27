@@ -7,6 +7,14 @@ import "../../../services/system"
 Item {
     id: widget
 
+    property Component tooltipComponent: Component {
+        Text {
+            text: Audio.muted ? "Muted" : "Volume: " + Math.round(Audio.volume * 100) + "%"
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+        }
+    }
+
     implicitWidth: text.implicitWidth
     implicitHeight: text.implicitHeight
 

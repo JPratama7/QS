@@ -7,6 +7,18 @@ import "../../../services/system"
 Text {
     id: widget
 
+    property Component tooltipComponent: Component {
+        Text {
+            text: {
+                if (!Power.present) return "On AC Power"
+                if (Power.charging) return "Charging: " + Power.percent + "%"
+                return "Battery: " + Power.percent + "%"
+            }
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+        }
+    }
+
     visible: Power.present
     text: Power.present ? Power.percent + "%" : "⏻ AC"
     color: {

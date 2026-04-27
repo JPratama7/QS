@@ -7,6 +7,14 @@ import "../../../services/system"
 Item {
     id: widget
 
+    property Component tooltipComponent: Component {
+        Text {
+            text: widget.hasUnread ? "Notifications: " + Notification.unreadCount : "No notifications"
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+        }
+    }
+
     readonly property bool hasUnread: Notification.unreadCount > 0
 
     implicitWidth: label.implicitWidth
