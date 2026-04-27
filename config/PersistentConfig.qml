@@ -12,6 +12,8 @@ FileView {
 
     onFileChanged: reload()
 
+    property alias adapterView: adapter
+
     Component.onCompleted: {
         reload()
     }
@@ -33,6 +35,7 @@ FileView {
         property int trayMenuMaxHeight: Defaults.trayMenuMaxHeight
         property var barWidgetLayout: Defaults.barWidgetLayout
         property var barWidgetLayoutPerScreen: Defaults.barWidgetLayoutPerScreen
+        property bool idleInhibitor: false
     }
 
     onAdapterUpdated: writeAdapter()
