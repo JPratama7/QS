@@ -16,25 +16,45 @@ Singleton {
         return Quickshell.screens.filter(s => !isExcluded(s.name));
     }
 
+    signal screenChanged()
+
+    property var enabledScreensMap: ({})
+
+    function rebuildScreensMap(): void {
+        const map = {};
+        for (const screen of registry.enabledScreens) {
+            map[screen.name] = screen;
+        }
+        enabledScreensMap = map;
+    }
+
+    Component.onCompleted: rebuildScreensMap()
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged(): void {
+            registry.rebuildScreensMap();
+            registry.screenChanged();
+        }
+    }
+
     function isExcluded(screenName: string): bool {
         const patterns = ShellConfig.excludedScreens;
-        for (let i = 0; i < patterns.length; i++) {
-            if (screenName.match(patterns[i]))
+        for (const pattern of patterns) {
+            if (screenName.match(pattern))
                 return true;
         }
         return false;
     }
 
     function screenByName(screenName: string): var {
-        for (let i = 0; i < enabledScreens.length; i++) {
-            if (enabledScreens[i].name === screenName)
-                return enabledScreens[i];
-        }
-        return null;
+        return enabledScreensMap[screenName] || null;
     }
 
     function createContext(screen: ShellScreen): ScreenContext {
-        const context = registry.screenContextComponent.createObject(null, { "screen": screen }) as ScreenContext;
+        const context = registry.screenContextComponent.createObject(null, {
+            "screen": screen
+        }) as ScreenContext;
         if (!context) {
             console.error("Failed to create screen context for screen:", screen.name);
             return null;
