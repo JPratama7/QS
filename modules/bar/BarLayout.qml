@@ -43,6 +43,8 @@ Item {
             return "Tray";
         case "session":
             return "Session";
+        case "idleInhibitor":
+            return "Idle Inhibitor";
         }
         return "";
     }
@@ -209,6 +211,8 @@ Item {
             return trayComp;
         case "session":
             return sessionComp;
+        case "idleInhibitor":
+            return idleInhibitorComp;
         }
         return null;
     }
@@ -270,6 +274,10 @@ Item {
             screenName: barLayout.screenName
             barWindow: barLayout.barWindow
         }
+    }
+    Component {
+        id: idleInhibitorComp
+        IdleInhibitorWidget {}
     }
 
     // Left zone
