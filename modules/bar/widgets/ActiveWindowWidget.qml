@@ -59,6 +59,8 @@ BaseWidget {
         id: row
         spacing: Theme.spacingSmall
 
+        visible: widget.windowTitle || widget.windowTitle !== ""
+
         IconImage {
             width: Theme.iconSizeSmall
             height: Theme.iconSizeSmall

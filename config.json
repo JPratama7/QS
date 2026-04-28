@@ -1,0 +1,56 @@
+{
+    "bar": {
+        "tooltip": {
+            "delayMs": 300,
+            "enabled": true
+        },
+        "widgets": {
+            "activeWindow": {
+                "maxTextWidth": 50,
+                "tooltip": {
+                    "text": "Active Window"
+                }
+            },
+            "workspaces": {
+                "showText": false
+            }
+        }
+    },
+    "barDisplayMode": "visible",
+    "barEdge": "top",
+    "barHeight": 32,
+    "barWidgetLayout": {
+        "center": [
+            "clock",
+            "taskbar"
+        ],
+        "left": [
+            "launcher",
+            "workspaces",
+            "activeWindow"
+        ],
+        "right": [
+            "network",
+            "volume",
+            "battery",
+            "systemMonitor",
+            "idleInhibitor",
+            "notifications",
+            "tray",
+            "session"
+        ]
+    },
+    "barWidgetLayoutPerScreen": {
+    },
+    "excludedScreens": [
+    ],
+    "idleInhibitor": true,
+    "launcherMaxResults": 8,
+    "launcherWidth": 560,
+    "popupEdgeMargin": 8,
+    "primaryScreen": "",
+    "trayHiddenIds": [
+    ],
+    "trayMenuMaxHeight": 400,
+    "triggerZoneHeight": 4
+}
