@@ -12,6 +12,9 @@ Item {
     required property string screenName
     required property PanelWindow barWindow
 
+    readonly property real widgetScale: ShellConfig.widgetScaleForScreen(screenName)
+    readonly property real spacing: Theme.spacingLarge
+
     anchors.fill: parent
     anchors.leftMargin: Theme.paddingNormal
     anchors.rightMargin: Theme.paddingNormal
@@ -19,12 +22,12 @@ Item {
     function showTooltip(widgetItem: Item): void {
         // qmllint disable missing-property
         if (widgetItem && widgetItem.tooltipComponent) {
-            Tooltip.show(widgetItem, widgetItem.tooltipComponent, barLayout.screenName, barLayout.barWindow)
+            Tooltip.show(widgetItem, widgetItem.tooltipComponent, barLayout.screenName, barLayout.barWindow);
         }
     }
 
     function hideTooltip(): void {
-        Tooltip.hide()
+        Tooltip.hide();
     }
 
     function widgetComponentForId(id: string): Component {
@@ -51,6 +54,10 @@ Item {
             return sessionComp;
         case "idleInhibitor":
             return idleInhibitorComp;
+        case "taskbar":
+            return taskbar;
+        case "systemMonitor":
+            return systemMonitorComp;
         }
         return null;
     }
@@ -65,45 +72,63 @@ Item {
         id: launcherComp
         LauncherButton {
             screenName: barLayout.screenName
+            widgetScale: barLayout.widgetScale
         }
+    }
+    Component {
+        id: taskbar
+        Applications {}
     }
     Component {
         id: workspacesComp
         WorkspacesWidget {
             screenName: barLayout.screenName
+            widgetScale: barLayout.widgetScale
         }
     }
     Component {
         id: activeWindowComp
         ActiveWindowWidget {
             screenName: barLayout.screenName
+            widgetScale: barLayout.widgetScale
         }
     }
     Component {
         id: clockComp
-        ClockWidget {}
+        ClockWidget {
+            widgetScale: barLayout.widgetScale
+        }
     }
     Component {
         id: networkComp
-        NetworkWidget {}
+        NetworkWidget {
+            widgetScale: barLayout.widgetScale
+        }
     }
     Component {
         id: volumeComp
-        VolumeWidget {}
+        VolumeWidget {
+            widgetScale: barLayout.widgetScale
+        }
     }
     Component {
         id: batteryComp
-        BatteryWidget {}
+        BatteryWidget {
+            widgetScale: barLayout.widgetScale
+        }
     }
     Component {
         id: notificationsComp
-        NotificationIndicatorWidget {}
+        NotificationIndicatorWidget {
+            widgetScale: barLayout.widgetScale
+        }
     }
     Component {
         id: trayComp
         TrayWidget {
             screenName: barLayout.screenName
             barWindow: barLayout.barWindow
+            widgetScale: barLayout.widgetScale
         }
     }
     Component {
@@ -111,11 +136,20 @@ Item {
         SessionMenuButton {
             screenName: barLayout.screenName
             barWindow: barLayout.barWindow
+            widgetScale: barLayout.widgetScale
         }
     }
     Component {
         id: idleInhibitorComp
-        IdleInhibitorWidget {}
+        IdleInhibitorWidget {
+            widgetScale: barLayout.widgetScale
+        }
+    }
+    Component {
+        id: systemMonitorComp
+        SystemMonitorWidget {
+            widgetScale: barLayout.widgetScale
+        }
     }
 
     // Left zone
@@ -125,7 +159,7 @@ Item {
         height: parent.height
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.spacingSmall
+        spacing: barLayout.spacing
 
         Repeater {
             model: barLayout.widgetLayoutForZone("left")
@@ -146,9 +180,9 @@ Item {
                     id: leftHoverHandler
                     onHoveredChanged: {
                         if (hovered && leftWidgetLoader.item)
-                            barLayout.showTooltip(leftWidgetLoader.item)
+                            barLayout.showTooltip(leftWidgetLoader.item);
                         else
-                            barLayout.hideTooltip()
+                            barLayout.hideTooltip();
                     }
                 }
             }
@@ -162,7 +196,7 @@ Item {
         height: parent.height
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.spacingSmall
+        spacing: barLayout.spacing
 
         Repeater {
             model: barLayout.widgetLayoutForZone("center")
@@ -183,9 +217,9 @@ Item {
                     id: centerHoverHandler
                     onHoveredChanged: {
                         if (hovered && centerWidgetLoader.item)
-                            barLayout.showTooltip(centerWidgetLoader.item)
+                            barLayout.showTooltip(centerWidgetLoader.item);
                         else
-                            barLayout.hideTooltip()
+                            barLayout.hideTooltip();
                     }
                 }
             }
@@ -199,7 +233,7 @@ Item {
         height: parent.height
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.spacingSmall
+        spacing: barLayout.spacing
 
         Repeater {
             model: barLayout.widgetLayoutForZone("right")
@@ -220,9 +254,9 @@ Item {
                     id: rightHoverHandler
                     onHoveredChanged: {
                         if (hovered && rightWidgetLoader.item)
-                            barLayout.showTooltip(rightWidgetLoader.item)
+                            barLayout.showTooltip(rightWidgetLoader.item);
                         else
-                            barLayout.hideTooltip()
+                            barLayout.hideTooltip();
                     }
                 }
             }
