@@ -2,12 +2,13 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "../../../config"
+import "../../../components/bar"
 import "../../../services/system"
 
-Item {
+BaseWidget {
     id: widget
 
-    property Component tooltipComponent: Component {
+    tooltipComponent: Component {
         Text {
             text: Network.connected ? "WiFi: " + Network.ssid : "WiFi: Off"
             font.pixelSize: Theme.fontSizeSmall

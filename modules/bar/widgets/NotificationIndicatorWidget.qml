@@ -2,12 +2,13 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "../../../config"
+import "../../../components/bar"
 import "../../../services/system"
 
-Item {
+BaseWidget {
     id: widget
 
-    property Component tooltipComponent: Component {
+    tooltipComponent: Component {
         Text {
             text: widget.hasUnread ? "Notifications: " + Notification.unreadCount : "No notifications"
             font.pixelSize: Theme.fontSizeSmall

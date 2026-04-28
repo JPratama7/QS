@@ -3,16 +3,17 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import "../../../config"
+import "../../../components/bar"
 import "../../../services/ui"
 import "../../popups"
 
-Item {
+BaseWidget {
     id: widget
 
     required property string screenName
     required property PanelWindow barWindow
 
-    property Component tooltipComponent: Component {
+    tooltipComponent: Component {
         Text {
             text: "Session"
             font.pixelSize: Theme.fontSizeSmall

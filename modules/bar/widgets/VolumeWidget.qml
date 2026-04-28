@@ -2,12 +2,13 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "../../../config"
+import "../../../components/bar"
 import "../../../services/system"
 
-Item {
+BaseWidget {
     id: widget
 
-    property Component tooltipComponent: Component {
+    tooltipComponent: Component {
         Text {
             text: Audio.muted ? "Muted" : "Volume: " + Math.round(Audio.volume * 100) + "%"
             font.pixelSize: Theme.fontSizeSmall

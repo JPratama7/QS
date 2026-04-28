@@ -4,17 +4,18 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.SystemTray
 import "../../../config"
+import "../../../components/bar"
 import "../../../services/system"
 import "../../../services/ui"
 import "../../popups"
 
-Item {
+BaseWidget {
     id: widget
 
     required property string screenName
     required property PanelWindow barWindow
 
-    property Component tooltipComponent: Component {
+    tooltipComponent: Component {
         Text {
             text: "System Tray"
             font.pixelSize: Theme.fontSizeSmall

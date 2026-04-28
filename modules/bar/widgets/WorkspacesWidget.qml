@@ -3,13 +3,14 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import "../../../services/compositor"
 import "../../../config"
+import "../../../components/bar"
 
-Item {
+BaseWidget {
     id: widget
 
     required property string screenName
 
-    property Component tooltipComponent: Component {
+    tooltipComponent: Component {
         Text {
             text: "Workspaces"
             font.pixelSize: Theme.fontSizeSmall

@@ -2,14 +2,15 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "../../../config"
+import "../../../components/bar"
 import "../../../services/launcher"
 
-Item {
+BaseWidget {
     id: widget
 
     required property string screenName
 
-    property Component tooltipComponent: Component {
+    tooltipComponent: Component {
         Text {
             text: "Launcher"
             font.pixelSize: Theme.fontSizeSmall

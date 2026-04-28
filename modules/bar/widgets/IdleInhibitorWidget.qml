@@ -2,12 +2,13 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "../../../config"
+import "../../../components/bar"
 import "../../../services/system"
 
-Text {
+BaseWidget {
     id: widget
 
-    property Component tooltipComponent: Component {
+    tooltipComponent: Component {
         Text {
             text: Idle.inhibited ? "Idle Inhibitor: Active" : "Idle Inhibitor: Inactive"
             font.pixelSize: Theme.fontSizeSmall
@@ -15,11 +16,16 @@ Text {
         }
     }
 
-    text: "\u23F1" // Hourglass icon
-    font.pixelSize: Theme.fontSizeNormal
-    font.family: Theme.fontFamily
+    implicitWidth: textItem.implicitWidth
+    implicitHeight: textItem.implicitHeight
 
-    color: Idle.inhibited ? Theme.accentColor : Theme.mutedColor
+    Text {
+        id: textItem
+        text: "\u23F1" // Hourglass icon
+        font.pixelSize: Theme.fontSizeNormal
+        font.family: Theme.fontFamily
+        color: Idle.inhibited ? Theme.accentColor : Theme.mutedColor
+    }
 
     MouseArea {
         anchors.fill: parent

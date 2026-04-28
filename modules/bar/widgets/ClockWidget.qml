@@ -2,11 +2,12 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "../../../config"
+import "../../../components/bar"
 
-Text {
+BaseWidget {
     id: widget
 
-    property Component tooltipComponent: Component {
+    tooltipComponent: Component {
         Text {
             text: "Clock"
             font.pixelSize: Theme.fontSizeSmall
@@ -29,20 +30,26 @@ Text {
         return days[date.getDay()] + " " + date.getDate();
     }
 
-    text: {
-        widget._seconds; // dependency
-        const date = new Date();
-        const h = date.getHours();
-        const m = date.getMinutes();
-        const timeStr = (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m);
-        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const dateStr = days[date.getDay()] + " " + date.getDate();
-        return timeStr + " " + dateStr;
+    implicitWidth: textItem.implicitWidth
+    implicitHeight: textItem.implicitHeight
+
+    Text {
+        id: textItem
+        text: {
+            widget._seconds; // dependency
+            const date = new Date();
+            const h = date.getHours();
+            const m = date.getMinutes();
+            const timeStr = (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m);
+            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            const dateStr = days[date.getDay()] + " " + date.getDate();
+            return timeStr + " " + dateStr;
+        }
+        color: Theme.foregroundColor
+        font.pixelSize: Theme.fontSizeNormal
+        font.family: Theme.fontFamily
+        verticalAlignment: Text.AlignVCenter
     }
-    color: Theme.foregroundColor
-    font.pixelSize: Theme.fontSizeNormal
-    font.family: Theme.fontFamily
-    verticalAlignment: Text.AlignVCenter
 
     Timer {
         interval: 1000

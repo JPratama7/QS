@@ -4,15 +4,16 @@ import QtQuick
 import "../../../services/compositor"
 import "../../../services/system"
 import "../../../config"
+import "../../../components/bar"
 
 import Quickshell.Widgets
 
-Item {
+BaseWidget {
     id: widget
 
     required property string screenName
 
-    property Component tooltipComponent: Component {
+    tooltipComponent: Component {
         Text {
             text: widget.windowTitle || "No active window"
             font.pixelSize: Theme.fontSizeSmall
