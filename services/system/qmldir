@@ -6,4 +6,5 @@ singleton Notification Notification.qml
 singleton Network Network.qml
 singleton Power Power.qml
 singleton SessionActions SessionActions.qml
+singleton SystemMonitor SystemMonitor.qml
 singleton Tray Tray.qml
