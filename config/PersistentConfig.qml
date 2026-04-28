@@ -35,6 +35,7 @@ FileView {
         property int trayMenuMaxHeight: Defaults.trayMenuMaxHeight
         property var barWidgetLayout: Defaults.barWidgetLayout
         property var barWidgetLayoutPerScreen: Defaults.barWidgetLayoutPerScreen
+        property var barWidgetScalePerScreen: ({})
         property bool idleInhibitor: false
     }
 

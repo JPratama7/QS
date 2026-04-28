@@ -35,6 +35,19 @@ QtObject {
     readonly property var barWidgetLayout: PersistentConfig.adapter.barWidgetLayout
     readonly property var barWidgetLayoutPerScreen: PersistentConfig.adapter.barWidgetLayoutPerScreen
 
+    // Bar widget scale configuration
+    readonly property real barWidgetScale: (PersistentConfig.adapter.bar || {}).widgets?.scale || 1.0
+    readonly property var barWidgetScalePerScreen: PersistentConfig.adapter.barWidgetScalePerScreen
+
+    function widgetScaleForScreen(screenName: string): real {
+        const perScreen = PersistentConfig.adapter.barWidgetScalePerScreen
+        const scale = perScreen && perScreen[screenName]
+        if (typeof scale === "number" && isFinite(scale) && scale > 0) {
+            return scale
+        }
+        return config.barWidgetScale
+    }
+
     function barWidgetsConfig(): var {
         const barConfig = PersistentConfig.adapter.bar || {}
         return barConfig.widgets || {}

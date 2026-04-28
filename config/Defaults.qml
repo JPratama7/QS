@@ -19,6 +19,7 @@ QtObject {
             "delayMs": 300
         },
         "widgets": {
+            "scale": 1.0,
             "workspaces": {
                 "showText": true
             },

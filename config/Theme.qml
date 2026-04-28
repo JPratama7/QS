@@ -29,6 +29,7 @@ QtObject {
     readonly property int paddingLarge: 12
     readonly property int spacingSmall: 4
     readonly property int spacingNormal: 8
+    readonly property int spacingLarge: 16
 
     // Radii
     readonly property int radiusSmall: 4
