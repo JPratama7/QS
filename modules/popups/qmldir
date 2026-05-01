@@ -1,5 +1,8 @@
 module popups
 ConfirmActionDialog ConfirmActionDialog.qml
+NotificationPopup NotificationPopup.qml
+NotificationToast NotificationToast.qml
+NotificationToastWindow NotificationToastWindow.qml
 PopupMenuWindow PopupMenuWindow.qml
 SessionMenu SessionMenu.qml
 TrayMenu TrayMenu.qml
