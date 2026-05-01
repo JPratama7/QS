@@ -30,6 +30,9 @@ FileView {
         property int launcherWidth: Defaults.launcherWidth
         property int launcherMaxResults: Defaults.launcherMaxResults
         property int popupEdgeMargin: Defaults.popupEdgeMargin
+        property string toastPosition: Defaults.toastPosition
+        property int toastMaxStack: Defaults.toastMaxStack
+        property int toastDurationMs: Defaults.toastDurationMs
         property var excludedScreens: []
         property var trayHiddenIds: Defaults.trayHiddenIds
         property int trayMenuMaxHeight: Defaults.trayMenuMaxHeight

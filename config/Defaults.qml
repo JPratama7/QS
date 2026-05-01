@@ -39,6 +39,11 @@ QtObject {
     // Popup defaults
     readonly property int popupEdgeMargin: 8
 
+    // Toast notification defaults
+    readonly property string toastPosition: "top-right"
+    readonly property int toastMaxStack: 3
+    readonly property int toastDurationMs: 5000
+
     // Tray defaults
     readonly property var trayHiddenIds: []
     readonly property int trayMenuMaxHeight: 400

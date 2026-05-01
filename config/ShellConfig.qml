@@ -21,6 +21,11 @@ QtObject {
     // Popup configuration
     readonly property int popupEdgeMargin: PersistentConfig.adapter.popupEdgeMargin
 
+    // Toast configuration
+    readonly property string toastPosition: PersistentConfig.adapter.toastPosition
+    readonly property int toastMaxStack: PersistentConfig.adapter.toastMaxStack
+    readonly property int toastDurationMs: PersistentConfig.adapter.toastDurationMs
+
     // Primary screen name — used by ScreenContext.isPrimary
     readonly property string primaryScreen: PersistentConfig.adapter.primaryScreen
 
