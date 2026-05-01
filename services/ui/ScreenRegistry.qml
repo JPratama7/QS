@@ -29,14 +29,13 @@ Singleton {
     }
 
     Component.onCompleted: {
-        if (PersistentConfig.adapterView.primaryScreen === "") {
-            const firstScreen = Quickshell.screens[0];
-            if (firstScreen) {
-                PersistentConfig.adapterView.primaryScreen = firstScreen.name;
-            }
+        rebuildScreensMap()
+
+        if (PersistentConfig.adapterView.primaryScreen === "" && registry.enabledScreens.length > 0) {
+            const firstScreen = registry.enabledScreens[0];
+            PersistentConfig.adapterView.primaryScreen = firstScreen.name;
         }
 
-        rebuildScreensMap()
     }
 
     Connections {
