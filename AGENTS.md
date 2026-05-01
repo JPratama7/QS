@@ -350,3 +350,102 @@ LazyLoader {
 - PRD: `docs/Quickshell-Desktop-PRD.md`
 - Dev Workflow: `docs/DEV-WORKFLOW.md`
 - Implementation Plan: `docs/plans/2026-04-12-quickshell-desktop-implementation-plan.md`
+
+---
+
+## Debugging Lessons Learned
+
+### QML Property Initialization Issues
+
+**Problem**: `property var toastQueue: []` doesn't properly initialize arrays in QML singletons.
+
+**Root Cause**: QML doesn't properly initialize `var` properties with array literals at declaration time. The array literal gets evaluated before the property system is fully ready, leading to `undefined` values.
+
+**Solution**: 
+```qml
+// ❌ Wrong - causes undefined errors
+property var toastQueue: []
+
+// ✅ Correct - proper initialization
+property var toastQueue
+Component.onCompleted: {
+    toastQueue = [];
+}
+```
+
+**Safety Pattern**: Always add null checks when accessing potentially undefined arrays:
+```qml
+// ❌ Unsafe - crashes if undefined
+visible: Notification.toastQueue.length > 0
+
+// ✅ Safe - handles undefined gracefully  
+visible: (Notification.toastQueue || []).length > 0
+```
+
+### Repeater Delegate Pattern Selection
+
+**Problem**: Complex `Loader + Component` pattern in Repeater delegates failed to render dynamic notification data.
+
+**Root Cause**: Over-engineering with unnecessary component loading complexity for simple dynamic data display.
+
+**Failed Approach**:
+```qml
+// ❌ Complex - timing issues, property propagation failures
+delegate: Loader {
+    sourceComponent: root.notificationItem
+    property Notification notification: modelData
+    onLoaded: {
+        item.notification = notification;
+        item.dismissed.connect(() => Notification.dismiss(notification));
+    }
+}
+```
+
+**Working Approach**:
+```qml
+// ✅ Simple - direct data access, immediate rendering
+delegate: Text {
+    text: "Notification: " + (modelData.summary || "No summary")
+    color: Theme.foregroundColor
+}
+```
+
+### When to Use Each Pattern
+
+**Use Loader + Component when**:
+- Heavy/complex components that impact performance
+- Components that may not always be needed  
+- Dynamic component selection between different types
+- When you need explicit control over component lifecycle
+
+**Use Direct Delegates when**:
+- Simple, repetitive items (list items, cards)
+- Dynamic data that needs immediate access
+- Performance-critical lists with many items
+- When the delegate is lightweight and data-driven
+
+### Debugging Strategy for QML UI Issues
+
+1. **Add Debug Output**: Insert temporary Text elements to show data counts and states
+2. **Simplify First**: Replace complex delegates with simple Text items to verify data flow
+3. **Check Property Initialization**: Ensure `var` properties are properly initialized in `Component.onCompleted`
+4. **Verify Data Sources**: Confirm the data source (e.g., `trackedList` vs `trackedNotifications`) works correctly
+5. **Test Incrementally**: Start with basic functionality, then add complexity
+
+### Key QML Timing Insights
+
+- **Singleton Initialization**: Singletons may not be fully initialized when other components first access them
+- **Property Binding Evaluation**: Property bindings are evaluated before `Component.onCompleted` handlers run
+- **Component Lifecycle**: `Loader.onLoaded` may fire before the loaded component is ready to accept properties
+- **Array vs List Properties**: `property var` with arrays needs explicit initialization, `list<Type>` properties work more reliably
+
+### Performance vs Simplicity Trade-off
+
+**Lesson**: Start with the simplest working solution, add complexity only when needed. The notification popup worked perfectly with a simple Text delegate, proving that:
+
+1. **Direct data access** (`modelData.property`) is more reliable than property passing
+2. **Immediate rendering** is better than lazy loading for dynamic content
+3. **Simple delegates** are easier to debug and maintain
+4. **Performance gains** from complex patterns may not justify the debugging overhead
+
+**Future Pattern**: For dynamic list content, prefer direct delegation over Loader-based approaches unless there's a clear performance need.
