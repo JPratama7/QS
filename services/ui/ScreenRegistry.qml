@@ -28,7 +28,16 @@ Singleton {
         enabledScreensMap = map;
     }
 
-    Component.onCompleted: rebuildScreensMap()
+    Component.onCompleted: {
+        if (PersistentConfig.adapterView.primaryScreen === "") {
+            const firstScreen = Quickshell.screens[0];
+            if (firstScreen) {
+                PersistentConfig.adapterView.primaryScreen = firstScreen.name;
+            }
+        }
+
+        rebuildScreensMap()
+    }
 
     Connections {
         target: Quickshell
