@@ -79,7 +79,7 @@ Singleton {
     function removeToast(notification: Notification): void {
         if (!root.toastQueue) return;
         let queue = root.toastQueue.slice();
-        root.dismiss(notification);
+        notification.expire();
         queue = queue.filter(item => item.notification !== notification);
         root.toastQueue = queue;
     }
