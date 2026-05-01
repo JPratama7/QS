@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Services.Notifications
 import "../../config"
 import "../../services/system"
 import "../../types"
@@ -84,8 +83,8 @@ PopupWindow {
                 notification: modelData.notification
 
                 onDismissed: {
-                    // Remove this toast from the queue by index
-                    Notification.removeToast(index);
+                    // Remove this toast from the queue by notification object
+                    Notification.removeToast(modelData.notification);
                 }
             }
         }

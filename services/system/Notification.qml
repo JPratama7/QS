@@ -50,7 +50,6 @@ Singleton {
             const duration = ShellConfig.toastDurationMs;
             const before = root.toastQueue.length;
             root.toastQueue = root.toastQueue.filter(item => (now - item.createdAt) < duration);
-            // filter() assigns a new array so toastQueueChanged fires automatically
         }
     }
 
@@ -77,10 +76,11 @@ Singleton {
         root.toastQueue = queue;
     }
 
-    function removeToast(index: int): void {
+    function removeToast(notification: Notification): void {
         if (!root.toastQueue) return;
         let queue = root.toastQueue.slice();
-        queue.splice(index, 1);
+        root.dismiss(notification);
+        queue = queue.filter(item => item.notification !== notification);
         root.toastQueue = queue;
     }
 }

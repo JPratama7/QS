@@ -29,7 +29,7 @@ Item {
             top: parent.top
             left: parent.left
             right: parent.right
-            margins: cardPadding
+            margins: toast.cardPadding
         }
         spacing: Theme.spacingNormal
 
@@ -107,7 +107,6 @@ Item {
         anchors.fill: parent
         onClicked: {
             // Activate the notification (open app, etc.)
-            toast.notification.activate();
             toast.dismissed();
         }
     }
