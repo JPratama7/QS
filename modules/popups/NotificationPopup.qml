@@ -188,7 +188,7 @@ Item {
                                 }
 
                                 onClicked: {
-                                    Notification.dismiss(notificationItem.notification);
+                                    Notification.dismiss(notificationItem.notification, Notification.ToastRemoveReason.Dismiss);
                                 }
                             }
                         }
@@ -199,7 +199,7 @@ Item {
                             anchors.fill: parent
                             hoverEnabled: true
                             onClicked: {
-                                Notification.dismiss(notificationItem.notification);
+                                Notification.dismiss(notificationItem.notification, Notification.ToastRemoveReason.Dismiss);
                             }
                         }
                     }
