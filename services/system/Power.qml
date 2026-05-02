@@ -10,11 +10,9 @@ Singleton {
     id: root
 
     // Direct binding to UPower - updates automatically when device becomes available
-    readonly property UPowerDevice primaryDevice: {
-        return UPower.devices.values.find(d => d.powerSupply === true);
-    }
-    readonly property bool displayReady: root.primaryDevice.ready
-    readonly property bool present: root.primaryDevice.isLaptopBattery ?? false
+    readonly property var primaryDevice: UPower.devices.values.find(d => d.powerSupply === true) ?? null
+    readonly property bool displayReady: root.primaryDevice ? root.primaryDevice.ready : false
+    readonly property bool present: root.displayReady ? root.primaryDevice.isLaptopBattery === true : false
     readonly property int percent: {
         if (!present)
             return 0;
@@ -26,7 +24,7 @@ Singleton {
         return root.primaryDevice.state === UPowerDeviceState.Charging;
     }
     readonly property int health: {
-        if (!present && !root.primaryDevice.healthSupported)
+        if (!present || !root.primaryDevice.healthSupported)
             return 0;
         return root.primaryDevice.healthPercentage;
     }
