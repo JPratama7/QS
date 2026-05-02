@@ -13,6 +13,9 @@ Singleton {
     // Launcher open state (screen name of the screen showing the launcher, or "")
     property string _launcherScreen: ""
 
+    // Cliphist open state (screen name of the screen showing cliphist, or "")
+    property string _cliphistScreen: ""
+
     // Track known screens for removal detection
     property var _knownScreenNames: ([])
 
@@ -26,7 +29,12 @@ Singleton {
     signal launcherOpened(screenName: string)
     signal launcherClosed()
 
+    // Emitted when cliphist opens/closes on a screen
+    signal cliphistOpened(screenName: string)
+    signal cliphistClosed()
+
     readonly property string launcherScreen: _launcherScreen
+    readonly property string cliphistScreen: _cliphistScreen
 
     // Detect screen removal and clean up state
     Connections {
@@ -44,6 +52,9 @@ Singleton {
                 if (root._launcherScreen === name) {
                     root.closeLauncher();
                 }
+                if (root._cliphistScreen === name) {
+                    root.closeCliphist();
+                }
             }
 
             root._knownScreenNames = currentNames;
@@ -56,9 +67,12 @@ Singleton {
 
     // Open a named popup on a screen with the component to render and optional anchor X position
     function openPopup(screenName: string, popupId: string, component: var, anchorX: int): void {
-        // Close launcher if open on any screen
+        // Close launcher and cliphist if open on any screen
         if (root._launcherScreen !== "") {
             root.closeLauncher();
+        }
+        if (root._cliphistScreen !== "") {
+            root.closeCliphist();
         }
         root._openScreens[screenName] = true;
         root.popupRequested(screenName, popupId, component, anchorX);
@@ -91,6 +105,9 @@ Singleton {
         if (root._launcherScreen !== "") {
             root.closeLauncher()
         }
+        if (root._cliphistScreen !== "") {
+            root.closeCliphist();
+        }
 
         root._launcherScreen = screenName;
         root.launcherOpened(screenName);
@@ -103,5 +120,30 @@ Singleton {
 
     function isLauncherOpen(): bool {
         return root._launcherScreen !== "";
+    }
+
+    // Cliphist open/close
+    function openCliphist(screenName: string): void {
+        if (root._cliphistScreen === screenName) {
+            return;
+        }
+        if (root._cliphistScreen !== "") {
+            root.closeCliphist();
+        }
+        if (root._launcherScreen !== "") {
+            root.closeLauncher();
+        }
+
+        root._cliphistScreen = screenName;
+        root.cliphistOpened(screenName);
+    }
+
+    function closeCliphist(): void {
+        root._cliphistScreen = "";
+        root.cliphistClosed();
+    }
+
+    function isCliphistOpen(): bool {
+        return root._cliphistScreen !== "";
     }
 }
