@@ -10,7 +10,7 @@ Singleton {
     id: root
 
     // Direct binding to UPower - updates automatically when device becomes available
-    readonly property var primaryDevice: UPower.devices.values.find(d => d.powerSupply === true) ?? null
+    readonly property var primaryDevice: (UPower.devices.values || []).find(d => d.powerSupply === true) ?? null
     readonly property bool displayReady: root.primaryDevice ? root.primaryDevice.ready : false
     readonly property bool present: root.displayReady ? root.primaryDevice.isLaptopBattery === true : false
     readonly property int percent: {
