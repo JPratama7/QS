@@ -38,7 +38,6 @@ A lightweight, compositor-agnostic Wayland desktop shell built on Quickshell, fe
 | `PopupMenuWindow` | per screen | `Top` | `OnDemand` | `Ignore` | Tray/session menus |
 | `LauncherOverlayWindow` | one screen | `Overlay` | `Exclusive` | `Ignore` | Full-screen launcher overlay |
 | `NotificationToastWindow` | per screen | `Top` | `None` | `Ignore` | Toast notification queue |
-| `NotificationPopup` | per screen | `Top` | `OnDemand` | `Ignore` | Notification center popup |
 
 ### Exclusion Behavior
 
