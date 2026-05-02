@@ -10,42 +10,44 @@ Singleton {
     id: root
 
     // Direct binding to UPower - updates automatically when device becomes available
-    readonly property bool displayReady: UPower.displayDevice.ready
-    readonly property bool present: UPower.displayDevice.isLaptopBattery ?? false
+    readonly property UPowerDevice primaryDevice: {
+        return UPower.devices.values.find(d => d.powerSupply === true);
+    }
+    readonly property bool displayReady: root.primaryDevice.ready
+    readonly property bool present: root.primaryDevice.isLaptopBattery ?? false
     readonly property int percent: {
         if (!present)
             return 0;
-        return Math.round(UPower.displayDevice.percentage * 100);
+        return Math.round(root.primaryDevice.percentage * 100);
     }
     readonly property bool charging: {
         if (!present)
             return false;
-        return UPower.displayDevice.state === UPowerDeviceState.Charging;
+        return root.primaryDevice.state === UPowerDeviceState.Charging;
     }
     readonly property int health: {
-        if (!present || !UPower.displayDevice.healthSupported)
+        if (!present && !root.primaryDevice.healthSupported)
             return 0;
-        return Math.round(UPower.displayDevice.healthPercentage * 100);
+        return root.primaryDevice.healthPercentage;
     }
     readonly property int timeToFull: {
         if (!present)
             return 0;
-        return UPower.displayDevice.timeToFull;
+        return root.primaryDevice.timeToFull;
     }
     readonly property int timeToEmpty: {
         if (!present)
             return 0;
-        return UPower.displayDevice.timeToEmpty;
+        return root.primaryDevice.timeToEmpty;
     }
-    readonly property real chargeRate: {
-        if (!present || !charging)
+    readonly property real changeRate: {
+        if (!present)
             return 0;
-        return Math.abs(UPower.displayDevice.changeRate);
+        return Math.abs(root.primaryDevice.changeRate);
     }
-    readonly property real dischargeRate: {
-        if (!present || charging)
-            return 0;
-        return Math.abs(UPower.displayDevice.changeRate);
+
+    onChangeRateChanged: {
+        console.log(changeRate);
     }
 
     Process {
