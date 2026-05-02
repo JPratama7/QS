@@ -7,13 +7,12 @@ import "../../services/system"
 Item {
     id: list
 
-    implicitHeight: resultsView.contentHeight
-
-    visible: Cliphist.hasResults
+    implicitHeight: resultsView.contentHeight || 100
 
     ListView {
         id: resultsView
         anchors.fill: parent
+        visible: Cliphist.hasResults
         model: Cliphist.results
         delegate: resultDelegate
         spacing: Theme.spacingSmall
