@@ -251,7 +251,7 @@ See [AGENTS.md](./AGENTS.md) for development guidelines and conventions.
 
 ## License
 
-[GPL 2](./LICENSE)
+[GPL 2](./LICENSE.md)
 
 
 ## Credits
