@@ -30,12 +30,21 @@ Singleton {
 
     Component.onCompleted: {
         rebuildScreensMap()
+        restoreFromPersistence()
+    }
 
+    Connections {
+        target: PersistentConfig
+        function onLoaded(): void {
+            registry.restoreFromPersistence()
+        }
+    }
+
+    function restoreFromPersistence(): void {
         if (PersistentConfig.adapterView.primaryScreen === "" && registry.enabledScreens.length > 0) {
             const firstScreen = registry.enabledScreens[0];
             PersistentConfig.adapterView.primaryScreen = firstScreen.name;
         }
-
     }
 
     Connections {
