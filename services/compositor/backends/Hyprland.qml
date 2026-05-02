@@ -10,10 +10,7 @@ QtObject {
 
     readonly property string name: "hyprland"
 
-    function focusedScreenName(): string {
-        const focused = Hyprland.focusedMonitor;
-        return focused ? focused.name : "";
-    }
+    readonly property string focusedScreen: Hyprland.focusedMonitor?.name ?? ""
 
     function activeWorkspaceIdForScreen(screenName: string): int {
         const monitor = Hyprland.monitors.values.find(m => m.name === screenName);

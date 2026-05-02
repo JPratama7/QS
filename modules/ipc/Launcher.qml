@@ -7,20 +7,20 @@ import "../../services/ui"
 import "../../services/launcher"
 
 // Standard IPC interface for external control.
-// Usage: qs ipc call shell <function>
+// Usage: qs ipc call launcher <function>
 //
 // Functions:
-//   toggleLauncher()           - Toggle launcher on primary screen
+//   toggleLauncher()              - Toggle launcher on primary screen
 //   openLauncher(screen?: string) - Open launcher (optional screen name)
-//   closeLauncher()            - Close launcher
-//   isLauncherOpen() -> bool   - Check if launcher is open
+//   closeLauncher()               - Close launcher
+//   isLauncherOpen() -> bool      - Check if launcher is open
 //
 // Example keybind in hyprland.conf:
-//   bind = SUPER, R, exec, qs ipc call shell toggleLauncher
+//   bind = SUPER, R, exec, qs ipc call launcher toggleLauncher
 IpcHandler {
     id: ipc
 
-    target: "shell"
+    target: "launcher"
 
     // Toggle launcher on primary screen
     function toggleLauncher(): void {

@@ -1,3 +1,4 @@
 module ipc
 Ipc Ipc.qml
 Launcher Launcher.qml
+Cliphist Cliphist.qml

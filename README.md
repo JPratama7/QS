@@ -15,6 +15,10 @@ A lightweight, compositor-agnostic Wayland desktop shell built on [Quickshell](h
   - Desktop entry search
   - Keyboard navigation
   - Fuzzy matching
+- **Clipboard history popup** (cliphist) with:
+  - Searchable clipboard entries
+  - Keyboard navigation
+  - One-key copy and close
 - **Auto-hide support** with edge trigger zones
 - **Multi-monitor** with hotplug handling (MVP)
 - **Compositor-agnostic**
@@ -24,6 +28,8 @@ A lightweight, compositor-agnostic Wayland desktop shell built on [Quickshell](h
 - Linux with Wayland compositor
 - Quickshell (see [installation](https://quickshell.org/docs/master/install/))
 - Qt 6.5+
+- [cliphist](https://github.com/sentriz/cliphist) — clipboard history manager (required for the clipboard popup)
+- [wl-clipboard](https://github.com/bugaevc/wl-clipboard) — Wayland clipboard utility (`wl-copy`, used by the clipboard popup)
 
 ## Installation
 
@@ -153,14 +159,15 @@ Configure toast notifications:
 }
 ```
 
-## Launcher Keybind
+## Keybinds
 
 ### Hyprland
 
 Add to `~/.config/hypr/hyprland.conf`:
 
 ```ini
-bind = SUPER, R, exec, qs ipc call shell toggleLauncher
+bind = SUPER, R, exec, qs ipc call launcher toggleLauncher
+bind = SUPER, V, exec, qs ipc call cliphist toggleCliphist
 ```
 
 ### Sway
@@ -168,7 +175,8 @@ bind = SUPER, R, exec, qs ipc call shell toggleLauncher
 Add to `~/.config/sway/config`:
 
 ```
-bindsym $mod+r exec qs ipc call shell toggleLauncher
+bindsym $mod+r exec qs ipc call launcher toggleLauncher
+bindsym $mod+v exec qs ipc call cliphist toggleCliphist
 ```
 
 ### Other Compositors
@@ -176,7 +184,8 @@ bindsym $mod+r exec qs ipc call shell toggleLauncher
 Use your compositor's keybind configuration to execute:
 
 ```bash
-qs ipc call shell toggleLauncher
+qs ipc call launcher toggleLauncher
+qs ipc call cliphist toggleCliphist
 ```
 
 ## IPC Commands
@@ -184,17 +193,17 @@ qs ipc call shell toggleLauncher
 Control the shell via IPC:
 
 ```bash
-# Toggle launcher
-qs ipc call shell toggleLauncher
+# Launcher
+qs ipc call launcher toggleLauncher
+qs ipc call launcher openLauncher DP-1   # open on specific screen
+qs ipc call launcher closeLauncher
+qs ipc call launcher isLauncherOpen
 
-# Open launcher on specific screen
-qs ipc call shell openLauncher DP-1
-
-# Close launcher
-qs ipc call shell closeLauncher
-
-# Check if launcher is open
-qs ipc call shell isLauncherOpen
+# Clipboard (cliphist)
+qs ipc call cliphist toggleCliphist
+qs ipc call cliphist openCliphist DP-1   # open on specific screen
+qs ipc call cliphist closeCliphist
+qs ipc call cliphist isCliphistOpen
 ```
 
 ## Architecture
@@ -251,7 +260,8 @@ See [AGENTS.md](./AGENTS.md) for development guidelines and conventions.
 
 ## License
 
-MIT
+[GPL 2](./LICENSE.md)
+
 
 ## Credits
 
