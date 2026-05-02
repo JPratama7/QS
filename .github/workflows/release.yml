@@ -16,8 +16,9 @@ jobs:
     steps:
       - name: Check for bot bump commit
         id: guard
+        env:
+          MSG: ${{ github.event.head_commit.message }}
         run: |
-          MSG="${{ github.event.head_commit.message }}"
           if echo "$MSG" | grep -qE '(\[skip ci\]|^chore: bump version to )'; then
             echo "Triggered by a bot bump commit — skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
