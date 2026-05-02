@@ -9,9 +9,7 @@ QtObject {
     readonly property string name: "generic"
     readonly property bool available: true
 
-    function focusedScreenName(): string {
-        return "";
-    }
+    readonly property string focusedScreen: ""
 
     function activeWorkspaceIdForScreen(screenName: string): int {
         return 0;
