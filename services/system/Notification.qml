@@ -16,7 +16,7 @@ Singleton {
     property list<Notification> trackedList: ([])
 
     // Toast queue — each entry: { notification: Notification, createdAt: int }
-    property var toastQueue
+    property var toastQueue: ([])
 
     signal newNotificationReceived(notification: Notification)
 
@@ -28,7 +28,6 @@ Singleton {
         Dismiss = 0,
         Expire = 1
     }
-
 
     NotificationServer {
         id: server
@@ -68,17 +67,10 @@ Singleton {
         }
     }
 
-    function dismiss(notification: Notification, reason: int): void {
-        if (reason === root.ToastRemoveReason.Expire) {
-            notification.expire();
-        } else if (reason === root.ToastRemoveReason.Dismiss) {
-            notification.dismiss();
-        } else {
-            console.warn("Unknown dismiss reason:", reason);
-            notification.dismiss();
-        }
+    function dismiss(notification: Notification): void {
+        notification.dismiss();
         root.trackedList = root.trackedList.filter(n => n !== notification);
-
+        root.toastQueue = root.toastQueue.filter(item => item.notification !== notification);
     }
 
     function addToast(notification: Notification): void {
@@ -97,9 +89,6 @@ Singleton {
     function removeToast(notification: Notification): void {
         if (!root.toastQueue)
             return;
-        let queue = root.toastQueue.slice();
-        root.dismiss(notification, root.ToastRemoveReason.Expire);
-        queue = queue.filter(item => item.notification !== notification);
-        root.toastQueue = queue;
+        root.toastQueue = root.toastQueue.filter(item => item.notification !== notification);
     }
 }
