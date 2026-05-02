@@ -33,11 +33,11 @@ Singleton {
     function iconForAppId(appId, fallbackName) {
         const fallback = fallbackName || "application-x-executable";
         if (!appId)
-            return iconFromName(fallback);
+            return iconFromName(fallback, fallback);
 
         try {
             if (typeof DesktopEntries === 'undefined' || !DesktopEntries.byId)
-                return iconFromName(fallback);
+                return iconFromName(fallback, fallback);
 
             const entry = (DesktopEntries.heuristicLookup) ? DesktopEntries.heuristicLookup(appId) : DesktopEntries.byId(appId);
             const name = entry && entry.icon ? entry.icon : "";
