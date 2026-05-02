@@ -14,8 +14,17 @@ FileView {
 
     property alias adapterView: adapter
 
+    // Guard: only write after the initial load has completed (or failed),
+    // so that default-value assignments during construction don't overwrite
+    // an existing config.json before it is read.
+    property bool readyToWrite: false
+
     Component.onCompleted: {
         reload()
+    }
+
+    onLoaded: {
+        readyToWrite = true
     }
 
     JsonAdapter {
@@ -42,8 +51,14 @@ FileView {
         property bool idleInhibitor: false
     }
 
-    onAdapterUpdated: writeAdapter()
+    onAdapterUpdated: {
+        if (readyToWrite) writeAdapter()
+    }
 
-    onLoadFailed: writeAdapter()
+    onLoadFailed: {
+        // File doesn't exist yet — write defaults to create it
+        readyToWrite = true
+        writeAdapter()
+    }
 
 }
