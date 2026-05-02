@@ -26,10 +26,14 @@ FileView {
             writeAdapter();
 
     }
-    onLoadFailed: {
-        // File doesn't exist yet — write defaults to create it
-        readyToWrite = true;
-        writeAdapter();
+    onLoadFailed: error => {
+        if (error === FileViewError.FileNotFound) {
+            // File doesn't exist yet — write defaults to create it
+            readyToWrite = true;
+            writeAdapter();
+        } else {
+            console.error("PersistentConfig: failed to load config file:", FileViewError.toString(error), path);
+        }
     }
 
     JsonAdapter {
