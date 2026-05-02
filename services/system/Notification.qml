@@ -76,6 +76,8 @@ Singleton {
 
     function addToast(notification: Notification): void {
         const maxStack = ShellConfig.toastMaxStack;
+        if (maxStack <= 0)
+            return;
         let queue = (root.toastQueue || []).slice();
         if (queue.length >= maxStack) {
             queue.shift();
