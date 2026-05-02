@@ -46,7 +46,7 @@
     "launcherMaxResults": 8,
     "launcherWidth": 560,
     "popupEdgeMargin": 8,
-    "primaryScreen": "MainMonitor",
+    "primaryScreen": "",
     "toastDurationMs": 5000,
     "toastMaxStack": 3,
     "toastPosition": "top-right",
