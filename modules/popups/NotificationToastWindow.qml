@@ -43,18 +43,21 @@ PopupWindow {
 
     function computeAnchorY(): int {
         const position = ShellConfig.toastPosition;
-        
+        const barAtBottom = toastWindow.context.barEdge === "bottom";
+
         switch (position) {
             case "top-left":
             case "top-center":
             case "top-right":
-                return toastWindow.context.barHeight + edgeMargin;
+                // Add barHeight only when the bar occupies the top edge
+                return (barAtBottom ? 0 : toastWindow.context.barHeight) + edgeMargin;
             case "bottom-left":
             case "bottom-center":
             case "bottom-right":
-                return -(toastColumn.implicitHeight + edgeMargin);
+                // Subtract barHeight as well when the bar occupies the bottom edge
+                return -(toastColumn.implicitHeight + edgeMargin + (barAtBottom ? toastWindow.context.barHeight : 0));
             default:
-                return toastWindow.context.barHeight + edgeMargin; // default to top
+                return (barAtBottom ? 0 : toastWindow.context.barHeight) + edgeMargin; // default to top
         }
     }
 
