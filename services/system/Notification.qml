@@ -54,7 +54,6 @@ Singleton {
                 return;
             const now = Date.now();
             const duration = ShellConfig.toastDurationMs;
-            const before = root.toastQueue.length;
             root.toastQueue = root.toastQueue.filter(item => (now - item.createdAt) < duration);
         }
     }
