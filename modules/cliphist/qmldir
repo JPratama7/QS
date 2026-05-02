@@ -1,0 +1,5 @@
+module cliphist
+CliphistOverlayWindow CliphistOverlayWindow.qml
+CliphistView CliphistView.qml
+CliphistSearchField CliphistSearchField.qml
+CliphistResultsList CliphistResultsList.qml
