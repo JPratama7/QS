@@ -44,10 +44,6 @@ Singleton {
         return Math.abs(root.primaryDevice.changeRate);
     }
 
-    onChangeRateChanged: {
-        console.log(changeRate);
-    }
-
     Process {
         id: powerProcess
     }
