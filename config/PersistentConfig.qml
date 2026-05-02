@@ -1,30 +1,35 @@
-pragma Singleton
-
 import QtQuick
 import Quickshell
 import Quickshell.Io
+pragma Singleton
 
 FileView {
     id: configFile
 
-    path: Quickshell.shellDir + "/config.json"
-    watchChanges: true
-
-    onFileChanged: reload()
-
     property alias adapterView: adapter
-
     // Guard: only write after the initial load has completed (or failed),
     // so that default-value assignments during construction don't overwrite
     // an existing config.json before it is read.
     property bool readyToWrite: false
 
+    path: Quickshell.shellDir + "/config.json"
+    watchChanges: true
+    onFileChanged: reload()
     Component.onCompleted: {
-        reload()
+        reload();
     }
-
     onLoaded: {
-        readyToWrite = true
+        readyToWrite = true;
+    }
+    onAdapterUpdated: {
+        if (readyToWrite)
+            writeAdapter();
+
+    }
+    onLoadFailed: {
+        // File doesn't exist yet — write defaults to create it
+        readyToWrite = true;
+        writeAdapter();
     }
 
     JsonAdapter {
@@ -47,18 +52,9 @@ FileView {
         property int trayMenuMaxHeight: Defaults.trayMenuMaxHeight
         property var barWidgetLayout: Defaults.barWidgetLayout
         property var barWidgetLayoutPerScreen: Defaults.barWidgetLayoutPerScreen
-        property var barWidgetScalePerScreen: ({})
+        property var barWidgetScalePerScreen: ({
+        })
         property bool idleInhibitor: false
-    }
-
-    onAdapterUpdated: {
-        if (readyToWrite) writeAdapter()
-    }
-
-    onLoadFailed: {
-        // File doesn't exist yet — write defaults to create it
-        readyToWrite = true
-        writeAdapter()
     }
 
 }

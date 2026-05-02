@@ -1,14 +1,12 @@
-pragma Singleton
-
-import QtQuick
 import QtQml
+import QtQuick
+pragma Singleton
 
 QtObject {
     id: defaults
 
     // Primary screen name (empty string = first screen is treated as primary)
     readonly property string primaryScreen: ""
-
     // Bar defaults
     readonly property int barHeight: 32
     readonly property string barEdge: "top"
@@ -19,7 +17,7 @@ QtObject {
             "delayMs": 300
         },
         "widgets": {
-            "scale": 1.0,
+            "scale": 1,
             "workspaces": {
                 "showText": true
             },
@@ -28,31 +26,26 @@ QtObject {
             }
         }
     }
-
     // Auto-hide trigger defaults
     readonly property int triggerZoneHeight: 4
-
     // Launcher defaults
     readonly property int launcherWidth: 560
     readonly property int launcherMaxResults: 8
-
     // Popup defaults
     readonly property int popupEdgeMargin: 8
-
     // Toast notification defaults
     readonly property string toastPosition: "top-right"
     readonly property int toastMaxStack: 3
     readonly property int toastDurationMs: 5000
-
     // Tray defaults
     readonly property var trayHiddenIds: []
     readonly property int trayMenuMaxHeight: 400
-
     // Bar widget layout defaults
     readonly property var barWidgetLayout: {
         "left": ["launcher", "workspaces", "activeWindow"],
         "center": ["clock"],
         "right": ["network", "volume", "battery", "idleInhibitor", "notifications", "tray", "session"]
     }
-    readonly property var barWidgetLayoutPerScreen: ({})
+    readonly property var barWidgetLayoutPerScreen: ({
+    })
 }
