@@ -37,6 +37,8 @@ A lightweight, compositor-agnostic Wayland desktop shell built on Quickshell, fe
 | `BarTriggerZone` | per screen (auto-hide) | `Top` | `None` | `Ignore` | Edge strip for auto-hide reveal |
 | `PopupMenuWindow` | per screen | `Top` | `OnDemand` | `Ignore` | Tray/session menus |
 | `LauncherOverlayWindow` | one screen | `Overlay` | `Exclusive` | `Ignore` | Full-screen launcher overlay |
+| `NotificationToastWindow` | per screen | `Top` | `None` | `Ignore` | Toast notification queue |
+| `NotificationPopup` | per screen | `Top` | `OnDemand` | `Ignore` | Notification center popup |
 
 ### Exclusion Behavior
 
@@ -93,6 +95,7 @@ services/                    # Business logic services
     ScreenRegistry.qml       # Screen enumeration
     ShellUI.qml              # Popup/launcher coordination
     BarVisibility.qml        # Bar visibility state
+    Tooltip.qml              # Tooltip management
   compositor/                # Compositor abstraction
     Compositor.qml           # Normalized interface
     backends/
@@ -108,6 +111,9 @@ services/                    # Business logic services
     Audio.qml                # Volume control
     Network.qml              # Network state
     SessionActions.qml       # Power actions
+    Idle.qml                 # Idle inhibition
+    Tray.qml                 # System tray
+    Power.qml                # Power management
 ```
 
 ---
@@ -132,6 +138,21 @@ services/                    # Business logic services
 - Auto-hide timer management
 - Fullscreen detection via `Compositor.activeToplevelChanged`
 - `effectiveVisible()` computes final visibility
+
+#### Tooltip
+- Manages tooltip positioning and visibility
+- Delayed show/hide based on `bar.tooltip.delayMs`
+- Anchored to trigger widget
+
+#### Idle
+- Manages systemd-inhibit for idle prevention
+- Syncs with `PersistentConfig.adapterView.idleInhibitor`
+- Uses `restoreFromPersistence()` pattern for config timing
+
+#### Tray
+- System tray icon management
+- Hidden icons list from config
+- Menu max height configuration
 
 ### Compositor Service
 
@@ -254,7 +275,31 @@ bind = SUPER, R, exec, qs ipc call shell toggleLauncher
   "barHeight": 32,
   "barDisplayMode": "visible",
   "barEdge": "top",
-  "excludedScreens": []
+  "excludedScreens": [],
+  "triggerZoneHeight": 4,
+  "launcherWidth": 560,
+  "launcherMaxResults": 8,
+  "popupEdgeMargin": 8,
+  "toastPosition": "top-right",
+  "toastMaxStack": 3,
+  "toastDurationMs": 5000,
+  "trayHiddenIds": [],
+  "trayMenuMaxHeight": 400,
+  "idleInhibitor": false,
+  "bar": {
+    "tooltip": { "enabled": true, "delayMs": 300 },
+    "widgets": {
+      "scale": 1.0,
+      "workspaces": { "showText": true },
+      "activeWindow": { "maxTextWidth": 200 }
+    }
+  },
+  "barWidgetLayout": {
+    "left": ["launcher", "workspaces", "activeWindow"],
+    "center": ["clock"],
+    "right": ["network", "volume", "battery", "idleInhibitor", "notifications", "tray", "session"]
+  },
+  "barWidgetLayoutPerScreen": {}
 }
 ```
 
@@ -276,6 +321,8 @@ See `docs/IMPLEMENTATION-NOTES.md` for detailed deviations from original design:
 4. **Event-Driven Fullscreen** - Signal-based, not polling
 5. **Mutual Exclusion** - Popup and launcher cannot coexist
 6. **Screen Removal Cleanup** - State cleaned on monitor disconnect
+7. **Config Persistence Timing** - Services use `restoreFromPersistence()` pattern with `PersistentConfig.onLoaded` to avoid reading before config loads
+8. **Toast Notifications** - Queue-based with auto-expire and position configuration
 
 ---
 
