@@ -30,7 +30,6 @@ Singleton {
 
     Component.onCompleted: {
         rebuildScreensMap()
-        restoreFromPersistence()
     }
 
     Connections {
