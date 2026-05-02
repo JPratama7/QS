@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  tag-release:
+    name: Create version tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read version from version.json
+        id: read_version
+        run: |
+          VERSION=$(jq -r '.version' version.json)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Check if tag exists and resolve final version
+        id: resolve_version
+        run: |
+          BASE="${{ steps.read_version.outputs.version }}"
+
+          # Fetch all tags
+          git fetch --tags
+
+          if git rev-parse "v${BASE}" >/dev/null 2>&1; then
+            echo "Tag v${BASE} already exists — auto-incrementing patch"
+
+            # Split semver parts
+            MAJOR=$(echo "$BASE" | cut -d. -f1)
+            MINOR=$(echo "$BASE" | cut -d. -f2)
+            PATCH=$(echo "$BASE" | cut -d. -f3)
+
+            # Keep incrementing patch until we find a free tag
+            PATCH=$((PATCH + 1))
+            while git rev-parse "v${MAJOR}.${MINOR}.${PATCH}" >/dev/null 2>&1; do
+              PATCH=$((PATCH + 1))
+            done
+
+            FINAL="${MAJOR}.${MINOR}.${PATCH}"
+          else
+            FINAL="$BASE"
+          fi
+
+          echo "final_version=${FINAL}" >> "$GITHUB_OUTPUT"
+          echo "Resolved version: ${FINAL}"
+
+      - name: Update version.json if version was bumped
+        id: update_version
+        run: |
+          BASE="${{ steps.read_version.outputs.version }}"
+          FINAL="${{ steps.resolve_version.outputs.final_version }}"
+
+          if [ "$BASE" != "$FINAL" ]; then
+            echo "Updating version.json: ${BASE} -> ${FINAL}"
+            jq --arg v "$FINAL" '.version = $v' version.json > version.json.tmp
+            mv version.json.tmp version.json
+            echo "updated=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "updated=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit updated version.json
+        if: steps.update_version.outputs.updated == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add version.json
+          git commit -m "chore: bump version to ${{ steps.resolve_version.outputs.final_version }} [skip ci]"
+          git push
+
+      - name: Create and push tag
+        run: |
+          TAG="v${{ steps.resolve_version.outputs.final_version }}"
+          git tag "$TAG"
+          git push origin "$TAG"
+          echo "Created tag: ${TAG}"
