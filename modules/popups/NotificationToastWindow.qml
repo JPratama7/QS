@@ -89,15 +89,4 @@ PopupWindow {
             }
         }
     }
-
-    // Update anchor position when config changes
-    Connections {
-        target: ShellConfig
-
-        function onToastPositionChanged() {
-            // Force re-evaluation of anchor position
-            toastWindow.anchor.rect.x = Qt.binding(() => toastWindow.computeAnchorX());
-            toastWindow.anchor.rect.y = Qt.binding(() => toastWindow.computeAnchorY());
-        }
-    }
 }
