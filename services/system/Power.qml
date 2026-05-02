@@ -10,6 +10,7 @@ Singleton {
     id: root
 
     // Direct binding to UPower - updates automatically when device becomes available
+    readonly property bool displayReady: UPower.displayDevice.ready
     readonly property bool present: UPower.displayDevice.isLaptopBattery ?? false
     readonly property int percent: {
         if (!present)
