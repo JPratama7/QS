@@ -7,11 +7,8 @@ QtObject {
     property string title: ""
     property string subtitle: ""
     property string icon: ""
-
     // Provider identity — used by Launcher to dispatch activate()
     property string providerId: ""
-
     // Opaque payload the provider needs to execute the action
     property var data: null
-
 }

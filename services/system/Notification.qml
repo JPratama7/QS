@@ -4,6 +4,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
+import "../../config"
 
 Singleton {
     id: root
@@ -12,17 +13,48 @@ Singleton {
 
     readonly property list<Notification> trackedNotifications: trackedList
 
-    property list<Notification> trackedList: []
+    property list<Notification> trackedList: ([])
+
+    // Toast queue — each entry: { notification: Notification, createdAt: int }
+    property var toastQueue: ([])
+
+    signal newNotificationReceived(notification: Notification)
+
+    Component.onCompleted: {
+        root.toastQueue = [];
+    }
+
+    enum ToastRemoveReason {
+        Dismiss = 0,
+        Expire = 1
+    }
 
     NotificationServer {
         id: server
         keepOnReload: true
         bodySupported: true
 
-        onNotification: (notification) => {
+        onNotification: notification => {
             notification.tracked = true;
             root.trackedList.push(notification);
             root.trackedListChanged();
+            root.newNotificationReceived(notification);
+            root.addToast(notification);
+        }
+    }
+
+    Timer {
+        id: toastSweepTimer
+        interval: 500
+        repeat: true
+        running: (root.toastQueue || []).length > 0
+
+        onTriggered: {
+            if (!root.toastQueue)
+                return;
+            const now = Date.now();
+            const duration = ShellConfig.toastDurationMs;
+            root.toastQueue = root.toastQueue.filter(item => (now - item.createdAt) < duration);
         }
     }
 
@@ -32,10 +64,35 @@ Singleton {
         for (const n of toClose) {
             n.dismiss();
         }
+
+        root.toastQueue = [];
     }
 
     function dismiss(notification: Notification): void {
-        root.trackedList = root.trackedList.filter(n => n !== notification);
         notification.dismiss();
+        root.trackedList = root.trackedList.filter(n => n !== notification);
+        root.toastQueue = root.toastQueue.filter(item => item.notification !== notification);
+    }
+
+    function addToast(notification: Notification): void {
+        const maxStack = ShellConfig.toastMaxStack;
+        if (maxStack <= 0)
+            return;
+        let queue = (root.toastQueue || []).slice();
+        if (queue.length >= maxStack) {
+            queue.shift();
+        }
+        queue.push({
+            notification: notification,
+            createdAt: Date.now()
+        });
+        root.toastQueue = queue;
+    }
+
+    function removeToast(notification: Notification): void {
+        if (!root.toastQueue)
+            return;
+        notification.expire();
+        root.toastQueue = root.toastQueue.filter(item => item.notification !== notification);
     }
 }

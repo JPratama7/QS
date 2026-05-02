@@ -28,7 +28,23 @@ Singleton {
         enabledScreensMap = map;
     }
 
-    Component.onCompleted: rebuildScreensMap()
+    Component.onCompleted: {
+        rebuildScreensMap()
+    }
+
+    Connections {
+        target: PersistentConfig
+        function onLoaded(): void {
+            registry.restoreFromPersistence()
+        }
+    }
+
+    function restoreFromPersistence(): void {
+        if (PersistentConfig.adapterView.primaryScreen === "" && registry.enabledScreens.length > 0) {
+            const firstScreen = registry.enabledScreens[0];
+            PersistentConfig.adapterView.primaryScreen = firstScreen.name;
+        }
+    }
 
     Connections {
         target: Quickshell

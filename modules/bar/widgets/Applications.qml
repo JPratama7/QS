@@ -44,12 +44,12 @@ BaseWidget {
                         anchors.centerIn: parent
                         width: Theme.iconSizeSmall
                         height: Theme.iconSizeSmall
-                        source: AppIcons.iconForAppId(appItem.modelData.appId ?? "")
+                        source: AppIcons.iconForAppId(appItem.modelData?.appId ?? "")
 
                         Connections {
                             target: appItem.modelData
                             function onAppIdChanged() {
-                                icon.source = AppIcons.iconForAppId(appItem.modelData.appId ?? "")
+                                icon.source = AppIcons.iconForAppId(appItem.modelData?.appId ?? "")
                             }
                         }
                     }

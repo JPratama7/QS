@@ -8,31 +8,83 @@ import "../../../services/system"
 BaseWidget {
     id: widget
 
+    function formatTime(seconds: int): string {
+        const hours = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        if (hours > 0)
+            return hours + "h " + mins + "m";
+        return mins + "m";
+    }
+
     tooltipComponent: Component {
-        Text {
-            text: {
-                if (!Power.present) return "On AC Power"
-                if (Power.charging) return "Charging: " + Power.percent + "%"
-                return "Battery: " + Power.percent + "%"
+        Column {
+            spacing: 4
+            Text {
+                text: !Power.present ? "On AC Power" : (Power.charging ? "Charging: " + Power.percent + "%" : "Battery: " + Power.percent + "%")
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.foregroundColor
             }
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.foregroundColor
+            Text {
+                visible: Power.present && Power.health > 0
+                text: "Health: " + Power.health + "%"
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.foregroundColor
+            }
+            Text {
+                visible: Power.present && Power.charging && Power.timeToFull > 0
+                text: "Time to full: " + widget.formatTime(Power.timeToFull)
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.foregroundColor
+            }
+            Text {
+                visible: Power.present && !Power.charging && Power.timeToEmpty > 0
+                text: "Time remaining: " + widget.formatTime(Power.timeToEmpty)
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.foregroundColor
+            }
+            Text {
+                visible: Power.present && Power.changeRate > 0
+                text: (Power.charging ? "Charge rate: " : "Discharge rate: ") + Power.changeRate.toFixed(1) + " W"
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.foregroundColor
+            }
         }
     }
 
     visible: Power.present
-    implicitWidth: textItem.implicitWidth
-    implicitHeight: textItem.implicitHeight
+    implicitWidth: row.implicitWidth
+    implicitHeight: row.implicitHeight
 
-    Text {
-        id: textItem
-        text: Power.present ? Power.percent + "%" : "⏻ AC"
-        color: {
-            if (Power.charging) return "#3b82f6";
-            if (Power.percent < 20) return "#ef4444";
-            return Theme.foregroundColor;
+    readonly property color _textColor: {
+        if (Power.charging)
+            return "#3b82f6";
+        if (Power.percent < 20)
+            return "#ef4444";
+        return Theme.foregroundColor;
+    }
+
+    Row {
+        id: row
+        spacing: 3
+
+        Text {
+            id: iconItem
+            // 🔌 when charging, 🔋 when on battery
+            text: Power.charging ? "🔌" : "🔋"
+            font.pixelSize: Theme.fontSizeSmall
+            font.family: Theme.fontFamily
+            color: widget._textColor
+            height: textItem.height
+            verticalAlignment: Text.AlignVCenter
         }
-        font.pixelSize: Theme.fontSizeSmall
-        font.family: Theme.fontFamily
+
+        Text {
+            id: textItem
+            text: Power.percent + "%"
+            color: widget._textColor
+            font.pixelSize: Theme.fontSizeSmall
+            font.family: Theme.fontFamily
+            verticalAlignment: Text.AlignVCenter
+        }
     }
 }

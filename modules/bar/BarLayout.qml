@@ -120,6 +120,8 @@ Item {
     Component {
         id: notificationsComp
         NotificationIndicatorWidget {
+            screenName: barLayout.screenName
+            barWindow: barLayout.barWindow
             widgetScale: barLayout.widgetScale
         }
     }

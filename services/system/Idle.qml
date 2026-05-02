@@ -18,7 +18,6 @@ Singleton {
         command: ["systemd-inhibit", "--what", "idle:sleep", "--who", "quickshell", "--why", "User requested idle inhibition", "sleep", "infinity"]
 
         onRunningChanged: {
-            console.log("Process running changed:", running, "processId:", processId)
             if (!running && root.inhibited) {
                 // Process died while we wanted inhibition - restart it
                 systemdInhibitProcess.running = true
@@ -33,7 +32,10 @@ Singleton {
 
     Connections {
         target: PersistentConfig
-        function onAdapterChanged() {
+        function onAdapterUpdated() {
+            root.restoreFromPersistence()
+        }
+        function onLoaded() {
             root.restoreFromPersistence()
         }
     }
@@ -56,7 +58,6 @@ Singleton {
 
     // Apply inhibition to backend using systemd-inhibit
     function applyInhibit(): void {
-        console.log("Running inhibitor")
         systemdInhibitProcess.running = true
         inhibited = true
     }

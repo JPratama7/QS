@@ -1,7 +1,6 @@
-pragma Singleton
-
-import QtQuick
 import QtQml
+import QtQuick
+pragma Singleton
 
 QtObject {
     id: theme
@@ -13,16 +12,13 @@ QtObject {
     readonly property color mutedColor: "#6c7086"
     readonly property color surfaceColor: "#313244"
     readonly property color errorColor: "#f38ba8"
-
     // Typography
     readonly property string fontFamily: "sans-serif"
     readonly property int fontSizeSmall: 11
     readonly property int fontSizeNormal: 13
     readonly property int fontSizeLarge: 15
-
     // Icon sizes
     readonly property int iconSizeSmall: 16
-
     // Spacing
     readonly property int paddingSmall: 4
     readonly property int paddingNormal: 8
@@ -30,7 +26,6 @@ QtObject {
     readonly property int spacingSmall: 4
     readonly property int spacingNormal: 8
     readonly property int spacingLarge: 16
-
     // Radii
     readonly property int radiusSmall: 4
     readonly property int radiusNormal: 8

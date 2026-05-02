@@ -32,6 +32,16 @@ Item {
     }
 
     Loader {
+        id: toastWindowLoader
+        active: delegate.context.isPrimary
+
+        sourceComponent: NotificationToastWindow {
+            context: delegate.context
+            barWindow: barWindow
+        }
+    }
+
+    Loader {
         id: launcherLoader
         active: false
 

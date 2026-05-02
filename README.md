@@ -56,7 +56,31 @@ Edit `config.json` in the shell directory:
   "barHeight": 32,
   "barDisplayMode": "visible",
   "barEdge": "top",
-  "excludedScreens": []
+  "excludedScreens": [],
+  "triggerZoneHeight": 4,
+  "launcherWidth": 560,
+  "launcherMaxResults": 8,
+  "popupEdgeMargin": 8,
+  "toastPosition": "top-right",
+  "toastMaxStack": 3,
+  "toastDurationMs": 5000,
+  "trayHiddenIds": [],
+  "trayMenuMaxHeight": 400,
+  "idleInhibitor": false,
+  "bar": {
+    "tooltip": { "enabled": true, "delayMs": 300 },
+    "widgets": {
+      "scale": 1.0,
+      "workspaces": { "showText": true },
+      "activeWindow": { "maxTextWidth": 200 }
+    }
+  },
+  "barWidgetLayout": {
+    "left": ["launcher", "workspaces", "activeWindow"],
+    "center": ["clock"],
+    "right": ["network", "volume", "battery", "idleInhibitor", "notifications", "tray", "session"]
+  },
+  "barWidgetLayoutPerScreen": {}
 }
 ```
 
@@ -76,6 +100,56 @@ Exclude screens by name pattern (regex):
 ```json
 {
   "excludedScreens": ["^HDMI-", "Virtual-1"]
+}
+```
+
+### Bar Widget Layout
+
+Configure widgets per zone (left/center/right):
+
+```json
+{
+  "barWidgetLayout": {
+    "left": ["launcher", "workspaces", "activeWindow"],
+    "center": ["clock"],
+    "right": ["network", "volume", "battery", "idleInhibitor", "notifications", "tray", "session"]
+  }
+}
+```
+
+Available widgets: `launcher`, `workspaces`, `activeWindow`, `clock`, `network`, `volume`, `battery`, `idleInhibitor`, `notifications`, `tray`, `session`, `systemMonitor`, `taskbar`
+
+Per-screen override:
+
+```json
+{
+  "barWidgetLayoutPerScreen": {
+    "DP-1": { "left": ["workspaces"], "center": [], "right": ["clock", "tray"] }
+  }
+}
+```
+
+### Idle Inhibition
+
+Enable idle inhibition (prevents screen sleep):
+
+```json
+{
+  "idleInhibitor": true
+}
+```
+
+> **Note**: If `primaryScreen` is empty, it will automatically be set to the first available screen on startup.
+
+### Notifications
+
+Configure toast notifications:
+
+```json
+{
+  "toastPosition": "top-right",
+  "toastMaxStack": 3,
+  "toastDurationMs": 5000
 }
 ```
 

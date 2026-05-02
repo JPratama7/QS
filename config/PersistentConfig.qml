@@ -1,21 +1,39 @@
-pragma Singleton
-
 import QtQuick
 import Quickshell
 import Quickshell.Io
+pragma Singleton
 
 FileView {
     id: configFile
 
+    property alias adapterView: adapter
+    // Guard: only write after the initial load has completed (or failed),
+    // so that default-value assignments during construction don't overwrite
+    // an existing config.json before it is read.
+    property bool readyToWrite: false
+
     path: Quickshell.shellDir + "/config.json"
     watchChanges: true
-
     onFileChanged: reload()
-
-    property alias adapterView: adapter
-
     Component.onCompleted: {
-        reload()
+        reload();
+    }
+    onLoaded: {
+        readyToWrite = true;
+    }
+    onAdapterUpdated: {
+        if (readyToWrite)
+            writeAdapter();
+
+    }
+    onLoadFailed: error => {
+        readyToWrite = true;
+        if (error === FileViewError.FileNotFound) {
+            // File doesn't exist yet — write defaults to create it
+            writeAdapter();
+        } else {
+            console.error("PersistentConfig: failed to load config file:", FileViewError.toString(error), path);
+        }
     }
 
     JsonAdapter {
@@ -30,17 +48,17 @@ FileView {
         property int launcherWidth: Defaults.launcherWidth
         property int launcherMaxResults: Defaults.launcherMaxResults
         property int popupEdgeMargin: Defaults.popupEdgeMargin
+        property string toastPosition: Defaults.toastPosition
+        property int toastMaxStack: Defaults.toastMaxStack
+        property int toastDurationMs: Defaults.toastDurationMs
         property var excludedScreens: []
         property var trayHiddenIds: Defaults.trayHiddenIds
         property int trayMenuMaxHeight: Defaults.trayMenuMaxHeight
         property var barWidgetLayout: Defaults.barWidgetLayout
         property var barWidgetLayoutPerScreen: Defaults.barWidgetLayoutPerScreen
-        property var barWidgetScalePerScreen: ({})
+        property var barWidgetScalePerScreen: ({
+        })
         property bool idleInhibitor: false
     }
-
-    onAdapterUpdated: writeAdapter()
-
-    onLoadFailed: writeAdapter()
 
 }

@@ -1,0 +1,57 @@
+{
+    "bar": {
+        "tooltip": {
+            "delayMs": 300,
+            "enabled": true
+        },
+        "widgets": {
+            "activeWindow": {
+                "maxTextWidth": 200
+            },
+            "scale": 1,
+            "workspaces": {
+                "showText": true
+            }
+        }
+    },
+    "barDisplayMode": "visible",
+    "barEdge": "top",
+    "barHeight": 32,
+    "barWidgetLayout": {
+        "center": [
+            "clock"
+        ],
+        "left": [
+            "launcher",
+            "workspaces",
+            "activeWindow"
+        ],
+        "right": [
+            "network",
+            "volume",
+            "battery",
+            "idleInhibitor",
+            "notifications",
+            "tray",
+            "session"
+        ]
+    },
+    "barWidgetLayoutPerScreen": {
+    },
+    "barWidgetScalePerScreen": {
+    },
+    "excludedScreens": [
+    ],
+    "idleInhibitor": false,
+    "launcherMaxResults": 8,
+    "launcherWidth": 560,
+    "popupEdgeMargin": 8,
+    "primaryScreen": "",
+    "toastDurationMs": 5000,
+    "toastMaxStack": 3,
+    "toastPosition": "top-right",
+    "trayHiddenIds": [
+    ],
+    "trayMenuMaxHeight": 400,
+    "triggerZoneHeight": 4
+}
