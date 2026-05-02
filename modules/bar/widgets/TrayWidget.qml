@@ -31,7 +31,7 @@ BaseWidget {
     Row {
         id: trayRow
         anchors.fill: parent
-        spacing: Theme.spacingSmall
+        spacing: Theme.spacingNormal
 
         Repeater {
             model: Tray.items
