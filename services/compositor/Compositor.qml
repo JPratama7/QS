@@ -5,7 +5,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
-import "../../types"
 
 Singleton {
     id: service
@@ -33,6 +32,8 @@ Singleton {
     readonly property var backend: _backend
     readonly property string backendName: _backend ? _backend.name : "none"
 
+    readonly property string focusedScreen: _backend ? _backend.focusedScreen : ""
+
     readonly property Toplevel topLevel: ToplevelManager.activeToplevel
 
     onTopLevelChanged: {
@@ -40,10 +41,6 @@ Singleton {
     }
 
     signal activeToplevelChanged(data: Toplevel)
-
-    function focusedScreenName(): string {
-        return backend ? backend.focusedScreenName() : "";
-    }
 
     function activeWorkspaceIdForScreen(screenName: string): int {
         return backend ? backend.activeWorkspaceIdForScreen(screenName) : 0;
