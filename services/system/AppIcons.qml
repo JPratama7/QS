@@ -8,6 +8,11 @@ Singleton {
 
   function iconFromName(iconName, fallbackName) {
     const fallback = fallbackName || "application-x-executable"
+
+    // Absolute path - use directly instead of passing through icon theme resolver
+    if (iconName && iconName.startsWith("/"))
+      return "file://" + iconName
+
     try {
       if (iconName && typeof Quickshell !== 'undefined' && Quickshell.iconPath) {
         const p = Quickshell.iconPath(iconName, fallback)
@@ -15,7 +20,6 @@ Singleton {
           return p
       }
     } catch (e) {
-
       // ignore and fall back
     }
     try {
