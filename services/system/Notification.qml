@@ -64,6 +64,8 @@ Singleton {
         for (const n of toClose) {
             n.dismiss();
         }
+
+        root.toastQueue = [];
     }
 
     function dismiss(notification: Notification): void {
