@@ -3,26 +3,67 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.UPower
 
 Singleton {
     id: root
 
     // Direct binding to UPower - updates automatically when device becomes available
-    readonly property bool present: UPower.displayDevice?.isLaptopBattery ?? false
-    readonly property int percent: present ? Math.round(UPower.displayDevice.percentage * 100) : 0
-    readonly property bool charging: present ? UPower.displayDevice.state === UPowerDeviceState.Charging : false
+    readonly property bool present: UPower.displayDevice.isLaptopBattery ?? false
+    readonly property int percent: {
+        if (!present)
+            return 0;
+        return Math.round(UPower.displayDevice.percentage * 100);
+    }
+    readonly property bool charging: {
+        if (!present)
+            return false;
+        return UPower.displayDevice.state === UPowerDeviceState.Charging;
+    }
+    readonly property int health: {
+        if (!present || !UPower.displayDevice.healthSupported)
+            return 0;
+        return Math.round(UPower.displayDevice.healthPercentage * 100);
+    }
+    readonly property int timeToFull: {
+        if (!present)
+            return 0;
+        return UPower.displayDevice.timeToFull;
+    }
+    readonly property int timeToEmpty: {
+        if (!present)
+            return 0;
+        return UPower.displayDevice.timeToEmpty;
+    }
+    readonly property real chargeRate: {
+        if (!present || !charging)
+            return 0;
+        return Math.abs(UPower.displayDevice.changeRate);
+    }
+    readonly property real dischargeRate: {
+        if (!present || charging)
+            return 0;
+        return Math.abs(UPower.displayDevice.changeRate);
+    }
+
+    Process {
+        id: powerProcess
+    }
 
     function shutdown(): void {
-        // Stub - requires logind D-Bus call
+        powerProcess.command = ["systemctl", "poweroff"];
+        powerProcess.startDetached();
     }
 
     function reboot(): void {
-        // Stub - requires logind D-Bus call
+        powerProcess.command = ["systemctl", "reboot"];
+        powerProcess.startDetached();
     }
 
     function suspend(): void {
-        // Stub - requires logind D-Bus call
+        powerProcess.command = ["systemctl", "suspend"];
+        powerProcess.startDetached();
     }
 
     function logout(): void {
