@@ -31,9 +31,9 @@ Singleton {
         if (!Pipewire.defaultAudioSink || !Pipewire.defaultAudioSink.audio)
             return "";
         const audio = Pipewire.defaultAudioSink.audio;
-        const chs = audio.channels;
-        const vols = audio.volumes;
-        if (!chs || chs.length === 0)
+        const chs = audio.channels || [];
+        const vols = audio.volumes || [];
+        if (chs.length === 0)
             return "";
         const parts = [];
         for (let i = 0; i < chs.length; i++) {
