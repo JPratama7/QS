@@ -15,7 +15,7 @@ Item {
 
     implicitWidth: menuWidth
     property int frozenHeight: 0
-    implicitHeight: (stack.depth > 1 && stack.currentItem) ? stack.currentItem.implicitHeight : (frozenHeight > 0 ? frozenHeight : (stack.currentItem ? stack.currentItem.implicitHeight : 0))
+    implicitHeight: (stack.depth >= 1 && stack.currentItem) ? stack.currentItem.implicitHeight : (frozenHeight > 0 ? frozenHeight : (stack.currentItem ? stack.currentItem.implicitHeight : 0))
 
     Connections {
         target: stack
