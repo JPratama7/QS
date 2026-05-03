@@ -8,111 +8,51 @@ import Quickshell.Services.Pipewire
 Singleton {
     id: root
 
-    property var sink: null
-
-    // Bind the sink node to ensure audio properties are available
+    // Track the default audio sink so its audio properties are live
     PwObjectTracker {
-        objects: root.sink ? [root.sink] : []
+        objects: Pipewire.defaultAudioSink ? [Pipewire.defaultAudioSink] : []
     }
 
-    // Internal state properties
-    property real _volume: 0
-    property bool _muted: false
+    // Directly bind to the default sink's audio properties
+    readonly property real volume: (Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio)
+        ? Pipewire.defaultAudioSink.audio.volume
+        : 0
 
-    readonly property real volume: _volume
-    readonly property bool muted: _muted
+    readonly property bool muted: (Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio)
+        ? Pipewire.defaultAudioSink.audio.muted
+        : false
 
-    Component.onCompleted: {
-        root.resolveSink();
-    }
+    readonly property string sinkDescription: Pipewire.defaultAudioSink
+        ? (Pipewire.defaultAudioSink.description || Pipewire.defaultAudioSink.nickname || Pipewire.defaultAudioSink.name || "")
+        : ""
 
-    Connections {
-        target: Pipewire
-        function onReadyChanged() {
-            if (Pipewire.ready) {
-                root.resolveSink();
-            }
+    // Per-channel volume info as a pre-formatted string for display (e.g. "FL: 75%  FR: 75%")
+    readonly property string channelVolumeText: {
+        if (!Pipewire.defaultAudioSink || !Pipewire.defaultAudioSink.audio)
+            return "";
+        const audio = Pipewire.defaultAudioSink.audio;
+        const chs = audio.channels || [];
+        const vols = audio.volumes || [];
+        if (chs.length === 0)
+            return "";
+        const parts = [];
+        for (let i = 0; i < chs.length; i++) {
+            const name = PwAudioChannel.toString(chs[i]);
+            const pct = Math.round((vols[i] ?? 0) * 100);
+            parts.push(name + ": " + pct + "%");
         }
-    }
-
-    Connections {
-        target: root
-        function onSinkChanged() {
-            if (root.sink) {
-                root.updateAudioState();
-            }
-        }
-    }
-
-    Connections {
-        target: root.sink
-        function onReadyChanged() {
-            if (root.sink.ready) {
-                root.updateAudioState();
-            }
-        }
-    }
-
-    Connections {
-        enabled: root.sink != null && root.sink.audio != null
-        target: root.sink ? root.sink.audio : null
-        function onVolumeChanged() {
-            root._volume = root.sink.audio.volume;
-        }
-        function onMutedChanged() {
-            root._muted = root.sink.audio.muted;
-        }
-    }
-
-    // Resolve the best available sink: prefer default, fallback to first working sink
-    function resolveSink(): void {
-        if (!Pipewire.ready) {
-            return;
-        }
-
-        const defaultSink = Pipewire.defaultAudioSink;
-
-        // Use default sink if it has audio interface
-        if (defaultSink && defaultSink.audio) {
-            root.sink = defaultSink;
-            return;
-        }
-
-        // Find first sink with audio interface from nodes
-        if (Pipewire.nodes) {
-            for (const node of Pipewire.nodes.values) {
-                if (node && node.isSink && node.audio) {
-                    root.sink = node;
-                    return;
-                }
-            }
-        }
-
-        // Last resort: use default sink even without audio (may become available later)
-        if (defaultSink) {
-            root.sink = defaultSink;
-        }
-    }
-
-    // Update volume/muted from sink audio (only when ready)
-    function updateAudioState(): void {
-        if (!root.sink || !root.sink.ready || !root.sink.audio) {
-            return;
-        }
-
-        root._volume = root.sink.audio.volume;
-        root._muted = root.sink.audio.muted;
+        return parts.join("  ");
     }
 
     function setVolume(value: real): void {
-        if (sink && sink.audio) {
-            sink.audio.volume = value;
+        if (Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio) {
+            Pipewire.defaultAudioSink.audio.volume = value;
         }
     }
 
     function toggleMute(): void {
-        if (sink && sink.audio) {
-            sink.audio.muted = !sink.audio.muted;
+        if (Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio) {
+            Pipewire.defaultAudioSink.audio.muted = !Pipewire.defaultAudioSink.audio.muted;
         }
     }
 }

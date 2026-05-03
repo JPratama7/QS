@@ -58,6 +58,7 @@ BaseWidget {
     Row {
         id: row
         spacing: Theme.spacingSmall
+        visible: widget.activeWindow !== null
 
         IconImage {
             width: Theme.iconSizeSmall
