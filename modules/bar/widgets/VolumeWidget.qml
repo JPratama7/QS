@@ -9,10 +9,28 @@ BaseWidget {
     id: widget
 
     tooltipComponent: Component {
-        Text {
-            text: Audio.muted ? "Muted" : "Volume: " + Math.round(Audio.volume * 100) + "%"
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.foregroundColor
+        Column {
+            spacing: Theme.spacingSmall
+
+            Text {
+                visible: Audio.sinkDescription !== ""
+                text: Audio.sinkDescription
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.foregroundColor
+            }
+
+            Text {
+                text: Audio.muted ? "Muted" : "Volume: " + Math.round(Audio.volume * 100) + "%"
+                font.pixelSize: Theme.fontSizeSmall
+                color: Audio.muted ? Theme.mutedColor : Theme.foregroundColor
+            }
+
+            Text {
+                visible: Audio.channelVolumeText !== ""
+                text: Audio.channelVolumeText
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.foregroundColor
+            }
         }
     }
 
