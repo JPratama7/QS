@@ -51,6 +51,7 @@ FileView {
         property string toastPosition: Defaults.toastPosition
         property int toastMaxStack: Defaults.toastMaxStack
         property int toastDurationMs: Defaults.toastDurationMs
+        property int notificationMaxHistory: Defaults.notificationMaxHistory
         property var excludedScreens: []
         property var trayHiddenIds: Defaults.trayHiddenIds
         property int trayMenuMaxHeight: Defaults.trayMenuMaxHeight
@@ -59,6 +60,7 @@ FileView {
         property var barWidgetScalePerScreen: ({
         })
         property bool idleInhibitor: false
+        property bool dndEnabled: Defaults.dndEnabled
     }
 
 }
