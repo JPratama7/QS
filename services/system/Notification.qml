@@ -17,11 +17,16 @@ Singleton {
 	readonly property int unreadCount: trackedList.length
 	readonly property list<Notification> trackedNotifications: trackedList
 	property list<Notification> trackedList: ([])
+	readonly property bool dndEnabled: ShellConfig.dndEnabled
 
 	// Toast queue — each entry: { notification: Notification, createdAt: int }
 	property var toastQueue: ([])
 
 	signal newNotificationReceived(notification: Notification)
+
+	function toggleDnd(): void {
+		PersistentConfig.adapterView.dndEnabled = !PersistentConfig.adapterView.dndEnabled;
+	}
 
 	function dismissAll(): void {
 		const toClose = root.trackedList.slice();
@@ -58,6 +63,23 @@ Singleton {
 		root.toastQueue = root.toastQueue.filter(item => item.notification !== notification);
 	}
 
+	// Enforce notification history cap — dismiss oldest overflow entries
+	function _enforceHistoryCap(): void {
+		const maxHistory = ShellConfig.notificationMaxHistory;
+		if (maxHistory <= 0)
+			return;
+		let list = root.trackedList;
+		while (list.length > maxHistory) {
+			const oldest = list[0];
+			oldest.dismiss();
+			// Remove from toast queue as well to avoid dangling references
+			root.toastQueue = (root.toastQueue || []).filter(item => item.notification !== oldest);
+			list = list.slice(1);
+		}
+		if (list !== root.trackedList)
+			root.trackedList = list;
+	}
+
 	Component.onCompleted: {
 		root.toastQueue = [];
 	}
@@ -77,8 +99,11 @@ Singleton {
 			notification.tracked = true;
 			root.trackedList.push(notification);
 			root.trackedListChanged();
+			root._enforceHistoryCap();
 			root.newNotificationReceived(notification);
-			root.addToast(notification);
+			if (!ShellConfig.dndEnabled) {
+				root.addToast(notification);
+			}
 		}
 	}
 	Timer {

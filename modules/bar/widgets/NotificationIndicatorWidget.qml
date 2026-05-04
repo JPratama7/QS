@@ -16,13 +16,18 @@ BaseWidget {
 
     tooltipComponent: Component {
         Text {
-            text: widget.hasUnread ? "Notifications: " + Notification.unreadCount : "No notifications"
+            text: Notification.dndEnabled
+                ? "Do Not Disturb is on — " + Notification.unreadCount + " pending"
+                : widget.hasUnread
+                    ? "Notifications: " + Notification.unreadCount
+                    : "No notifications"
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.foregroundColor
         }
     }
 
     readonly property bool hasUnread: Notification.unreadCount > 0
+    readonly property bool isDnd: Notification.dndEnabled
 
     implicitWidth: label.implicitWidth
     implicitHeight: label.implicitHeight
@@ -30,8 +35,8 @@ BaseWidget {
     Text {
         id: label
         anchors.centerIn: parent
-        text: widget.hasUnread ? "\uD83D\uDD14 " + Notification.unreadCount : "\uD83D\uDD15"
-        color: widget.hasUnread ? Theme.foregroundColor : Theme.mutedColor
+        text: widget.isDnd ? "\uD83D\uDD07" : (widget.hasUnread ? "\uD83D\uDD14 " + Notification.unreadCount : "\uD83D\uDD15")
+        color: widget.isDnd ? Theme.accentColor : (widget.hasUnread ? Theme.foregroundColor : Theme.mutedColor)
         font.pixelSize: Theme.fontSizeSmall
         font.family: Theme.fontFamily
     }
@@ -39,7 +44,12 @@ BaseWidget {
     MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
-        onClicked: {
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton) {
+                Notification.toggleDnd();
+                return;
+            }
             const pos = widget.mapToItem(null, 0, 0);
             ShellUI.openPopup(widget.screenName, "notifications", notificationPopupComponent, pos.x);
         }

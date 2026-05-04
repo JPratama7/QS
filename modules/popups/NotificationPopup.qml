@@ -46,6 +46,35 @@ Item {
             font.weight: Font.Medium
         }
 
+        // DnD toggle
+        Button {
+            id: dndButton
+            width: parent.width
+            height: dndText.implicitHeight + Theme.paddingSmall * 2
+
+            Rectangle {
+                anchors.fill: parent
+                radius: Theme.radiusSmall
+                color: dndArea.containsMouse ? Qt.alpha(Theme.accentColor, 0.15) : "transparent"
+            }
+
+            Text {
+                id: dndText
+                anchors.centerIn: parent
+                text: Notification.dndEnabled ? "Do Not Disturb: ON" : "Do Not Disturb: OFF"
+                color: Notification.dndEnabled ? Theme.accentColor : Theme.mutedColor
+                font.pixelSize: Theme.fontSizeSmall
+                font.family: Theme.fontFamily
+            }
+
+            MouseArea {
+                id: dndArea
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: Notification.toggleDnd()
+            }
+        }
+
         // Clear all button (only show if there are notifications)
         Button {
             id: clearAllButton
@@ -81,7 +110,7 @@ Item {
             id: notificationsScrollView
 
             width: parent.width
-            height: Math.min(notificationColumn.implicitHeight, root.maxPopupHeight - clearAllButton.height - 30 - Theme.paddingNormal * 4)
+            height: Math.min(notificationColumn.implicitHeight, root.maxPopupHeight - dndButton.height - clearAllButton.height - 30 - Theme.paddingNormal * 4)
             visible: Notification.trackedList.length > 0
             clip: true
 
