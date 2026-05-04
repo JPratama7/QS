@@ -15,6 +15,43 @@ Item {
     readonly property int popupWidth: 280
     readonly property int maxPopupHeight: 400
 
+    // Expanded state keyed by notification.id — survives delegate reuse
+    property var _expandedMap: ({})
+
+    function _isExpanded(notificationId: uint): bool {
+        return _expandedMap[notificationId] === true;
+    }
+    function _setExpanded(notificationId: uint, expanded: bool): void {
+        const map = Object.assign({}, _expandedMap);
+        if (expanded)
+            map[notificationId] = true;
+        else
+            delete map[notificationId];
+        _expandedMap = map;
+    }
+
+    // Prune stale entries when notifications are dismissed
+    function _pruneExpandedMap(): void {
+        const activeIds = new Set(Notification.trackedList.map(n => n.id));
+        const map = Object.assign({}, _expandedMap);
+        let changed = false;
+        for (const key of Object.keys(map)) {
+            if (!activeIds.has(parseInt(key))) {
+                delete map[key];
+                changed = true;
+            }
+        }
+        if (changed)
+            _expandedMap = map;
+    }
+
+    Connections {
+        target: Notification
+        function onTrackedListChanged() {
+            root._pruneExpandedMap();
+        }
+    }
+
     implicitWidth: popupWidth
     implicitHeight: Math.min(column.implicitHeight + Theme.paddingNormal * 2, maxPopupHeight)
 
@@ -126,7 +163,7 @@ Item {
                 readonly property int itemPadding: Theme.paddingSmall
                 readonly property int iconSize: Theme.iconSizeSmall * 1.5
 
-                property bool bodyExpanded: false
+                readonly property bool bodyExpanded: root._isExpanded(notification.id)
 
                 width: ListView.view.width
                 implicitHeight: contentColumn.implicitHeight + itemPadding * 2
@@ -232,7 +269,7 @@ Item {
                             MouseArea {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: notificationItem.bodyExpanded = !notificationItem.bodyExpanded
+                                onClicked: root._setExpanded(notificationItem.notification.id, !notificationItem.bodyExpanded)
                             }
                         }
                     }
