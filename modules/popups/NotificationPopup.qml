@@ -105,180 +105,173 @@ Item {
             }
         }
 
-        // Notifications list
-        ScrollView {
-            id: notificationsScrollView
+        // Notifications list — ListView for delegate reuse (virtualization)
+        ListView {
+            id: notificationList
 
             width: parent.width
-            height: Math.min(notificationColumn.implicitHeight, root.maxPopupHeight - dndButton.height - clearAllButton.height - 30 - Theme.paddingNormal * 4)
+            height: Math.min(contentHeight, Math.max(0, root.maxPopupHeight - dndButton.height - clearAllButton.height - 30 - Theme.paddingNormal * 4))
             visible: Notification.trackedList.length > 0
             clip: true
+            spacing: Theme.spacingSmall
 
-            Column {
-                id: notificationColumn
-                width: parent.width
-                spacing: Theme.spacingSmall
+            model: Notification.trackedList
 
-                Repeater {
-                    model: Notification.trackedList
+            delegate: Item {
+                id: notificationItem
 
-                    delegate: Item {
-                        id: notificationItem
+                required property QuickshellNotifications.Notification modelData
+                property QuickshellNotifications.Notification notification: modelData
 
-                        required property QuickshellNotifications.Notification modelData
-                        property QuickshellNotifications.Notification notification: modelData
+                readonly property int itemPadding: Theme.paddingSmall
+                readonly property int iconSize: Theme.iconSizeSmall * 1.5
 
-                        readonly property int itemPadding: Theme.paddingSmall
-                        readonly property int iconSize: Theme.iconSizeSmall * 1.5
+                property bool bodyExpanded: false
 
-                        property bool bodyExpanded: false
+                width: ListView.view.width
+                implicitHeight: contentColumn.implicitHeight + itemPadding * 2
 
-                        width: notificationColumn.width
-                        implicitHeight: contentColumn.implicitHeight + itemPadding * 2
+                Rectangle {
+                    anchors.fill: parent
+                    radius: Theme.radiusSmall
+                    color: itemArea.containsMouse ? Qt.alpha(Theme.foregroundColor, 0.05) : "transparent"
+
+                    border.width: notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Critical ? 1 : 0
+                    border.color: Qt.alpha(Theme.errorColor, 0.3)
+                }
+
+                Row {
+                    id: contentColumn
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        right: parent.right
+                        margins: notificationItem.itemPadding
+                    }
+                    spacing: Theme.spacingSmall
+
+                    Rectangle {
+                        id: iconContainer
+                        width: notificationItem.iconSize
+                        height: width
+                        radius: Theme.radiusSmall
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        color: {
+                            if (notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Critical)
+                                return Qt.alpha(Theme.errorColor, 0.2);
+                            if (notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Low)
+                                return Qt.alpha(Theme.mutedColor, 0.15);
+                            return Qt.alpha(Theme.accentColor, 0.2);
+                        }
+
+                        // Resolved icon (image > appIcon > desktopEntry)
+                        IconImage {
+                            anchors.fill: parent
+                            anchors.margins: Theme.paddingSmall
+                            source: notificationItem.notification.image
+                                || (notificationItem.notification.appIcon && AppIcons.iconFromName(notificationItem.notification.appIcon))
+                                || (notificationItem.notification.desktopEntry && AppIcons.iconForAppId(notificationItem.notification.desktopEntry))
+                                || ""
+                            visible: source !== ""
+                        }
+
+                        // Fallback bell emoji
+                        Text {
+                            anchors.centerIn: parent
+                            text: "🔔"
+                            font.pixelSize: Theme.iconSizeSmall
+                            visible: !notificationItem.notification.image && !notificationItem.notification.appIcon && !notificationItem.notification.desktopEntry
+                            color: {
+                                if (notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Critical)
+                                    return Theme.errorColor;
+                                if (notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Low)
+                                    return Theme.mutedColor;
+                                return Theme.accentColor;
+                            }
+                        }
+                    }
+
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - iconContainer.width - parent.spacing - dismissButton.width
+
+                        Text {
+                            id: titleText
+                            width: parent.width
+                            text: notificationItem.notification.summary || "Notification"
+                            color: Theme.foregroundColor
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.family: Theme.fontFamily
+                            font.weight: Font.Medium
+                            elide: Text.ElideRight
+                        }
+
+                        Text {
+                            id: bodyText
+                            width: parent.width
+                            text: notificationItem.notification.body || ""
+                            textFormat: Text.StyledText
+                            color: Theme.mutedColor
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.family: Theme.fontFamily
+                            elide: Text.ElideRight
+                            maximumLineCount: notificationItem.bodyExpanded ? undefined : 3
+                            wrapMode: Text.WordWrap
+                            visible: text.length > 0
+                        }
+
+                        Text {
+                            id: expandIndicator
+                            visible: bodyText.visible && (bodyText.truncated || notificationItem.bodyExpanded)
+                            text: notificationItem.bodyExpanded ? "▲ show less" : "▼ show more"
+                            color: Theme.accentColor
+                            font.pixelSize: Theme.fontSizeSmall - 1
+                            font.family: Theme.fontFamily
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: notificationItem.bodyExpanded = !notificationItem.bodyExpanded
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: dismissButton
+                        z: 1 // Need to above MouseArea for itemArea
+                        width: Theme.iconSizeSmall + Theme.paddingSmall
+                        height: width
+                        anchors.verticalCenter: parent.verticalCenter
+                        hoverEnabled: true
 
                         Rectangle {
                             anchors.fill: parent
                             radius: Theme.radiusSmall
-                            color: itemArea.containsMouse ? Qt.alpha(Theme.foregroundColor, 0.05) : "transparent"
-
-                            border.width: notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Critical ? 1 : 0
-                            border.color: Qt.alpha(Theme.errorColor, 0.3)
+                            color: dismissButton.containsMouse ? Qt.alpha(Theme.errorColor, 0.2) : "transparent"
                         }
 
-                        Row {
-                            id: contentColumn
-                            anchors {
-                                top: parent.top
-                                left: parent.left
-                                right: parent.right
-                                margins: notificationItem.itemPadding
-                            }
-                            spacing: Theme.spacingSmall
-
-                            Rectangle {
-                                id: iconContainer
-                                width: notificationItem.iconSize
-                                height: width
-                                radius: Theme.radiusSmall
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                color: {
-                                    if (notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Critical)
-                                        return Qt.alpha(Theme.errorColor, 0.2);
-                                    if (notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Low)
-                                        return Qt.alpha(Theme.mutedColor, 0.15);
-                                    return Qt.alpha(Theme.accentColor, 0.2);
-                                }
-
-                                // Resolved icon (image > appIcon > desktopEntry)
-                                IconImage {
-                                    anchors.fill: parent
-                                    anchors.margins: Theme.paddingSmall
-                                    source: notificationItem.notification.image
-                                        || (notificationItem.notification.appIcon && AppIcons.iconFromName(notificationItem.notification.appIcon))
-                                        || (notificationItem.notification.desktopEntry && AppIcons.iconForAppId(notificationItem.notification.desktopEntry))
-                                        || ""
-                                    visible: source !== ""
-                                }
-
-                                // Fallback bell emoji
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "🔔"
-                                    font.pixelSize: Theme.iconSizeSmall
-                                    visible: !notificationItem.notification.image && !notificationItem.notification.appIcon && !notificationItem.notification.desktopEntry
-                                    color: {
-                                        if (notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Critical)
-                                            return Theme.errorColor;
-                                        if (notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Low)
-                                            return Theme.mutedColor;
-                                        return Theme.accentColor;
-                                    }
-                                }
-                            }
-
-                            Column {
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: parent.width - iconContainer.width - parent.spacing - dismissButton.width
-
-                                Text {
-                                    id: titleText
-                                    width: parent.width
-                                    text: notificationItem.notification.summary || "Notification"
-                                    color: Theme.foregroundColor
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    font.family: Theme.fontFamily
-                                    font.weight: Font.Medium
-                                    elide: Text.ElideRight
-                                }
-
-                                Text {
-                                    id: bodyText
-                                    width: parent.width
-                                    text: notificationItem.notification.body || ""
-                                    textFormat: Text.StyledText
-                                    color: Theme.mutedColor
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    font.family: Theme.fontFamily
-                                    elide: Text.ElideRight
-                                    maximumLineCount: notificationItem.bodyExpanded ? undefined : 3
-                                    wrapMode: Text.WordWrap
-                                    visible: text.length > 0
-                                }
-
-                                Text {
-                                    id: expandIndicator
-                                    visible: bodyText.visible && (bodyText.truncated || notificationItem.bodyExpanded)
-                                    text: notificationItem.bodyExpanded ? "▲ show less" : "▼ show more"
-                                    color: Theme.accentColor
-                                    font.pixelSize: Theme.fontSizeSmall - 1
-                                    font.family: Theme.fontFamily
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: notificationItem.bodyExpanded = !notificationItem.bodyExpanded
-                                    }
-                                }
-                            }
-
-                            MouseArea {
-                                id: dismissButton
-                                z: 1 // Need to above MouseArea for itemArea
-                                width: Theme.iconSizeSmall + Theme.paddingSmall
-                                height: width
-                                anchors.verticalCenter: parent.verticalCenter
-                                hoverEnabled: true
-
-                                Rectangle {
-                                    anchors.fill: parent
-                                    radius: Theme.radiusSmall
-                                    color: dismissButton.containsMouse ? Qt.alpha(Theme.errorColor, 0.2) : "transparent"
-                                }
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "✕"
-                                    color: dismissButton.containsMouse ? Theme.errorColor : Theme.mutedColor
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    font.family: Theme.fontFamily
-                                }
-
-                                onClicked: {
-                                    Notification.dismiss(notificationItem.notification);
-                                }
-                            }
+                        Text {
+                            anchors.centerIn: parent
+                            text: "✕"
+                            color: dismissButton.containsMouse ? Theme.errorColor : Theme.mutedColor
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.family: Theme.fontFamily
                         }
 
-                        MouseArea {
-                            id: itemArea
-                            z: -1 // Need to be below dismiss button to not block clicks
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: {
-                                Notification.dismiss(notificationItem.notification);
-                            }
+                        onClicked: {
+                            Notification.dismiss(notificationItem.notification);
                         }
+                    }
+                }
+
+                MouseArea {
+                    id: itemArea
+                    z: -1 // Need to be below dismiss button to not block clicks
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: {
+                        Notification.dismiss(notificationItem.notification);
                     }
                 }
             }
