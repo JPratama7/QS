@@ -70,6 +70,7 @@ Edit `config.json` in the shell directory:
   "toastPosition": "top-right",
   "toastMaxStack": 3,
   "toastDurationMs": 5000,
+  "notificationMaxHistory": 100,
   "trayHiddenIds": [],
   "trayMenuMaxHeight": 400,
   "idleInhibitor": false,
@@ -155,9 +156,12 @@ Configure toast notifications:
 {
   "toastPosition": "top-right",
   "toastMaxStack": 3,
-  "toastDurationMs": 5000
+  "toastDurationMs": 5000,
+  "notificationMaxHistory": 100
 }
 ```
+
+> **Note**: `notificationMaxHistory` caps the number of retained notifications in history. Set to `0` for unlimited.
 
 ## Keybinds
 

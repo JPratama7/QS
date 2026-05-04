@@ -282,6 +282,7 @@ bind = SUPER, R, exec, qs ipc call shell toggleLauncher
   "toastPosition": "top-right",
   "toastMaxStack": 3,
   "toastDurationMs": 5000,
+  "notificationMaxHistory": 100,
   "trayHiddenIds": [],
   "trayMenuMaxHeight": 400,
   "idleInhibitor": false,
