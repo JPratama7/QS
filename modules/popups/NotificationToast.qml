@@ -1,26 +1,34 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell.Services.Notifications
+import Quickshell.Services.Notifications as QuickshellNotification
+import Quickshell.Widgets
 import "../../config"
+import "../../services/system"
 
 Item {
     id: toast
 
-    required property Notification notification
+    required property QuickshellNotification.Notification notification
     signal dismissed()
 
     readonly property int cardPadding: Theme.paddingNormal
+    readonly property int iconSize: Theme.iconSizeSmall * 2
+
+    property bool bodyExpanded: false
 
     implicitWidth: parent.width
     implicitHeight: cardContent.implicitHeight + cardPadding * 2
 
     Rectangle {
+        id: card
         anchors.fill: parent
         color: Theme.surfaceColor
         radius: Theme.radiusNormal
         border.width: 1
-        border.color: Qt.alpha(Theme.foregroundColor, 0.1)
+        border.color: toast.notification.urgency === QuickshellNotification.NotificationUrgency.Critical
+            ? Qt.alpha(Theme.errorColor, 0.3)
+            : Qt.alpha(Theme.foregroundColor, 0.1)
     }
 
     Row {
@@ -35,23 +43,50 @@ Item {
 
         Rectangle {
             id: iconContainer
-            width: Theme.iconSizeSmall * 2
-            height: width
+            width: toast.iconSize
+            height: toast.iconSize
             radius: Theme.radiusSmall
-            color: Qt.alpha(Theme.accentColor, 0.2)
             anchors.verticalCenter: parent.verticalCenter
 
+            color: {
+                if (toast.notification.urgency === QuickshellNotification.NotificationUrgency.Critical)
+                    return Qt.alpha(Theme.errorColor, 0.2);
+                if (toast.notification.urgency === QuickshellNotification.NotificationUrgency.Low)
+                    return Qt.alpha(Theme.mutedColor, 0.15);
+                return Qt.alpha(Theme.accentColor, 0.2);
+            }
+
+            // Resolved icon (image > appIcon > desktopEntry)
+            IconImage {
+                anchors.fill: parent
+                anchors.margins: Theme.paddingSmall
+                source: toast.notification.image
+                    || (toast.notification.appIcon && AppIcons.iconFromName(toast.notification.appIcon))
+                    || (toast.notification.desktopEntry && AppIcons.iconForAppId(toast.notification.desktopEntry))
+                    || ""
+                visible: source !== ""
+            }
+
+            // Fallback bell emoji
             Text {
                 anchors.centerIn: parent
                 text: "🔔"
                 font.pixelSize: Theme.iconSizeSmall
-                color: Theme.accentColor
+                visible: !toast.notification.image && !toast.notification.appIcon && !toast.notification.desktopEntry
+                color: {
+                    if (toast.notification.urgency === QuickshellNotification.NotificationUrgency.Critical)
+                        return Theme.errorColor;
+                    if (toast.notification.urgency === QuickshellNotification.NotificationUrgency.Low)
+                        return Theme.mutedColor;
+                    return Theme.accentColor;
+                }
             }
         }
 
         Column {
+            id: textColumn
             anchors.verticalCenter: parent.verticalCenter
-            width: parent.width - iconContainer.width - parent.spacing - dismissButton.width
+            width: parent.width - iconContainer.width - parent.spacing - dismissButton.width - parent.spacing
 
             Text {
                 id: titleText
@@ -68,13 +103,29 @@ Item {
                 id: bodyText
                 width: parent.width
                 text: toast.notification.body || ""
+                textFormat: Text.StyledText
                 color: Theme.mutedColor
                 font.pixelSize: Theme.fontSizeSmall
                 font.family: Theme.fontFamily
                 elide: Text.ElideRight
-                maximumLineCount: 2
+                maximumLineCount: toast.bodyExpanded ? undefined : 2
                 wrapMode: Text.WordWrap
                 visible: text.length > 0
+            }
+
+            Text {
+                id: expandIndicator
+                visible: bodyText.visible && (bodyText.truncated || toast.bodyExpanded)
+                text: toast.bodyExpanded ? "▲ show less" : "▼ show more"
+                color: Theme.accentColor
+                font.pixelSize: Theme.fontSizeSmall - 1
+                font.family: Theme.fontFamily
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: toast.bodyExpanded = !toast.bodyExpanded
+                }
             }
         }
 
@@ -104,10 +155,8 @@ Item {
     }
 
     MouseArea {
+        z: -1
         anchors.fill: parent
-        onClicked: {
-            // Activate the notification (open app, etc.)
-            toast.dismissed();
-        }
+        onClicked: toast.dismissed()
     }
 }

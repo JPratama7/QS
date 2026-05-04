@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import Quickshell.Services.Notifications as QuickshellNotifications
+import Quickshell.Widgets
 import "../../config"
 import "../../services/system"
 
@@ -101,6 +102,8 @@ Item {
                         readonly property int itemPadding: Theme.paddingSmall
                         readonly property int iconSize: Theme.iconSizeSmall * 1.5
 
+                        property bool bodyExpanded: false
+
                         width: notificationColumn.width
                         implicitHeight: contentColumn.implicitHeight + itemPadding * 2
 
@@ -108,6 +111,9 @@ Item {
                             anchors.fill: parent
                             radius: Theme.radiusSmall
                             color: itemArea.containsMouse ? Qt.alpha(Theme.foregroundColor, 0.05) : "transparent"
+
+                            border.width: notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Critical ? 1 : 0
+                            border.color: Qt.alpha(Theme.errorColor, 0.3)
                         }
 
                         Row {
@@ -125,14 +131,40 @@ Item {
                                 width: notificationItem.iconSize
                                 height: width
                                 radius: Theme.radiusSmall
-                                color: Qt.alpha(Theme.accentColor, 0.2)
                                 anchors.verticalCenter: parent.verticalCenter
 
+                                color: {
+                                    if (notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Critical)
+                                        return Qt.alpha(Theme.errorColor, 0.2);
+                                    if (notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Low)
+                                        return Qt.alpha(Theme.mutedColor, 0.15);
+                                    return Qt.alpha(Theme.accentColor, 0.2);
+                                }
+
+                                // Resolved icon (image > appIcon > desktopEntry)
+                                IconImage {
+                                    anchors.fill: parent
+                                    anchors.margins: Theme.paddingSmall
+                                    source: notificationItem.notification.image
+                                        || (notificationItem.notification.appIcon && AppIcons.iconFromName(notificationItem.notification.appIcon))
+                                        || (notificationItem.notification.desktopEntry && AppIcons.iconForAppId(notificationItem.notification.desktopEntry))
+                                        || ""
+                                    visible: source !== ""
+                                }
+
+                                // Fallback bell emoji
                                 Text {
                                     anchors.centerIn: parent
                                     text: "🔔"
                                     font.pixelSize: Theme.iconSizeSmall
-                                    color: Theme.accentColor
+                                    visible: !notificationItem.notification.image && !notificationItem.notification.appIcon && !notificationItem.notification.desktopEntry
+                                    color: {
+                                        if (notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Critical)
+                                            return Theme.errorColor;
+                                        if (notificationItem.notification.urgency === QuickshellNotifications.NotificationUrgency.Low)
+                                            return Theme.mutedColor;
+                                        return Theme.accentColor;
+                                    }
                                 }
                             }
 
@@ -155,13 +187,29 @@ Item {
                                     id: bodyText
                                     width: parent.width
                                     text: notificationItem.notification.body || ""
+                                    textFormat: Text.StyledText
                                     color: Theme.mutedColor
                                     font.pixelSize: Theme.fontSizeSmall
                                     font.family: Theme.fontFamily
                                     elide: Text.ElideRight
-                                    maximumLineCount: 3
+                                    maximumLineCount: notificationItem.bodyExpanded ? undefined : 3
                                     wrapMode: Text.WordWrap
                                     visible: text.length > 0
+                                }
+
+                                Text {
+                                    id: expandIndicator
+                                    visible: bodyText.visible && (bodyText.truncated || notificationItem.bodyExpanded)
+                                    text: notificationItem.bodyExpanded ? "▲ show less" : "▼ show more"
+                                    color: Theme.accentColor
+                                    font.pixelSize: Theme.fontSizeSmall - 1
+                                    font.family: Theme.fontFamily
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: notificationItem.bodyExpanded = !notificationItem.bodyExpanded
+                                    }
                                 }
                             }
 
@@ -188,7 +236,7 @@ Item {
                                 }
 
                                 onClicked: {
-Notification.dismiss(notificationItem.notification);
+                                    Notification.dismiss(notificationItem.notification);
                                 }
                             }
                         }
@@ -216,6 +264,7 @@ Notification.dismiss(notificationItem.notification);
             font.family: Theme.fontFamily
             horizontalAlignment: Text.AlignHCenter
             visible: Notification.trackedList.length === 0
+            topPadding: Theme.paddingNormal
         }
     }
 }
