@@ -18,10 +18,10 @@ Item {
     // Expanded state keyed by notification.id — survives delegate reuse
     property var _expandedMap: ({})
 
-    function _isExpanded(notificationId: uint): bool {
+    function _isExpanded(notificationId: int): bool {
         return _expandedMap[notificationId] === true;
     }
-    function _setExpanded(notificationId: uint, expanded: bool): void {
+    function _setExpanded(notificationId: int, expanded: bool): void {
         const map = Object.assign({}, _expandedMap);
         if (expanded)
             map[notificationId] = true;
