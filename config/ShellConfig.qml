@@ -64,6 +64,12 @@ QtObject {
         return barConfig.widgets || {}
     }
 
+    function systemMonitorRamFormat(): string {
+        const widgetsConfig = config.barWidgetsConfig()
+        const fmt = widgetsConfig.systemMonitor?.ramFormat
+        return (fmt === "used" || fmt === "used/total") ? fmt : "percent"
+    }
+
     function normalizedBarWidgetLayout(layout: var): var {
         const source = layout || {}
         const seen = ({})
