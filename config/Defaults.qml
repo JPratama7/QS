@@ -23,6 +23,9 @@ QtObject {
             },
             "activeWindow": {
                 "maxTextWidth": 200
+            },
+            "systemMonitor": {
+                "ramFormat": "percent"
             }
         }
     }
