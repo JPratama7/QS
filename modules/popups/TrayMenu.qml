@@ -8,6 +8,7 @@ import "."
 Item {
     id: root
 
+    required property string screenName
     required property var menuHandle
     onMenuHandleChanged: root.frozenHeight = 0
 
@@ -15,7 +16,29 @@ Item {
 
     implicitWidth: menuWidth
     property int frozenHeight: 0
-    implicitHeight: (stack.depth > 1 && stack.currentItem) ? stack.currentItem.implicitHeight : (frozenHeight > 0 ? frozenHeight : (stack.currentItem ? stack.currentItem.implicitHeight : 0))
+    implicitHeight: (stack.depth >= 1 && stack.currentItem) ? stack.currentItem.implicitHeight : Math.max(frozenHeight, 0)
+
+    opacity: 0
+    Behavior on opacity {
+        NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
+    }
+
+    transform: Translate {
+        id: entranceSlide
+        y: 20
+        Behavior on y {
+            NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
+        }
+    }
+
+    Behavior on implicitHeight {
+        NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+    }
+
+    Component.onCompleted: {
+        opacity = 1;
+        entranceSlide.y = 0;
+    }
 
     Connections {
         target: stack
@@ -44,16 +67,28 @@ Item {
         initialItem: menuPage
 
         pushEnter: Transition {
-            NumberAnimation { property: "x"; from: root.menuWidth; to: 0; duration: 180; easing.type: Easing.OutCubic }
+            ParallelAnimation {
+                NumberAnimation { property: "x"; from: root.menuWidth; to: 0; duration: 200; easing.type: Easing.OutCubic }
+                NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 200; easing.type: Easing.OutCubic }
+            }
         }
         pushExit: Transition {
-            NumberAnimation { property: "x"; from: 0; to: -root.menuWidth / 3; duration: 180; easing.type: Easing.OutCubic }
+            ParallelAnimation {
+                NumberAnimation { property: "x"; from: 0; to: -root.menuWidth; duration: 200; easing.type: Easing.OutCubic }
+                NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 200; easing.type: Easing.OutCubic }
+            }
         }
         popEnter: Transition {
-            NumberAnimation { property: "x"; from: -root.menuWidth / 3; to: 0; duration: 180; easing.type: Easing.OutCubic }
+            ParallelAnimation {
+                NumberAnimation { property: "x"; from: -root.menuWidth; to: 0; duration: 200; easing.type: Easing.OutCubic }
+                NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 200; easing.type: Easing.OutCubic }
+            }
         }
         popExit: Transition {
-            NumberAnimation { property: "x"; from: 0; to: root.menuWidth; duration: 180; easing.type: Easing.OutCubic }
+            ParallelAnimation {
+                NumberAnimation { property: "x"; from: 0; to: root.menuWidth; duration: 200; easing.type: Easing.OutCubic }
+                NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 200; easing.type: Easing.OutCubic }
+            }
         }
     }
 
@@ -62,6 +97,7 @@ Item {
         TrayMenuPage {
             menuHandle: root.menuHandle
             stackView: stack
+            screenName: root.screenName
             width: root.menuWidth
         }
     }

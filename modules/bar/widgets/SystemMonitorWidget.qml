@@ -8,12 +8,26 @@ import "../../../services/system"
 BaseWidget {
     id: widget
 
+    readonly property string _ramFormat: ShellConfig.systemMonitorRamFormat()
+
+    readonly property string _ramAbsolute: SystemMonitor.useGB
+        ? SystemMonitor.ramUsedGB.toFixed(1) + "/" + SystemMonitor.ramTotalGB.toFixed(1) + " GB"
+        : SystemMonitor.ramUsedMB + "/" + SystemMonitor.ramTotalMB + " MB"
+
+    readonly property string _ramUsed: SystemMonitor.useGB
+        ? SystemMonitor.ramUsedGB.toFixed(1) + " GB"
+        : SystemMonitor.ramUsedMB + " MB"
+
+    readonly property string _ramText: {
+        if (_ramFormat === "used/total") return _ramAbsolute
+        if (_ramFormat === "used") return _ramUsed
+        return Math.round(SystemMonitor.ramUsage * 100) + "%"
+    }
+
     property Component widgetTooltip: Component {
         Text {
             text: "CPU: " + Math.round(SystemMonitor.cpuUsage * 100) + "%\n"
-                + "RAM: " + (SystemMonitor.useGB
-                    ? SystemMonitor.ramUsedGB + "/" + SystemMonitor.ramTotalGB + " GB"
-                    : SystemMonitor.ramUsedMB + "/" + SystemMonitor.ramTotalMB + " MB") + "\n"
+                + "RAM: " + widget._ramAbsolute + " (" + Math.round(SystemMonitor.ramUsage * 100) + "%)\n"
                 + "Temp: " + SystemMonitor.temperature + "°C"
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.foregroundColor
@@ -39,7 +53,7 @@ BaseWidget {
 
         // RAM
         Text {
-            text: "RAM " + Math.round(SystemMonitor.ramUsage * 100) + "%"
+            text: "RAM " + widget._ramText
             color: SystemMonitor.ramUsage > 0.9 ? "#ef4444" : Theme.foregroundColor
             font.pixelSize: Theme.fontSizeSmall
             font.family: Theme.fontFamily

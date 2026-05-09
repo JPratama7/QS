@@ -77,6 +77,7 @@ BaseWidget {
     Component {
         id: trayMenuComponent
         TrayMenu {
+            screenName: widget.screenName
             menuHandle: Tray.activeRequest ? Tray.activeRequest.item.menu : null
         }
     }

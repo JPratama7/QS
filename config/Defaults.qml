@@ -23,6 +23,9 @@ QtObject {
             },
             "activeWindow": {
                 "maxTextWidth": 200
+            },
+            "systemMonitor": {
+                "ramFormat": "percent"
             }
         }
     }
@@ -33,10 +36,14 @@ QtObject {
     readonly property int launcherMaxResults: 8
     // Popup defaults
     readonly property int popupEdgeMargin: 8
+    // Notification defaults
+    readonly property bool dndEnabled: false
     // Toast notification defaults
     readonly property string toastPosition: "top-right"
     readonly property int toastMaxStack: 3
     readonly property int toastDurationMs: 5000
+    // Notification history cap — 0 means unlimited
+    readonly property int notificationMaxHistory: 100
     // Tray defaults
     readonly property var trayHiddenIds: []
     readonly property int trayMenuMaxHeight: 400

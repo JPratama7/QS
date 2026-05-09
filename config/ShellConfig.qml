@@ -26,6 +26,12 @@ QtObject {
     readonly property int toastMaxStack: PersistentConfig.adapter.toastMaxStack
     readonly property int toastDurationMs: PersistentConfig.adapter.toastDurationMs
 
+    // Notification history cap — 0 means unlimited
+    readonly property int notificationMaxHistory: PersistentConfig.adapter.notificationMaxHistory
+
+    // DnD configuration
+    readonly property bool dndEnabled: PersistentConfig.adapter.dndEnabled
+
     // Primary screen name — used by ScreenContext.isPrimary
     readonly property string primaryScreen: PersistentConfig.adapter.primaryScreen
 
@@ -56,6 +62,12 @@ QtObject {
     function barWidgetsConfig(): var {
         const barConfig = PersistentConfig.adapter.bar || {}
         return barConfig.widgets || {}
+    }
+
+    function systemMonitorRamFormat(): string {
+        const widgetsConfig = config.barWidgetsConfig()
+        const fmt = widgetsConfig.systemMonitor?.ramFormat
+        return (fmt === "used" || fmt === "used/total") ? fmt : "percent"
     }
 
     function normalizedBarWidgetLayout(layout: var): var {

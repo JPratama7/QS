@@ -49,6 +49,7 @@
     "primaryScreen": "",
     "toastDurationMs": 5000,
     "toastMaxStack": 3,
+    "notificationMaxHistory": 100,
     "toastPosition": "top-right",
     "trayHiddenIds": [
     ],
