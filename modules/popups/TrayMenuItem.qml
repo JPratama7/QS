@@ -2,13 +2,15 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.DBusMenu
 import "../../config"
 
 Item {
     id: root
 
-    required property var entry
+    required property DBusMenuItem entry
 
+    signal triggered()
     signal submenuRequested(entry: var)
 
     readonly property bool isSeparator: root.entry?.isSeparator ?? false
@@ -94,8 +96,9 @@ Item {
             if (!root.entry) return;
             if (root.entry.hasChildren)
                 root.submenuRequested(root.entry);
-            else
+            else {
                 root.entry.triggered();
+            }
         }
     }
 }

@@ -4,11 +4,13 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell
 import "../../config"
+import "../../services/ui"
 import "."
 
 Item {
     id: page
 
+    required property string screenName
     required property var menuHandle
     required property StackView stackView
 
@@ -110,6 +112,7 @@ Item {
                         page.stackView.push(Qt.resolvedUrl("TrayMenuPage.qml"), {
                             menuHandle: entry,
                             stackView: page.stackView,
+                            screenName: page.screenName,
                             width: page.width
                         });
                     }

@@ -8,6 +8,7 @@ import "."
 Item {
     id: root
 
+    required property string screenName
     required property var menuHandle
     onMenuHandleChanged: root.frozenHeight = 0
 
@@ -62,6 +63,7 @@ Item {
         TrayMenuPage {
             menuHandle: root.menuHandle
             stackView: stack
+            screenName: root.screenName
             width: root.menuWidth
         }
     }
