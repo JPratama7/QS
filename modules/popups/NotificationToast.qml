@@ -17,6 +17,12 @@ Item {
 
     property bool bodyExpanded: false
 
+    // Single resolved icon string used by both IconImage and fallback Text
+    readonly property string resolvedIcon: toast.notification.image
+        || (toast.notification.appIcon && AppIcons.iconFromName(toast.notification.appIcon))
+        || (toast.notification.desktopEntry && AppIcons.iconForAppId(toast.notification.desktopEntry))
+        || ""
+
     implicitWidth: parent.width
     implicitHeight: cardContent.implicitHeight + cardPadding * 2
 
@@ -60,11 +66,8 @@ Item {
             IconImage {
                 anchors.fill: parent
                 anchors.margins: Theme.paddingSmall
-                source: toast.notification.image
-                    || (toast.notification.appIcon && AppIcons.iconFromName(toast.notification.appIcon))
-                    || (toast.notification.desktopEntry && AppIcons.iconForAppId(toast.notification.desktopEntry))
-                    || ""
-                visible: source !== ""
+                source: toast.resolvedIcon
+                visible: toast.resolvedIcon !== ""
             }
 
             // Fallback bell emoji
@@ -72,7 +75,7 @@ Item {
                 anchors.centerIn: parent
                 text: "🔔"
                 font.pixelSize: Theme.iconSizeSmall
-                visible: !toast.notification.image && !toast.notification.appIcon && !toast.notification.desktopEntry
+                visible: toast.resolvedIcon === ""
                 color: {
                     if (toast.notification.urgency === QuickshellNotification.NotificationUrgency.Critical)
                         return Theme.errorColor;
