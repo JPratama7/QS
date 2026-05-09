@@ -19,14 +19,19 @@ FileView {
         reload();
     }
     onLoaded: {
-        readyToWrite = true;
-        // Merge disk values with defaults (disk takes precedence)
-        // and write back to ensure new defaults are persisted
-        const rawText = configFile.text() || "{}";
-        const diskValues = rawText ? JSON.parse(rawText) : {};
-        const merged = mergeWithDefaults(diskValues);
-        applyMergedValues(merged);
-        writeAdapter();
+        // Parse, merge, and apply before enabling writes
+        // to avoid onAdapterUpdated from firing writeAdapter() mid-apply
+        try {
+            const rawText = configFile.text() || "{}";
+            const diskValues = JSON.parse(rawText);
+            const merged = mergeWithDefaults(diskValues);
+            applyMergedValues(merged);
+            writeAdapter();
+            readyToWrite = true;
+        } catch (e) {
+            console.error("PersistentConfig: failed to parse or apply config:", e);
+            // Don't enable writes — state is inconsistent
+        }
     }
     onAdapterUpdated: {
         if (readyToWrite)
