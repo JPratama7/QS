@@ -15,7 +15,7 @@ Item {
 	required property StackView stackView
 	readonly property bool isSubmenu: page.stackView.depth > 1
 	readonly property int maxMenuHeight: ShellConfig.trayMenuMaxHeight
-	readonly property int headerHeight: isSubmenu ? backButton.implicitHeight + Theme.spacingSmall : 0
+	readonly property int headerHeight: isSubmenu ? backButton.height + Theme.spacingSmall : 0
 	readonly property int contentHeight: pageColumn.implicitHeight + Theme.paddingNormal * 2
 	readonly property int totalHeight: headerHeight + contentHeight
 
