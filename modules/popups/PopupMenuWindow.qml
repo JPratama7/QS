@@ -28,16 +28,31 @@ PopupWindow {
     // Dismiss on click outside
     grabFocus: true
 
-    property var activeComponent: null
+    property Component activeComponent: null
+
+    // Track if close was triggered internally to prevent recursive close
+    property bool _internalClose: false
 
     visible: popupWindow.activeComponent !== null
 
     color: "transparent"
 
+    // Managed manually — unbind from activeComponent to defer content destruction
+    // Window must hide first before Loader destroys content (avoids Wayland "Invalid size")
     Loader {
         id: popupContent
         anchors.fill: parent
-        sourceComponent: popupWindow.activeComponent
+        sourceComponent: null
+    }
+
+    onActiveComponentChanged: {
+        if (activeComponent)
+            popupContent.sourceComponent = activeComponent
+        else
+            Qt.callLater(() => {
+                if (popupWindow.activeComponent === null)
+                    popupContent.sourceComponent = null
+            })
     }
 
     Connections {
@@ -54,6 +69,7 @@ PopupWindow {
         function onPopupClosed(screenName: string) {
             if (screenName !== popupWindow.context.name)
                 return;
+            popupWindow._internalClose = true;
             popupWindow.activeComponent = null;
             BarVisibility.popupClose(screenName);
         }
@@ -63,8 +79,11 @@ PopupWindow {
     // When visible becomes false while activeComponent is set, notify ShellUI
     // ShellUI will emit popupClosed signal, triggering our onPopupClosed handler
     onVisibleChanged: {
-        if (!visible && activeComponent !== null) {
+        if (!visible && activeComponent !== null && !_internalClose) {
             ShellUI.closePopup(context.name);
+        }
+        if (!visible) {
+            _internalClose = false;
         }
     }
 }

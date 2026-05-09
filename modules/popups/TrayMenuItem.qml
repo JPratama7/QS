@@ -10,8 +10,8 @@ Item {
 
     required property DBusMenuItem entry
 
-    signal triggered()
-    signal submenuRequested(entry: var)
+    signal triggered(entry: DBusMenuItem)
+    signal submenuRequested(entry: DBusMenuItem)
 
     readonly property bool isSeparator: root.entry?.isSeparator ?? false
 
@@ -96,9 +96,8 @@ Item {
             if (!root.entry) return;
             if (root.entry.hasChildren)
                 root.submenuRequested(root.entry);
-            else {
-                root.entry.triggered();
-            }
+            else
+                root.triggered(root.entry);
         }
     }
 }
