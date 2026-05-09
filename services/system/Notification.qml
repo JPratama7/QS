@@ -20,6 +20,7 @@ Singleton {
 	readonly property bool dndEnabled: ShellConfig.dndEnabled
 
 	// Toast queue — each entry: { notification: Notification, createdAt: int }
+	// Persisted via PersistentProperties for reload survival
 	property var toastQueue: ([])
 
 	signal newNotificationReceived(notification: Notification)
@@ -36,11 +37,14 @@ Singleton {
 		}
 
 		root.toastQueue = [];
+		persist.toastQueue = [];
 	}
 	function dismiss(notification: Notification): void {
 		notification.dismiss();
 		root.trackedList = root.trackedList.filter(n => n !== notification);
-		root.toastQueue = root.toastQueue.filter(item => item.notification !== notification);
+		const filtered = root.toastQueue.filter(item => item.notification !== notification);
+		root.toastQueue = filtered;
+		persist.toastQueue = filtered;
 	}
 	function addToast(notification: Notification): void {
 		const maxStack = ShellConfig.toastMaxStack;
@@ -55,12 +59,15 @@ Singleton {
 			createdAt: Date.now()
 		});
 		root.toastQueue = queue;
+		persist.toastQueue = queue;
 	}
 	function removeToast(notification: Notification): void {
 		if (!root.toastQueue)
 			return;
 		notification.expire();
-		root.toastQueue = root.toastQueue.filter(item => item.notification !== notification);
+		const filtered = root.toastQueue.filter(item => item.notification !== notification);
+		root.toastQueue = filtered;
+		persist.toastQueue = filtered;
 	}
 
 	// Enforce notification history cap — dismiss oldest overflow entries
@@ -78,10 +85,11 @@ Singleton {
 		}
 		if (list !== root.trackedList)
 			root.trackedList = list;
+		persist.toastQueue = root.toastQueue;
 	}
 
 	Component.onCompleted: {
-		root.toastQueue = [];
+		root.toastQueue = persist.toastQueue || [];
 	}
 
 	NotificationServer {
@@ -93,7 +101,7 @@ Singleton {
 		bodyHyperlinksSupported: true
 		bodyImagesSupported: true
 		imageSupported: true
-		keepOnReload: false
+		keepOnReload: true
 
 		onNotification: notification => {
 			notification.tracked = true;
@@ -118,7 +126,15 @@ Singleton {
 				return;
 			const now = Date.now();
 			const duration = ShellConfig.toastDurationMs;
-			root.toastQueue = root.toastQueue.filter(item => (now - item.createdAt) < duration);
+			const filtered = root.toastQueue.filter(item => (now - item.createdAt) < duration);
+			root.toastQueue = filtered;
+			persist.toastQueue = filtered;
 		}
+	}
+
+	PersistentProperties {
+		id: persist
+		reloadableId: "notification-toast"
+		property var toastQueue: ([])
 	}
 }
