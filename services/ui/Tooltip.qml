@@ -76,7 +76,7 @@ Singleton {
 		PopupWindow {
 			id: tooltipWindow
 
-			property var targetItem: null
+			property Item targetItem: null
 			property int margin: 8
 			readonly property int marginX2: margin * 2
 			readonly property int paddingNormalX2: Theme.paddingNormal * 2
