@@ -365,8 +365,4 @@ import "../../services/compositor"
 
 ## References
 
-- Design Doc: `docs/Quickshell-Desktop-DESIGN.md`
-- Implementation Notes: `docs/IMPLEMENTATION-NOTES.md`
-- PRD: `docs/Quickshell-Desktop-PRD.md`
-- Dev Workflow: `docs/DEV-WORKFLOW.md`
 - Quickshell Docs: https://quickshell.org/docs/master/
