@@ -31,13 +31,13 @@ A lightweight, compositor-agnostic Wayland desktop shell built on Quickshell, fe
 
 ## Surface Topology
 
-| Surface | Count | Layer | Keyboard Focus | Exclusion | Purpose |
-|---------|-------|-------|----------------|-----------|---------|
-| `BarContentWindow` | per screen | `Top` | `None` | `Auto` | Visible bar UI + space reservation |
-| `BarTriggerZone` | per screen (auto-hide) | `Top` | `None` | `Ignore` | Edge strip for auto-hide reveal |
-| `PopupMenuWindow` | per screen | `Top` | `OnDemand` | `Ignore` | Tray/session menus |
-| `LauncherOverlayWindow` | one screen | `Overlay` | `Exclusive` | `Ignore` | Full-screen launcher overlay |
-| `NotificationToastWindow` | per screen | `Top` | `None` | `Ignore` | Toast notification queue |
+| Surface                   | Count                  | Layer     | Keyboard Focus | Exclusion | Purpose                            |
+| ------------------------- | ---------------------- | --------- | -------------- | --------- | ---------------------------------- |
+| `BarContentWindow`        | per screen             | `Top`     | `None`         | `Auto`    | Visible bar UI + space reservation |
+| `BarTriggerZone`          | per screen (auto-hide) | `Top`     | `None`         | `Ignore`  | Edge strip for auto-hide reveal    |
+| `PopupMenuWindow`         | per screen             | `Top`     | `OnDemand`     | `Ignore`  | Tray/session menus                 |
+| `LauncherOverlayWindow`   | one screen             | `Overlay` | `Exclusive`    | `Ignore`  | Full-screen launcher overlay       |
+| `NotificationToastWindow` | per screen             | `Top`     | `None`         | `Ignore`  | Toast notification queue           |
 
 ### Exclusion Behavior
 
@@ -122,33 +122,39 @@ services/                    # Business logic services
 ### UI Services
 
 #### ScreenRegistry
+
 - Enumerates enabled screens (excludes configured patterns)
 - Creates `ScreenContext` instances
 - Provides `screenByName()` lookup
 
 #### ShellUI
+
 - Coordinates popup and launcher lifecycle
 - Enforces mutual exclusion (popup OR launcher, not both)
 - Tracks open popup screens
 - Handles screen removal cleanup
 
 #### BarVisibility
+
 - Per-screen visibility state (display mode, hover, popup, fullscreen)
 - Auto-hide timer management
 - Fullscreen detection via `Compositor.activeToplevelChanged`
 - `effectiveVisible()` computes final visibility
 
 #### Tooltip
+
 - Manages tooltip positioning and visibility
 - Delayed show/hide based on `bar.tooltip.delayMs`
 - Anchored to trigger widget
 
 #### Idle
+
 - Manages systemd-inhibit for idle prevention
 - Syncs with `PersistentConfig.adapterView.idleInhibitor`
 - Uses `restoreFromPersistence()` pattern for config timing
 
 #### Tray
+
 - System tray icon management
 - Hidden icons list from config
 - Menu max height configuration
@@ -156,6 +162,7 @@ services/                    # Business logic services
 ### Compositor Service
 
 #### Compositor
+
 - Detects compositor type (Hyprland/Generic)
 - Loads appropriate backend dynamically
 - Normalized API:
@@ -166,10 +173,11 @@ services/                    # Business logic services
   - `switchWorkspace(screenName, id)`
 
 #### Backend Pattern
+
 ```qml
 QtObject {
     readonly property string name: "hyprland" | "generic"
-    
+
     function focusedScreenName(): string
     function workspacesForScreen(screenName: string): var
     function activeWindowForScreen(screenName: string): var
@@ -181,26 +189,29 @@ QtObject {
 ### Launcher Service
 
 #### Launcher
+
 - Manages query, results, selection state
 - `open(screenName)` / `close()` / `toggle()`
 - `activateSelected()` executes result action
 - Emits signals for UI binding
 
 #### LauncherProviderRegistry
+
 - Provider registration (self-registration pattern)
 - Dispatches `search(query)` to all providers
 - Aggregates and deduplicates results
 
 #### Provider Pattern
+
 ```qml
 QtObject {
     id: provider
     property string name: "applications"
     property int priority: 100  // lower = higher priority
-    
+
     function search(query: string): var  // returns LauncherResult[]
     function activate(data: var): void
-    
+
     Component.onCompleted: LauncherProviderRegistry.register(provider)
 }
 ```
@@ -210,6 +221,7 @@ QtObject {
 ## Data Flow
 
 ### Popup Flow
+
 ```
 Widget.onClick
   -> ShellUI.openPopup(screenName, popupId, component, anchorX)
@@ -222,6 +234,7 @@ Widget.onClick
 ```
 
 ### Launcher Flow
+
 ```
 IPC call / LauncherButton.onClick
   -> Launcher.open(screenName)
@@ -234,6 +247,7 @@ IPC call / LauncherButton.onClick
 ```
 
 ### Fullscreen Flow
+
 ```
 Window focus change
   -> Compositor.activeToplevelChanged
@@ -251,14 +265,15 @@ Window focus change
 
 Compositor-agnostic control via `qs ipc call shell <function>`:
 
-| Function | Args | Description |
-|----------|------|-------------|
-| `toggleLauncher` | - | Toggle launcher on primary/first screen |
-| `openLauncher` | `screen?` | Open launcher on specified screen |
-| `closeLauncher` | - | Close launcher |
-| `isLauncherOpen` | - | Returns boolean |
+| Function         | Args      | Description                             |
+| ---------------- | --------- | --------------------------------------- |
+| `toggleLauncher` | -         | Toggle launcher on primary/first screen |
+| `openLauncher`   | `screen?` | Open launcher on specified screen       |
+| `closeLauncher`  | -         | Close launcher                          |
+| `isLauncherOpen` | -         | Returns boolean                         |
 
 ### Keybind Integration (Hyprland)
+
 ```ini
 bind = SUPER, R, exec, qs ipc call shell toggleLauncher
 ```
@@ -268,6 +283,7 @@ bind = SUPER, R, exec, qs ipc call shell toggleLauncher
 ## Configuration
 
 ### config.json
+
 ```json
 {
   "primaryScreen": "",
@@ -297,13 +313,22 @@ bind = SUPER, R, exec, qs ipc call shell toggleLauncher
   "barWidgetLayout": {
     "left": ["launcher", "workspaces", "activeWindow"],
     "center": ["clock"],
-    "right": ["network", "volume", "battery", "idleInhibitor", "notifications", "tray", "session"]
+    "right": [
+      "network",
+      "volume",
+      "battery",
+      "idleInhibitor",
+      "notifications",
+      "tray",
+      "session"
+    ]
   },
   "barWidgetLayoutPerScreen": {}
 }
 ```
 
 ### Display Modes
+
 - `visible` - Always visible, reserves space
 - `auto_hide` - Hidden by default, appears on hover/edge trigger
 - `hidden` - Never visible
@@ -312,8 +337,6 @@ bind = SUPER, R, exec, qs ipc call shell toggleLauncher
 ---
 
 ## Key Implementation Decisions
-
-See `docs/IMPLEMENTATION-NOTES.md` for detailed deviations from original design:
 
 1. **IPC Module** - Compositor-agnostic keybinds via `IpcHandler`
 2. **Launcher Lazy Loading** - Wrapped in `Loader` for performance
@@ -342,21 +365,25 @@ import "../../services/compositor"
 ## Extension Points
 
 ### Adding a Widget
+
 1. Create in `modules/bar/widgets/`
 2. Register in `modules/bar/qmldir`
 3. Add to `BarLayout.qml` in appropriate zone
 
 ### Adding a Service
+
 1. Create in appropriate `services/` subdirectory
 2. Register in `services/qmldir` as singleton
 3. Import via relative path from consumers
 
 ### Adding a Launcher Provider
+
 1. Create in `services/launcher/providers/`
 2. Implement `search()` and `activate()`
 3. Self-register in `Component.onCompleted`
 
 ### Adding a Compositor Backend
+
 1. Create in `services/compositor/backends/`
 2. Implement normalized interface
 3. Never import from `modules/` or `components/`
