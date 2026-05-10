@@ -33,7 +33,7 @@ QtObject {
 			if (!app || app.noDisplay)
 				continue;
 			if (provider._matches(app, q)) {
-				const result = resultFactory.createObject(null, {
+				const result = resultFactory.createObject(provider, {
 					title: app.name,
 					subtitle: app.genericName || app.comment || "",
 					icon: app.icon || "",
