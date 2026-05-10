@@ -260,7 +260,7 @@ See [AGENTS.md](./AGENTS.md) for development guidelines and conventions.
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - System architecture
 - [AGENTS.md](./AGENTS.md) - Development guidelines
 - [docs/IMPLEMENTATION-NOTES.md](./docs/IMPLEMENTATION-NOTES.md) - Implementation decisions
-- [docs/Quickshell-Desktop-DESIGN-v2.md](./docs/Quickshell-Desktop-DESIGN-v2.md) - Design document
+- [docs/Quickshell-Desktop-DESIGN.md](./docs/Quickshell-Desktop-DESIGN.md) - Design document
 
 ## License
 
