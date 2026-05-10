@@ -1,0 +1,4 @@
+module popups.notifications
+NotificationPopup NotificationPopup.qml
+NotificationToast NotificationToast.qml
+NotificationToastWindow NotificationToastWindow.qml

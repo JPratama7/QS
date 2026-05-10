@@ -6,7 +6,8 @@ import "../../services/ui"
 import "../bar"
 import "../cliphist"
 import "../launcher"
-import "../popups"
+import "../popups/shared"
+import "../popups/notifications"
 
 Item {
     id: delegate

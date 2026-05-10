@@ -5,7 +5,7 @@ import Quickshell
 import "../../../config"
 import "../../../components/bar"
 import "../../../services/ui"
-import "../../popups"
+import "../../popups/session"
 
 BaseWidget {
     id: widget

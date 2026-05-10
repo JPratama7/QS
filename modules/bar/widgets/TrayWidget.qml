@@ -7,7 +7,7 @@ import "../../../config"
 import "../../../components/bar"
 import "../../../services/system"
 import "../../../services/ui"
-import "../../popups"
+import "../../popups/tray"
 
 BaseWidget {
     id: widget
