@@ -8,12 +8,12 @@ import "../../config"
 Singleton {
 	id: root
 
-	property var activeTarget: null
-	property var activeComponent: null
-	property var anchorWindow: null
+	property Item activeTarget: null
+	property Component activeComponent: null
+	property PanelWindow anchorWindow: null
 	property string activeScreenName: ""
 	property int delayMs: 500
-	property var tooltipWindow: null
+	property PopupWindow tooltipWindow: null
 	readonly property string _barEdge: ShellConfig.barEdge
 
 	function show(target: Item, tooltipComponent: Component, screenName: string, window: PanelWindow): void {
