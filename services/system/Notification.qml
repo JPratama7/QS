@@ -28,7 +28,6 @@ Singleton {
 	function toggleDnd(): void {
 		PersistentConfig.adapterView.dndEnabled = !PersistentConfig.adapterView.dndEnabled;
 	}
-
 	function dismissAll(): void {
 		const toClose = root.trackedList.slice();
 		root.trackedList = [];
@@ -38,6 +37,7 @@ Singleton {
 
 		root.toastQueue = [];
 		persist.toastQueue = [];
+		toastSweepTimer.scheduleNext();
 	}
 	function dismiss(notification: Notification): void {
 		notification.dismiss();
@@ -45,6 +45,7 @@ Singleton {
 		const filtered = root.toastQueue.filter(item => item.notification !== notification);
 		root.toastQueue = filtered;
 		persist.toastQueue = filtered;
+		toastSweepTimer.scheduleNext();
 	}
 	function addToast(notification: Notification): void {
 		const maxStack = ShellConfig.toastMaxStack;
@@ -60,6 +61,7 @@ Singleton {
 		});
 		root.toastQueue = queue;
 		persist.toastQueue = queue;
+		toastSweepTimer.scheduleNext();
 	}
 	function removeToast(notification: Notification): void {
 		if (!root.toastQueue)
@@ -68,6 +70,7 @@ Singleton {
 		const filtered = root.toastQueue.filter(item => item.notification !== notification);
 		root.toastQueue = filtered;
 		persist.toastQueue = filtered;
+		toastSweepTimer.scheduleNext();
 	}
 
 	// Enforce notification history cap — dismiss oldest overflow entries
@@ -86,10 +89,12 @@ Singleton {
 		if (list !== root.trackedList)
 			root.trackedList = list;
 		persist.toastQueue = root.toastQueue;
+		toastSweepTimer.scheduleNext();
 	}
 
 	Component.onCompleted: {
 		root.toastQueue = persist.toastQueue || [];
+		toastSweepTimer.scheduleNext();
 	}
 
 	NotificationServer {
@@ -117,24 +122,42 @@ Singleton {
 	Timer {
 		id: toastSweepTimer
 
-		interval: 500
-		repeat: true
-		running: (root.toastQueue || []).length > 0
+		function scheduleNext(): void {
+			const queue = root.toastQueue;
+			if (!queue || queue.length === 0) {
+				running = false;
+				return;
+			}
+			const now = Date.now();
+			const duration = ShellConfig.toastDurationMs;
+			let earliest = Infinity;
+			for (const item of queue) {
+				const remaining = (item.createdAt + duration) - now;
+				if (remaining < earliest)
+					earliest = remaining;
+			}
+			interval = Math.max(1, earliest);
+			running = true;
+		}
+
+		repeat: false
 
 		onTriggered: {
-			if (!root.toastQueue)
-				return;
 			const now = Date.now();
 			const duration = ShellConfig.toastDurationMs;
 			const filtered = root.toastQueue.filter(item => (now - item.createdAt) < duration);
-			root.toastQueue = filtered;
-			persist.toastQueue = filtered;
+			if (filtered.length !== root.toastQueue.length) {
+				root.toastQueue = filtered;
+				persist.toastQueue = filtered;
+			}
+			scheduleNext();
 		}
 	}
-
 	PersistentProperties {
 		id: persist
-		reloadableId: "notification-toast"
+
 		property var toastQueue: ([])
+
+		reloadableId: "notification-toast"
 	}
 }
