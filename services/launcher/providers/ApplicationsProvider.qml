@@ -2,14 +2,12 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import ".."
+import "../../../types/launcher"
+import "../../launcher"
 
 // Launcher provider for installed desktop-entry applications.
-// Registers itself with LauncherProviderRegistry on creation.
-QtObject {
+LauncherProvider {
 	id: provider
-
-	readonly property string providerId: "applications"
 
 	// Search by name, genericName, comment, and keywords (case-insensitive)
 	function search(query: string): var {
@@ -74,6 +72,8 @@ QtObject {
 		}
 		return false;
 	}
+
+	providerId: "applications"
 
 	Component.onCompleted: {
 		LauncherProviderRegistry.register(provider);
