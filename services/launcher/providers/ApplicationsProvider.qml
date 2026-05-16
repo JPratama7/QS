@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import "../../../types"
 import ".."
 
 // Launcher provider for installed desktop-entry applications.
@@ -11,12 +10,6 @@ QtObject {
 	id: provider
 
 	readonly property string providerId: "applications"
-
-	// Factory for creating LauncherResult instances
-	property Component resultFactory: Component {
-		LauncherResult {
-		}
-	}
 
 	// Search by name, genericName, comment, and keywords (case-insensitive)
 	function search(query: string): var {
@@ -33,14 +26,13 @@ QtObject {
 			if (!app || app.noDisplay)
 				continue;
 			if (provider._matches(app, q)) {
-				const result = resultFactory.createObject(provider, {
+				results.push({
 					title: app.name,
 					subtitle: app.genericName || app.comment || "",
 					icon: app.icon || "",
 					providerId: provider.providerId,
 					data: app.id
 				});
-				results.push(result);
 			}
 		}
 
