@@ -44,20 +44,10 @@ BaseWidget {
 					color: appItem.modelData?.activated ? Qt.alpha(Theme.accentColor, 0.3) : "transparent"
 
 					IconImage {
-						id: icon
-
 						anchors.centerIn: parent
 						width: Theme.iconSizeSmall
 						height: Theme.iconSizeSmall
 						source: AppIcons.iconForAppId(appItem.modelData?.appId ?? "")
-
-						Connections {
-							function onAppIdChanged() {
-								icon.source = AppIcons.iconForAppId(appItem.modelData?.appId ?? "");
-							}
-
-							target: appItem.modelData
-						}
 					}
 				}
 				MouseArea {
