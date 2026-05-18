@@ -11,7 +11,7 @@ QtObject {
 	id: provider
 
 	// Unique identifier for this provider type
-	required property string providerId
+	property string providerId
 
 	// Search for items matching the query.
 	// Return array of plain JS objects with: { title, subtitle, icon, providerId, data }

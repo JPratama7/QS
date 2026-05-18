@@ -2,3 +2,4 @@ module types
 ScreenContext ScreenContext.qml
 ScreenState ScreenState.qml
 TrayMenuRequest TrayMenuRequest.qml
+CompositorBackend compositor/CompositorBackend.qml
