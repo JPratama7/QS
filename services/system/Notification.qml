@@ -23,6 +23,9 @@ Singleton {
 	// Persisted via PersistentProperties for reload survival
 	property var toastQueue: ([])
 
+	// Cached earliest expiry timestamp — avoids O(N) scan in scheduleNext()
+	property int _earliestExpiry: 0
+
 	signal newNotificationReceived(notification: Notification)
 
 	function toggleDnd(): void {
@@ -36,15 +39,16 @@ Singleton {
 		}
 
 		root.toastQueue = [];
-		persist.toastQueue = [];
-		toastSweepTimer.scheduleNext();
+		root._earliestExpiry = 0;
+		root._schedulePersist();
+		toastSweepTimer.running = false;
 	}
 	function dismiss(notification: Notification): void {
 		notification.dismiss();
 		root.trackedList = root.trackedList.filter(n => n !== notification);
-		const filtered = root.toastQueue.filter(item => item.notification !== notification);
-		root.toastQueue = filtered;
-		persist.toastQueue = filtered;
+		root.toastQueue = root.toastQueue.filter(item => item.notification !== notification);
+		root._recomputeEarliestExpiry();
+		root._schedulePersist();
 		toastSweepTimer.scheduleNext();
 	}
 	function addToast(notification: Notification): void {
@@ -55,21 +59,24 @@ Singleton {
 		if (queue.length >= maxStack) {
 			queue.shift();
 		}
+		const now = Date.now();
+		const expiresAt = now + ShellConfig.toastDurationMs;
 		queue.push({
 			notification: notification,
-			createdAt: Date.now()
+			createdAt: now
 		});
 		root.toastQueue = queue;
-		persist.toastQueue = queue;
+		root._earliestExpiry = (!root._earliestExpiry || expiresAt < root._earliestExpiry) ? expiresAt : root._earliestExpiry;
+		root._schedulePersist();
 		toastSweepTimer.scheduleNext();
 	}
 	function removeToast(notification: Notification): void {
 		if (!root.toastQueue)
 			return;
 		notification.expire();
-		const filtered = root.toastQueue.filter(item => item.notification !== notification);
-		root.toastQueue = filtered;
-		persist.toastQueue = filtered;
+		root.toastQueue = root.toastQueue.filter(item => item.notification !== notification);
+		root._recomputeEarliestExpiry();
+		root._schedulePersist();
 		toastSweepTimer.scheduleNext();
 	}
 
@@ -88,12 +95,36 @@ Singleton {
 		}
 		if (list !== root.trackedList)
 			root.trackedList = list;
-		persist.toastQueue = root.toastQueue;
+		root._recomputeEarliestExpiry();
+		root._schedulePersist();
 		toastSweepTimer.scheduleNext();
+	}
+
+	// Recompute _earliestExpiry from current queue (after removals)
+	function _recomputeEarliestExpiry(): void {
+		const queue = root.toastQueue;
+		if (!queue || queue.length === 0) {
+			root._earliestExpiry = 0;
+			return;
+		}
+		const duration = ShellConfig.toastDurationMs;
+		let earliest = Infinity;
+		for (const item of queue) {
+			const expiresAt = item.createdAt + duration;
+			if (expiresAt < earliest)
+				earliest = expiresAt;
+		}
+		root._earliestExpiry = earliest;
+	}
+
+	// Debounce persist writes — coalesces rapid successive mutations
+	function _schedulePersist(): void {
+		persistDebounce.restart();
 	}
 
 	Component.onCompleted: {
 		root.toastQueue = persist.toastQueue || [];
+		root._recomputeEarliestExpiry();
 		toastSweepTimer.scheduleNext();
 	}
 
@@ -128,15 +159,13 @@ Singleton {
 				running = false;
 				return;
 			}
-			const now = Date.now();
-			const duration = ShellConfig.toastDurationMs;
-			let earliest = Infinity;
-			for (const item of queue) {
-				const remaining = (item.createdAt + duration) - now;
-				if (remaining < earliest)
-					earliest = remaining;
+			const remaining = root._earliestExpiry - Date.now();
+			if (remaining <= 0) {
+				// Already expired — fire immediately
+				interval = 1;
+			} else {
+				interval = remaining;
 			}
-			interval = Math.max(1, earliest);
 			running = true;
 		}
 
@@ -148,9 +177,20 @@ Singleton {
 			const filtered = root.toastQueue.filter(item => (now - item.createdAt) < duration);
 			if (filtered.length !== root.toastQueue.length) {
 				root.toastQueue = filtered;
-				persist.toastQueue = filtered;
+				root._recomputeEarliestExpiry();
+				root._schedulePersist();
 			}
 			scheduleNext();
+		}
+	}
+	Timer {
+		id: persistDebounce
+
+		interval: 50
+		repeat: false
+
+		onTriggered: {
+			persist.toastQueue = root.toastQueue;
 		}
 	}
 	PersistentProperties {
