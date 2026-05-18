@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import "../../types/compositor"
 
 Singleton {
 	id: service
@@ -14,9 +15,9 @@ Singleton {
 			return "Hyprland";
 		return "Generic";
 	}
-	property var _backend: null
-	readonly property var backend: _backend
-	readonly property string backendName: _backend ? _backend.name : "none"
+	property CompositorBackend _backend: null
+	readonly property CompositorBackend backend: _backend
+	readonly property string backendName: _backend ? _backend.backendId : "none"
 	readonly property string focusedScreen: _backend ? _backend.focusedScreen : ""
 	property string toplevelSortMode: "workspaceId" // "none", "activeFirst", "workspaceId"
 
