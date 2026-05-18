@@ -166,7 +166,7 @@ Singleton {
 			} else {
 				interval = remaining;
 			}
-			running = true;
+			restart();
 		}
 
 		repeat: false
