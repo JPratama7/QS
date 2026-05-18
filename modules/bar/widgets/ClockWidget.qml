@@ -27,7 +27,7 @@ BaseWidget {
 	SystemClock {
 		id: systemClock
 
-		precision: SystemClock.Seconds
+		precision: SystemClock.Minutes
 	}
 	Text {
 		id: textItem
