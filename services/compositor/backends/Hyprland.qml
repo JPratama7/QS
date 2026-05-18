@@ -3,12 +3,10 @@ import QtQml
 
 import QtQuick
 import Quickshell.Hyprland
+import "../../../types/compositor"
 
-QtObject {
+CompositorBackend {
 	id: backend
-
-	readonly property string name: "hyprland"
-	readonly property string focusedScreen: Hyprland.focusedMonitor?.name ?? ""
 
 	function activeWorkspaceIdForScreen(screenName: string): int {
 		const monitor = Hyprland.monitors.values.find(m => m.name === screenName);
@@ -60,4 +58,7 @@ QtObject {
 	function switchWorkspace(screenName: string, workspaceId: int): void {
 		Hyprland.dispatch("workspace " + String(workspaceId));
 	}
+
+	backendId: "hyprland"
+	focusedScreen: Hyprland.focusedMonitor?.name ?? ""
 }
