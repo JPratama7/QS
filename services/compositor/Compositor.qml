@@ -19,43 +19,7 @@ Singleton {
 	readonly property CompositorBackend backend: _backend
 	readonly property string backendName: _backend ? _backend.backendId : "none"
 	readonly property string focusedScreen: _backend ? _backend.focusedScreen : ""
-	property string toplevelSortMode: "workspaceId" // "none", "activeFirst", "workspaceId"
-
-	readonly property var toplevels: {
-		if (toplevelSortMode === "none") {
-			return ToplevelManager.toplevels;
-		}
-
-		const items = ToplevelManager.toplevels.values.slice();
-
-		if (toplevelSortMode === "activeFirst") {
-			items.sort(function (a, b) {
-				if (a.activated !== b.activated) {
-					return a.activated ? -1 : 1;
-				}
-				return (a.title || "").localeCompare(b.title || "");
-			});
-		} else if (toplevelSortMode === "workspaceId") {
-			const wsMap = new Map();
-			if (compositorType === "Hyprland") {
-				for (const ht of Hyprland.toplevels.values) {
-					wsMap.set(ht.title, ht);
-				}
-			}
-			items.sort(function (a, b) {
-				const wsA = wsMap.get(a.title);
-				const wsB = wsMap.get(b.title);
-				if (wsA && wsB && wsA.workspace && wsB.workspace) {
-					return wsA.workspace.id - wsB.workspace.id;
-				}
-				return (a.title || "").localeCompare(b.title || "");
-			});
-
-			wsMap.clear();
-		}
-
-		return items;
-	}
+	readonly property var toplevels: _backend ? _backend.toplevels : []
 	readonly property Toplevel topLevel: ToplevelManager.activeToplevel
 
 	signal activeToplevelChanged(data: Toplevel)
@@ -75,6 +39,10 @@ Singleton {
 	function switchWorkspace(screenName: string, workspaceId: int): void {
 		if (backend)
 			backend.switchWorkspace(screenName, workspaceId);
+	}
+	function setToplevelSortMode(mode: int): void {
+		if (backend)
+			backend.sortMode = mode;
 	}
 
 	Component.onCompleted: {

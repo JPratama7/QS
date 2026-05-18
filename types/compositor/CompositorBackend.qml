@@ -10,11 +10,25 @@ import QtQuick
 QtObject {
 	id: backend
 
+	enum ToplevelSort {
+		None = 0,
+		WorkspaceId = 1,
+		Name = 2
+	}
+
+	default property list<QtObject> data
+
 	// Unique identifier for this backend type
 	property string backendId: ""
 
 	// Whether this backend is functional
 	property bool available: true
+
+	// Sorted toplevel list
+	property var toplevels: []
+
+	// Sort strategy for toplevels
+	property int sortMode: CompositorBackend.ToplevelSort.WorkspaceId
 
 	// Name of the currently focused screen
 	property string focusedScreen: ""
