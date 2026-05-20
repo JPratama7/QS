@@ -50,6 +50,7 @@ Singleton {
 	}
 	function createContext(screen: ShellScreen): ScreenContext {
 		if (registry.screenContexts[screen.name]) {
+			registry.screenContexts[screen.name].screen = screen;
 			return registry.screenContexts[screen.name];
 		}
 		const context = registry.screenContextComponent.createObject(registry, {
