@@ -24,7 +24,7 @@ Singleton {
 	property var toastQueue: ([])
 
 	// Cached earliest expiry timestamp — avoids O(N) scan in scheduleNext()
-	property int _earliestExpiry: 0
+	property real _earliestExpiry: 0
 
 	signal newNotificationReceived(notification: Notification)
 
