@@ -3,7 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.DBusMenu
-import "../../config"
+import "../../../config"
 
 Item {
     id: root

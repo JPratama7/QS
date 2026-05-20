@@ -3,8 +3,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import Quickshell
-import "../../config"
-import "../../services/ui"
+import "../../../config"
+import "../../../services/ui"
 import "."
 
 Item {

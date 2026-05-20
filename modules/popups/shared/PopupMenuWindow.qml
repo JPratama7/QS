@@ -2,8 +2,8 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import "../../types"
-import "../../services/ui"
+import "../../../types"
+import "../../../services/ui"
 
 PopupWindow {
     id: popupWindow

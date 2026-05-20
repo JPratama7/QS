@@ -3,8 +3,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell.Services.Notifications as QuickshellNotification
 import Quickshell.Widgets
-import "../../config"
-import "../../services/system"
+import "../../../config"
+import "../../../services/system"
 
 Item {
     id: toast

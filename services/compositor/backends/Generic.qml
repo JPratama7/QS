@@ -1,33 +1,84 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import "../../../types"
+import Quickshell.Wayland
+import "../../../types/compositor"
 
-QtObject {
-    id: backend
+CompositorBackend {
+	id: backend
 
-    readonly property string name: "generic"
-    readonly property bool available: true
+	property bool _dirty: true
 
-    readonly property string focusedScreen: ""
+	function _markDirty(): void {
+		_dirty = true;
+		debounce.restart();
+	}
+	function _rebuild(): void {
+		const mode = backend.sortMode;
+		const items = ToplevelManager.toplevels.values.slice();
 
-    function activeWorkspaceIdForScreen(screenName: string): int {
-        return 0;
-    }
+		if (mode === CompositorBackend.ToplevelSort.None) {
+			// No sorting
+		} else if (mode === CompositorBackend.ToplevelSort.WorkspaceId) {
+			// Generic backend doesn't have workspace info, fall back to name sort
+			items.sort(function (a, b) {
+				return (a.title || "").localeCompare(b.title || "");
+			});
+		} else if (mode === CompositorBackend.ToplevelSort.Name) {
+			items.sort(function (a, b) {
+				return (a.title || "").localeCompare(b.title || "");
+			});
+		}
+		backend.toplevels = items;
+		_dirty = false;
+	}
+	function activeWorkspaceIdForScreen(screenName: string): int {
+		return 0;
+	}
+	function workspacesForScreen(screenName: string): var {
+		return [];
+	}
+	function activeWindowForScreen(screenName: string): var {
+		return null;
+	}
+	function screenHasFullscreen(screenName: string): bool {
+		return false;
+	}
+	function switchWorkspace(screenName: string, workspaceId: int): void {
+		console.log("GenericBackend: switchWorkspace not supported");
+	}
 
-    function workspacesForScreen(screenName: string): var {
-        return [];
-    }
+	backendId: "generic"
+	available: true
+	focusedScreen: ""
 
-    function activeWindowForScreen(screenName: string): var {
-        return null;
-    }
+	Component.onCompleted: {
+		backend._rebuild();
+	}
 
-    function screenHasFullscreen(screenName: string): bool {
-        return false;
-    }
+	Connections {
+		function onSortModeChanged(): void {
+			backend._markDirty();
+		}
 
-    function switchWorkspace(screenName: string, workspaceId: int): void {
-        console.log("GenericBackend: switchWorkspace not supported");
-    }
+		target: backend
+	}
+	Connections {
+		function onValuesChanged(): void {
+			backend._markDirty();
+		}
+
+		target: ToplevelManager.toplevels
+	}
+	Timer {
+		id: debounce
+
+		interval: 50
+		repeat: false
+
+		onTriggered: {
+			if (backend._dirty)
+				backend._rebuild();
+		}
+	}
 }

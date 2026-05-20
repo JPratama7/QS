@@ -1,0 +1,4 @@
+module popups.tray
+TrayMenu TrayMenu.qml
+TrayMenuItem TrayMenuItem.qml
+TrayMenuPage TrayMenuPage.qml

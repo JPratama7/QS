@@ -7,261 +7,282 @@ import "../../services/ui"
 import "widgets"
 
 Item {
-    id: barLayout
+	id: barLayout
 
-    required property string screenName
-    required property PanelWindow barWindow
+	required property string screenName
+	required property PanelWindow barWindow
+	readonly property real widgetScale: ShellConfig.widgetScaleForScreen(screenName)
+	readonly property real spacing: Theme.spacingLarge
 
-    readonly property real widgetScale: ShellConfig.widgetScaleForScreen(screenName)
-    readonly property real spacing: Theme.spacingLarge
+	function showTooltip(widgetItem: Item): void {
+		// qmllint disable missing-property
+		if (widgetItem && widgetItem.tooltipComponent) {
+			Tooltip.show(widgetItem, widgetItem.tooltipComponent, barLayout.screenName, barLayout.barWindow);
+		}
+	}
+	function hideTooltip(): void {
+		Tooltip.hide();
+	}
+	function widgetComponentForId(id: string): Component {
+		switch (id) {
+		case "launcher":
+			return launcherComp;
+		case "workspaces":
+			return workspacesComp;
+		case "activeWindow":
+			return activeWindowComp;
+		case "clock":
+			return clockComp;
+		case "network":
+			return networkComp;
+		case "volume":
+			return volumeComp;
+		case "battery":
+			return batteryComp;
+		case "notifications":
+			return notificationsComp;
+		case "tray":
+			return trayComp;
+		case "session":
+			return sessionComp;
+		case "idleInhibitor":
+			return idleInhibitorComp;
+		case "taskbar":
+			return taskbar;
+		case "systemMonitor":
+			return systemMonitorComp;
+		}
+		return null;
+	}
+	function widgetLayoutForZone(zone: string): var {
+		const layout = ShellConfig.barWidgetLayoutForScreen(barLayout.screenName);
+		return layout[zone] || [];
+	}
 
-    anchors.fill: parent
-    anchors.leftMargin: Theme.paddingNormal
-    anchors.rightMargin: Theme.paddingNormal
+	anchors.fill: parent
+	anchors.leftMargin: Theme.paddingNormal
+	anchors.rightMargin: Theme.paddingNormal
 
-    function showTooltip(widgetItem: Item): void {
-        // qmllint disable missing-property
-        if (widgetItem && widgetItem.tooltipComponent) {
-            Tooltip.show(widgetItem, widgetItem.tooltipComponent, barLayout.screenName, barLayout.barWindow);
-        }
-    }
+	// Widget components - shared, no Loader inside
+	Component {
+		id: launcherComp
 
-    function hideTooltip(): void {
-        Tooltip.hide();
-    }
+		LauncherButton {
+			screenName: barLayout.screenName
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
+		id: taskbar
 
-    function widgetComponentForId(id: string): Component {
-        switch (id) {
-        case "launcher":
-            return launcherComp;
-        case "workspaces":
-            return workspacesComp;
-        case "activeWindow":
-            return activeWindowComp;
-        case "clock":
-            return clockComp;
-        case "network":
-            return networkComp;
-        case "volume":
-            return volumeComp;
-        case "battery":
-            return batteryComp;
-        case "notifications":
-            return notificationsComp;
-        case "tray":
-            return trayComp;
-        case "session":
-            return sessionComp;
-        case "idleInhibitor":
-            return idleInhibitorComp;
-        case "taskbar":
-            return taskbar;
-        case "systemMonitor":
-            return systemMonitorComp;
-        }
-        return null;
-    }
+		Applications {
+		}
+	}
+	Component {
+		id: workspacesComp
 
-    function widgetLayoutForZone(zone: string): var {
-        const layout = ShellConfig.barWidgetLayoutForScreen(barLayout.screenName);
-        return layout[zone] || [];
-    }
+		WorkspacesWidget {
+			screenName: barLayout.screenName
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
+		id: activeWindowComp
 
-    // Widget components - shared, no Loader inside
-    Component {
-        id: launcherComp
-        LauncherButton {
-            screenName: barLayout.screenName
-            widgetScale: barLayout.widgetScale
-        }
-    }
-    Component {
-        id: taskbar
-        Applications {}
-    }
-    Component {
-        id: workspacesComp
-        WorkspacesWidget {
-            screenName: barLayout.screenName
-            widgetScale: barLayout.widgetScale
-        }
-    }
-    Component {
-        id: activeWindowComp
-        ActiveWindowWidget {
-            screenName: barLayout.screenName
-            widgetScale: barLayout.widgetScale
-        }
-    }
-    Component {
-        id: clockComp
-        ClockWidget {
-            widgetScale: barLayout.widgetScale
-        }
-    }
-    Component {
-        id: networkComp
-        NetworkWidget {
-            widgetScale: barLayout.widgetScale
-        }
-    }
-    Component {
-        id: volumeComp
-        VolumeWidget {
-            widgetScale: barLayout.widgetScale
-        }
-    }
-    Component {
-        id: batteryComp
-        BatteryWidget {
-            widgetScale: barLayout.widgetScale
-        }
-    }
-    Component {
-        id: notificationsComp
-        NotificationIndicatorWidget {
-            screenName: barLayout.screenName
-            barWindow: barLayout.barWindow
-            widgetScale: barLayout.widgetScale
-        }
-    }
-    Component {
-        id: trayComp
-        TrayWidget {
-            screenName: barLayout.screenName
-            barWindow: barLayout.barWindow
-            widgetScale: barLayout.widgetScale
-        }
-    }
-    Component {
-        id: sessionComp
-        SessionMenuButton {
-            screenName: barLayout.screenName
-            barWindow: barLayout.barWindow
-            widgetScale: barLayout.widgetScale
-        }
-    }
-    Component {
-        id: idleInhibitorComp
-        IdleInhibitorWidget {
-            widgetScale: barLayout.widgetScale
-        }
-    }
-    Component {
-        id: systemMonitorComp
-        SystemMonitorWidget {
-            widgetScale: barLayout.widgetScale
-        }
-    }
+		ActiveWindowWidget {
+			screenName: barLayout.screenName
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
+		id: clockComp
 
-    // Left zone
-    Row {
-        id: leftZone
+		ClockWidget {
+			screenName: barLayout.screenName
+			barWindow: barLayout.barWindow
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
+		id: networkComp
 
-        height: parent.height
-        anchors.left: parent.left
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: barLayout.spacing
+		NetworkWidget {
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
+		id: volumeComp
 
-        Repeater {
-            model: barLayout.widgetLayoutForZone("left")
-            Item {
-                required property var modelData
-                readonly property string widgetId: modelData
-                width: leftWidgetLoader.implicitWidth
-                height: parent.height
-                anchors.verticalCenter: parent.verticalCenter
+		VolumeWidget {
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
+		id: batteryComp
 
-                Loader {
-                    id: leftWidgetLoader
-                    sourceComponent: barLayout.widgetComponentForId(parent.widgetId)
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+		BatteryWidget {
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
+		id: notificationsComp
 
-                HoverHandler {
-                    id: leftHoverHandler
-                    onHoveredChanged: {
-                        if (hovered && leftWidgetLoader.item)
-                            barLayout.showTooltip(leftWidgetLoader.item);
-                        else
-                            barLayout.hideTooltip();
-                    }
-                }
-            }
-        }
-    }
+		NotificationIndicatorWidget {
+			screenName: barLayout.screenName
+			barWindow: barLayout.barWindow
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
+		id: trayComp
 
-    // Center zone
-    Row {
-        id: centerZone
+		TrayWidget {
+			screenName: barLayout.screenName
+			barWindow: barLayout.barWindow
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
+		id: sessionComp
 
-        height: parent.height
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: barLayout.spacing
+		SessionMenuButton {
+			screenName: barLayout.screenName
+			barWindow: barLayout.barWindow
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
+		id: idleInhibitorComp
 
-        Repeater {
-            model: barLayout.widgetLayoutForZone("center")
-            Item {
-                required property var modelData
-                readonly property string widgetId: modelData
-                width: centerWidgetLoader.implicitWidth
-                height: parent.height
-                anchors.verticalCenter: parent.verticalCenter
+		IdleInhibitorWidget {
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
+		id: systemMonitorComp
 
-                Loader {
-                    id: centerWidgetLoader
-                    sourceComponent: barLayout.widgetComponentForId(parent.widgetId)
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+		SystemMonitorWidget {
+			widgetScale: barLayout.widgetScale
+		}
+	}
 
-                HoverHandler {
-                    id: centerHoverHandler
-                    onHoveredChanged: {
-                        if (hovered && centerWidgetLoader.item)
-                            barLayout.showTooltip(centerWidgetLoader.item);
-                        else
-                            barLayout.hideTooltip();
-                    }
-                }
-            }
-        }
-    }
+	// Left zone
+	Row {
+		id: leftZone
 
-    // Right zone
-    Row {
-        id: rightZone
+		height: parent.height
+		anchors.left: parent.left
+		anchors.verticalCenter: parent.verticalCenter
+		spacing: barLayout.spacing
 
-        height: parent.height
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: barLayout.spacing
+		Repeater {
+			model: barLayout.widgetLayoutForZone("left")
 
-        Repeater {
-            model: barLayout.widgetLayoutForZone("right")
-            Item {
-                required property var modelData
-                readonly property string widgetId: modelData
-                width: rightWidgetLoader.implicitWidth
-                height: parent.height
-                anchors.verticalCenter: parent.verticalCenter
+			Item {
+				required property var modelData
+				readonly property string widgetId: modelData
 
-                Loader {
-                    id: rightWidgetLoader
-                    sourceComponent: barLayout.widgetComponentForId(parent.widgetId)
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+				width: leftWidgetLoader.implicitWidth
+				height: parent.height
+				anchors.verticalCenter: parent.verticalCenter
 
-                HoverHandler {
-                    id: rightHoverHandler
-                    onHoveredChanged: {
-                        if (hovered && rightWidgetLoader.item)
-                            barLayout.showTooltip(rightWidgetLoader.item);
-                        else
-                            barLayout.hideTooltip();
-                    }
-                }
-            }
-        }
-    }
+				Loader {
+					id: leftWidgetLoader
+
+					sourceComponent: barLayout.widgetComponentForId(parent.widgetId)
+					anchors.verticalCenter: parent.verticalCenter
+				}
+				HoverHandler {
+					id: leftHoverHandler
+
+					onHoveredChanged: {
+						if (hovered && leftWidgetLoader.item)
+							barLayout.showTooltip(leftWidgetLoader.item);
+						else
+							barLayout.hideTooltip();
+					}
+				}
+			}
+		}
+	}
+
+	// Center zone
+	Row {
+		id: centerZone
+
+		height: parent.height
+		anchors.horizontalCenter: parent.horizontalCenter
+		anchors.verticalCenter: parent.verticalCenter
+		spacing: barLayout.spacing
+
+		Repeater {
+			model: barLayout.widgetLayoutForZone("center")
+
+			Item {
+				required property var modelData
+				readonly property string widgetId: modelData
+
+				width: centerWidgetLoader.implicitWidth
+				height: parent.height
+				anchors.verticalCenter: parent.verticalCenter
+
+				Loader {
+					id: centerWidgetLoader
+
+					sourceComponent: barLayout.widgetComponentForId(parent.widgetId)
+					anchors.verticalCenter: parent.verticalCenter
+				}
+				HoverHandler {
+					id: centerHoverHandler
+
+					onHoveredChanged: {
+						if (hovered && centerWidgetLoader.item)
+							barLayout.showTooltip(centerWidgetLoader.item);
+						else
+							barLayout.hideTooltip();
+					}
+				}
+			}
+		}
+	}
+
+	// Right zone
+	Row {
+		id: rightZone
+
+		height: parent.height
+		anchors.right: parent.right
+		anchors.verticalCenter: parent.verticalCenter
+		spacing: barLayout.spacing
+
+		Repeater {
+			model: barLayout.widgetLayoutForZone("right")
+
+			Item {
+				required property var modelData
+				readonly property string widgetId: modelData
+
+				width: rightWidgetLoader.implicitWidth
+				height: parent.height
+				anchors.verticalCenter: parent.verticalCenter
+
+				Loader {
+					id: rightWidgetLoader
+
+					sourceComponent: barLayout.widgetComponentForId(parent.widgetId)
+					anchors.verticalCenter: parent.verticalCenter
+				}
+				HoverHandler {
+					id: rightHoverHandler
+
+					onHoveredChanged: {
+						if (hovered && rightWidgetLoader.item)
+							barLayout.showTooltip(rightWidgetLoader.item);
+						else
+							barLayout.hideTooltip();
+					}
+				}
+			}
+		}
+	}
 }

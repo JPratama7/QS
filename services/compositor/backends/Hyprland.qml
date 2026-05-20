@@ -1,66 +1,138 @@
 pragma ComponentBehavior: Bound
+import QtQml
 
 import QtQuick
-import QtQml
 import Quickshell.Hyprland
-import "../../../types"
+import Quickshell.Wayland
+import "../../../types/compositor"
 
-QtObject {
-    id: backend
+CompositorBackend {
+	id: backend
 
-    readonly property string name: "hyprland"
+	property bool _dirty: true
 
-    readonly property string focusedScreen: Hyprland.focusedMonitor?.name ?? ""
+	function _markDirty(): void {
+		if (_dirty && debounce.running)
+			return;
+		_dirty = true;
+		debounce.restart();
+	}
+	function _rebuild(): void {
+		const mode = backend.sortMode;
+		const items = ToplevelManager.toplevels.values.slice();
 
-    function activeWorkspaceIdForScreen(screenName: string): int {
-        const monitor = Hyprland.monitors.values.find(m => m.name === screenName);
-        return monitor ? monitor.activeWorkspace?.id ?? 0 : 0;
-    }
+		if (mode === CompositorBackend.ToplevelSort.None) {
+			backend.toplevels = items;
+		} else if (mode === CompositorBackend.ToplevelSort.WorkspaceId) {
+			const wsMap = new Map();
+			for (const ht of Hyprland.toplevels.values) {
+				wsMap.set(ht.title, ht);
+			}
+			items.sort(function (a, b) {
+				const wsA = wsMap.get(a.title);
+				const wsB = wsMap.get(b.title);
+				if (wsA && wsB && wsA.workspace && wsB.workspace) {
+					return wsA.workspace.id - wsB.workspace.id;
+				}
+				return (a.title || "").localeCompare(b.title || "");
+			});
+			backend.toplevels = items;
+		} else if (mode === CompositorBackend.ToplevelSort.Name) {
+			items.sort(function (a, b) {
+				return (a.title || "").localeCompare(b.title || "");
+			});
+			backend.toplevels = items;
+		}
+		_dirty = false;
+	}
+	function activeWorkspaceIdForScreen(screenName: string): int {
+		const monitor = Hyprland.monitors.values.find(m => m.name === screenName);
+		return monitor ? monitor.activeWorkspace?.id ?? 0 : 0;
+	}
+	function workspacesForScreen(screenName: string): var {
+		const workspaces = Hyprland.workspaces?.values;
+		if (!workspaces)
+			return [];
 
-    function workspacesForScreen(screenName: string): var {
-        const workspaces = Hyprland.workspaces?.values;
-        if (!workspaces) return [];
+		const monitor = Hyprland.monitors.values.find(monitor => monitor.name === screenName);
+		return workspaces.filter(ws => ws.monitor === monitor).map(ws => ({
+					"id": ws.id,
+					"name": ws.name,
+					"monitor": ws.monitor,
+					"windows": ws.windows
+				}));
+	}
+	function activeWindowForScreen(screenName: string): var {
+		const active = Hyprland.activeToplevel;
+		if (!active)
+			return null;
 
-        const monitor = Hyprland.monitors.values.find(monitor => monitor.name === screenName);
-        return workspaces.filter(ws => ws.monitor === monitor).map(ws => ({
-            "id": ws.id,
-            "name": ws.name,
-            "monitor": ws.monitor,
-            "windows": ws.windows,
-        }));
-    }
+		const monitor = active.monitor;
+		if (monitor && monitor.name === screenName) {
+			return {
+				"title": active.title,
+				"class": active.workspace?.name ?? "",
+				"monitor": active.monitor,
+				"pid": 0
+			};
+		}
+		return null;
+	}
+	function screenHasFullscreen(screenName: string): bool {
+		const workspaces = Hyprland.workspaces?.values;
+		if (!workspaces)
+			return false;
 
-    function activeWindowForScreen(screenName: string): var {
-        const active = Hyprland.activeToplevel;
-        if (!active) return null;
+		for (let i = 0; i < workspaces.length; i++) {
+			const ws = workspaces[i];
+			const wsMonitor = ws.monitor;
+			if (wsMonitor && wsMonitor.name === screenName && ws.fullscreen) {
+				return true;
+			}
+		}
+		return false;
+	}
+	function switchWorkspace(screenName: string, workspaceId: int): void {
+		Hyprland.dispatch("workspace " + String(workspaceId));
+	}
 
-        const monitor = active.monitor;
-        if (monitor && monitor.name === screenName) {
-            return {
-                "title": active.title,
-                "class": active.workspace?.name ?? "",
-                "monitor": active.monitor,
-                "pid": 0
-            };
-        }
-        return null;
-    }
+	backendId: "hyprland"
+	focusedScreen: Hyprland.focusedMonitor?.name ?? ""
 
-    function screenHasFullscreen(screenName: string): bool {
-        const workspaces = Hyprland.workspaces?.values;
-        if (!workspaces) return false;
+	Component.onCompleted: {
+		backend._rebuild();
+	}
 
-        for (let i = 0; i < workspaces.length; i++) {
-            const ws = workspaces[i];
-            const wsMonitor = ws.monitor;
-            if (wsMonitor && wsMonitor.name === screenName && ws.fullscreen) {
-                return true;
-            }
-        }
-        return false;
-    }
+	Connections {
+		function onSortModeChanged(): void {
+			backend._markDirty();
+		}
 
-    function switchWorkspace(screenName: string, workspaceId: int): void {
-        Hyprland.dispatch("workspace " + String(workspaceId));
-    }
+		target: backend
+	}
+	Connections {
+		function onValuesChanged(): void {
+			backend._markDirty();
+		}
+
+		target: ToplevelManager.toplevels
+	}
+	Connections {
+		function onRefreshToplevels(): void {
+			backend._markDirty();
+		}
+
+		target: Hyprland
+	}
+	Timer {
+		id: debounce
+
+		interval: 50
+		repeat: false
+
+		onTriggered: {
+			if (backend._dirty)
+				backend._rebuild();
+		}
+	}
 }

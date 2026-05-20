@@ -1,0 +1,2 @@
+module popups.session
+SessionMenu SessionMenu.qml

@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import "../../config"
+import "../../../config"
 
 Rectangle {
     id: dialog

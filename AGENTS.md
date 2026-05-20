@@ -7,6 +7,7 @@ Guides for AI agents working on this Quickshell desktop shell project.
 ## Project Overview
 
 This is a **Quickshell-based Wayland desktop shell** implementing:
+
 - System bar with widgets (workspaces, clock, tray, etc.)
 - Overlay application launcher
 - System tray support
@@ -221,7 +222,9 @@ Available properties: `name`, `model`, `serialNumber`, `x`, `y`, `width`, `heigh
 ### Core Components
 
 #### ShellRoot
+
 Optional root configuration element for specifying settings inline:
+
 ```qml
 ShellRoot {
     settings.watchFiles: true  // auto-reload on file changes (default: true)
@@ -229,7 +232,9 @@ ShellRoot {
 ```
 
 #### PanelWindow
+
 Decorationless window attached to screen edges:
+
 ```qml
 PanelWindow {
     anchors { left: true; top: true; right: true }
@@ -241,7 +246,9 @@ PanelWindow {
 ```
 
 #### PopupWindow
+
 Popup positioned relative to a parent window:
+
 ```qml
 PopupWindow {
     anchor.window: parentWindow
@@ -261,6 +268,7 @@ PopupWindow {
 ### WlrLayershell (Wayland)
 
 Attached to PanelWindow for layer control:
+
 ```qml
 PanelWindow {
     Component.onCompleted: {
@@ -275,6 +283,7 @@ PanelWindow {
 ### ShellScreen Properties
 
 Read-only monitor information:
+
 - `name` - Display name (e.g., "DP-1", "HDMI-1")
 - `model` - Model name from OS
 - `serialNumber` - Monitor serial
@@ -287,6 +296,7 @@ Read-only monitor information:
 ### Configuration Persistence
 
 #### FileView + JsonAdapter (disk-persistent)
+
 ```qml
 FileView {
     path: Quickshell.shellDir + "/config.json"
@@ -302,6 +312,7 @@ FileView {
 ```
 
 #### PersistentProperties (reload-persistent, not disk-persistent)
+
 ```qml
 PersistentProperties {
     id: persist
@@ -313,18 +324,21 @@ PersistentProperties {
 ### Quickshell Singleton
 
 Directory paths:
+
 - `Quickshell.shellDir` - Shell root directory
 - `Quickshell.dataDir` - Persistent data
 - `Quickshell.stateDir` - Application state
 - `Quickshell.cacheDir` - Cached files
 
 Path helpers:
+
 - `Quickshell.shellPath(path)` - Resolve relative to shellDir
 - `Quickshell.dataPath(path)` - Resolve relative to dataDir
 
 ### LazyLoader
 
 Async loading for heavy components:
+
 ```qml
 LazyLoader {
     id: popupLoader
@@ -345,11 +359,6 @@ LazyLoader {
 
 - Architecture: `ARCHITECTURE.md`
 - README: `README.md`
-- Design Doc: `docs/Quickshell-Desktop-DESIGN-v2.md`
-- Implementation Notes: `docs/IMPLEMENTATION-NOTES.md`
-- PRD: `docs/Quickshell-Desktop-PRD.md`
-- Dev Workflow: `docs/DEV-WORKFLOW.md`
-- Implementation Plan: `docs/plans/2026-04-12-quickshell-desktop-implementation-plan.md`
 
 ---
 
@@ -361,7 +370,8 @@ LazyLoader {
 
 **Root Cause**: QML doesn't properly initialize `var` properties with array literals at declaration time. The array literal gets evaluated before the property system is fully ready, leading to `undefined` values.
 
-**Solution**: 
+**Solution**:
+
 ```qml
 // ❌ Wrong - causes undefined errors
 property var toastQueue: []
@@ -374,11 +384,12 @@ Component.onCompleted: {
 ```
 
 **Safety Pattern**: Always add null checks when accessing potentially undefined arrays:
+
 ```qml
 // ❌ Unsafe - crashes if undefined
 visible: Notification.toastQueue.length > 0
 
-// ✅ Safe - handles undefined gracefully  
+// ✅ Safe - handles undefined gracefully
 visible: (Notification.toastQueue || []).length > 0
 ```
 
@@ -389,6 +400,7 @@ visible: (Notification.toastQueue || []).length > 0
 **Root Cause**: Over-engineering with unnecessary component loading complexity for simple dynamic data display.
 
 **Failed Approach**:
+
 ```qml
 // ❌ Complex - timing issues, property propagation failures
 delegate: Loader {
@@ -402,6 +414,7 @@ delegate: Loader {
 ```
 
 **Working Approach**:
+
 ```qml
 // ✅ Simple - direct data access, immediate rendering
 delegate: Text {
@@ -413,12 +426,14 @@ delegate: Text {
 ### When to Use Each Pattern
 
 **Use Loader + Component when**:
+
 - Heavy/complex components that impact performance
-- Components that may not always be needed  
+- Components that may not always be needed
 - Dynamic component selection between different types
 - When you need explicit control over component lifecycle
 
 **Use Direct Delegates when**:
+
 - Simple, repetitive items (list items, cards)
 - Dynamic data that needs immediate access
 - Performance-critical lists with many items
