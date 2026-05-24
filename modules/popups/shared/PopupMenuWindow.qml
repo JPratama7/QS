@@ -21,7 +21,7 @@ PopupWindow {
 	property bool _internalClose: false
 
 	anchor.window: popupWindow.barWindow
-	anchor.rect.y: popupWindow.context.barHeight
+	anchor.rect.y: popupWindow.context.barEdge === "bottom" ? -popupWindow.implicitHeight : popupWindow.context.barHeight
 	anchor.rect.x: popupWindow.anchorX
 
 	// qmllint disable missing-property
