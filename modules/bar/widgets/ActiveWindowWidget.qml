@@ -1,78 +1,75 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import "../../../services/compositor"
-import "../../../services/system"
-import "../../../config"
-import "../../../components/bar"
 
 import Quickshell.Widgets
+import "../../../components/bar"
+import "../../../config"
+import "../../../services/compositor"
+import "../../../services/system"
 
 BaseWidget {
-    id: widget
+	id: widget
 
-    required property string screenName
+	required property string screenName
+	property var activeWindow: null
+	readonly property string windowTitle: activeWindow ? activeWindow.title : ""
+	property int maxTextWidth: 200
 
-    tooltipComponent: Component {
-        Text {
-            text: widget.windowTitle || "No active window"
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.foregroundColor
-        }
-    }
+	function applyActiveWindowConfig(): void {
+		const widgetsConfig = ShellConfig.barWidgetsConfig();
+		const activeWindowConfig = widgetsConfig.activeWindow || {};
+		const configuredMaxTextWidth = activeWindowConfig.maxTextWidth;
 
-    property var activeWindow: null
-    readonly property string windowTitle: activeWindow ? activeWindow.title : ""
-    property int maxTextWidth: 200
+		maxTextWidth = (typeof configuredMaxTextWidth === "number" && configuredMaxTextWidth > 0) ? configuredMaxTextWidth : Defaults.bar.widgets.activeWindow.maxTextWidth;
+	}
 
-    function applyActiveWindowConfig(): void {
-        const widgetsConfig = ShellConfig.barWidgetsConfig()
-        const activeWindowConfig = widgetsConfig.activeWindow || {}
-        const configuredMaxTextWidth = activeWindowConfig.maxTextWidth
+	implicitWidth: row.implicitWidth
+	implicitHeight: row.implicitHeight
 
-        maxTextWidth = (typeof configuredMaxTextWidth === "number" && configuredMaxTextWidth > 0)
-            ? configuredMaxTextWidth
-            : Defaults.bar.widgets.activeWindow.maxTextWidth
-    }
+	tooltipComponent: Component {
+		Text {
+			text: widget.windowTitle || "No active window"
+			font.pixelSize: Theme.fontSizeSmall
+			color: Theme.foregroundColor
+		}
+	}
 
-    Component.onCompleted: applyActiveWindowConfig()
+	Component.onCompleted: applyActiveWindowConfig()
 
-    Connections {
-        target: Compositor
-        function onActiveToplevelChanged(data: var){
-            widget.activeWindow = data;
-        }
-    }
+	Connections {
+		function onActiveToplevelChanged(data: var) {
+			widget.activeWindow = data;
+		}
 
-    Connections {
-        target: ShellConfig
-        function onBarChanged(): void {
-            widget.applyActiveWindowConfig()
-        }
-    }
+		target: Compositor
+	}
+	Connections {
+		function onBarChanged(): void {
+			widget.applyActiveWindowConfig();
+		}
 
+		target: ShellConfig
+	}
+	Row {
+		id: row
 
-    implicitWidth: row.implicitWidth
-    implicitHeight: row.implicitHeight
+		spacing: Theme.spacingSmall
+		visible: widget.activeWindow !== null
 
-    Row {
-        id: row
-        spacing: Theme.spacingSmall
-        visible: widget.activeWindow !== null
+		IconImage {
+			width: Theme.iconSizeSmall
+			height: Theme.iconSizeSmall
+			source: AppIcons.iconForAppId(widget.activeWindow?.appId ?? "")
+		}
+		Text {
+			id: text
 
-        IconImage {
-            width: Theme.iconSizeSmall
-            height: Theme.iconSizeSmall
-            source: AppIcons.iconForAppId(widget.activeWindow?.appId ?? "")
-        }
-
-        Text {
-            id: text
-            text: widget.windowTitle || "No active window"
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.foregroundColor
-            elide: Text.ElideRight
-            width: widget.maxTextWidth
-        }
-    }
+			text: widget.windowTitle || "No active window"
+			font.pixelSize: Theme.fontSizeSmall
+			color: Theme.foregroundColor
+			elide: Text.ElideRight
+			width: widget.maxTextWidth
+		}
+	}
 }
