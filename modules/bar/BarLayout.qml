@@ -189,6 +189,7 @@ Item {
 				Loader {
 					id: leftWidgetLoader
 
+					asynchronous: true
 					sourceComponent: barLayout.widgetComponentForId(parent.widgetId)
 					anchors.verticalCenter: parent.verticalCenter
 				}
@@ -229,6 +230,7 @@ Item {
 				Loader {
 					id: centerWidgetLoader
 
+					asynchronous: true
 					sourceComponent: barLayout.widgetComponentForId(parent.widgetId)
 					anchors.verticalCenter: parent.verticalCenter
 				}
@@ -269,6 +271,7 @@ Item {
 				Loader {
 					id: rightWidgetLoader
 
+					asynchronous: true
 					sourceComponent: barLayout.widgetComponentForId(parent.widgetId)
 					anchors.verticalCenter: parent.verticalCenter
 				}
