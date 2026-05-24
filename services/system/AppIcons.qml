@@ -7,9 +7,16 @@ Singleton {
 
 	// Cache: iconName -> resolved path (or "" for not-found)
 	property var _cache: ({})
+	readonly property int _maxCacheSize: 500
 
 	function _invalidateCache(): void {
 		root._cache = {};
+	}
+	function _addToCache(key, value) {
+		root._cache[key] = value;
+		if (Object.keys(root._cache).length > root._maxCacheSize) {
+			root._invalidateCache();
+		}
 	}
 	function iconFromName(iconName, fallbackName) {
 		const fallback = fallbackName || "application-x-executable";
@@ -23,19 +30,24 @@ Singleton {
 		if (cacheKey in root._cache)
 			return root._cache[cacheKey];
 
-		let resolved = "";
 		if (iconName && Quickshell.iconPath) {
 			const p = Quickshell.iconPath(iconName, fallback);
-			if (p && p !== "") {
-				resolved = p;
+			if (p) {
+				root._addToCache(cacheKey, p);
+				return p;
 			}
 		}
-		if (!resolved && Quickshell.iconPath) {
-			resolved = Quickshell.iconPath(fallback, true) || "";
+
+		if (Quickshell.iconPath) {
+			const p = Quickshell.iconPath(fallback, true);
+			if (p) {
+				root._addToCache(cacheKey, p);
+				return p;
+			}
 		}
 
-		root._cache[cacheKey] = resolved;
-		return resolved;
+		root._addToCache(cacheKey, "");
+		return "";
 	}
 
 	// Resolve icon path for a DesktopEntries appId - safe on missing entries
@@ -51,14 +63,14 @@ Singleton {
 
 		if (typeof DesktopEntries === 'undefined' || !DesktopEntries.byId) {
 			const result = iconFromName(fallback, fallback);
-			root._cache[appIdKey] = result;
+			root._addToCache(appIdKey, result);
 			return result;
 		}
 
 		const entry = (DesktopEntries.heuristicLookup) ? DesktopEntries.heuristicLookup(appId) : DesktopEntries.byId(appId);
 		const name = entry && entry.icon ? entry.icon : "";
 		const result = iconFromName(name || fallback, fallback);
-		root._cache[appIdKey] = result;
+		root._addToCache(appIdKey, result);
 		return result;
 	}
 
