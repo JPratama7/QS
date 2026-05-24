@@ -28,8 +28,8 @@ RowLayout {
 		spacing: 5
 
 		Rectangle {
-			width: 30
-			height: 30
+			Layout.preferredWidth: PersistentConfig.adapterView.settings?.components?.numberButton?.width || 30
+			Layout.preferredHeight: PersistentConfig.adapterView.settings?.components?.numberButton?.height || 30
 			radius: Theme.radiusSmall
 			color: Theme.surfaceColor
 			border.color: Theme.surfaceColor
@@ -53,8 +53,8 @@ RowLayout {
 			}
 		}
 		Rectangle {
-			width: 60
-			height: 30
+			Layout.preferredWidth: PersistentConfig.adapterView.settings?.components?.numberDisplay?.width || 60
+			Layout.preferredHeight: PersistentConfig.adapterView.settings?.components?.numberDisplay?.height || 30
 			radius: Theme.radiusSmall
 			color: Theme.backgroundColor
 			border.color: Theme.surfaceColor
@@ -68,8 +68,8 @@ RowLayout {
 			}
 		}
 		Rectangle {
-			width: 30
-			height: 30
+			Layout.preferredWidth: PersistentConfig.adapterView.settings?.components?.numberButton?.width || 30
+			Layout.preferredHeight: PersistentConfig.adapterView.settings?.components?.numberButton?.height || 30
 			radius: Theme.radiusSmall
 			color: Theme.surfaceColor
 			border.color: Theme.surfaceColor
