@@ -47,6 +47,27 @@ QtObject {
 	// Tray defaults
 	readonly property var trayHiddenIds: []
 	readonly property int trayMenuMaxHeight: 400
+	// Settings panel component dimensions
+	readonly property var settings: {
+		"components": {
+			"numberButton": {
+				"width": 30,
+				"height": 30
+			},
+			"numberDisplay": {
+				"width": 60,
+				"height": 30
+			},
+			"select": {
+				"width": 100,
+				"height": 30
+			},
+			"toggle": {
+				"width": 40,
+				"height": 20
+			}
+		}
+	}
 	// Bar widget layout defaults
 	readonly property var barWidgetLayout: {
 		"left": ["launcher", "workspaces", "activeWindow"],
