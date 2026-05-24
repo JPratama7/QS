@@ -187,8 +187,10 @@ Singleton {
     }
 
     function closeSettings(): void {
-        root._settingsScreen = "";
-        root.settingsClosed();
+        if (root._settingsScreen !== "") {
+            root._settingsScreen = "";
+            root.settingsClosed();
+        }
     }
 
     function isSettingsOpen(): bool {
