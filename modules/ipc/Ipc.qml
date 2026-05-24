@@ -6,4 +6,6 @@ QtObject {
 	}
 	readonly property Cliphist cliphist: Cliphist {
 	}
+	readonly property Settings settings: Settings {
+	}
 }

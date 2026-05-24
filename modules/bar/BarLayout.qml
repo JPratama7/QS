@@ -45,6 +45,8 @@ Item {
 			return trayComp;
 		case "session":
 			return sessionComp;
+		case "settings":
+			return settingsComp;
 		case "idleInhibitor":
 			return idleInhibitorComp;
 		case "taskbar":
@@ -152,6 +154,14 @@ Item {
 		}
 	}
 	Component {
+		id: settingsComp
+
+		SettingsWidget {
+			screenName: barLayout.screenName
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
 		id: idleInhibitorComp
 
 		IdleInhibitorWidget {
@@ -179,8 +189,7 @@ Item {
 			model: barLayout.widgetLayoutForZone("left")
 
 			Item {
-				required property var modelData
-				readonly property string widgetId: modelData
+				required property string modelData
 
 				width: leftWidgetLoader.implicitWidth
 				height: parent.height
@@ -190,7 +199,7 @@ Item {
 					id: leftWidgetLoader
 
 					asynchronous: true
-					sourceComponent: barLayout.widgetComponentForId(parent.widgetId)
+					sourceComponent: barLayout.widgetComponentForId(parent.modelData)
 					anchors.verticalCenter: parent.verticalCenter
 				}
 				HoverHandler {
@@ -220,8 +229,7 @@ Item {
 			model: barLayout.widgetLayoutForZone("center")
 
 			Item {
-				required property var modelData
-				readonly property string widgetId: modelData
+				required property string modelData
 
 				width: centerWidgetLoader.implicitWidth
 				height: parent.height
@@ -231,7 +239,7 @@ Item {
 					id: centerWidgetLoader
 
 					asynchronous: true
-					sourceComponent: barLayout.widgetComponentForId(parent.widgetId)
+					sourceComponent: barLayout.widgetComponentForId(parent.modelData)
 					anchors.verticalCenter: parent.verticalCenter
 				}
 				HoverHandler {
@@ -261,8 +269,7 @@ Item {
 			model: barLayout.widgetLayoutForZone("right")
 
 			Item {
-				required property var modelData
-				readonly property string widgetId: modelData
+				required property string modelData
 
 				width: rightWidgetLoader.implicitWidth
 				height: parent.height
@@ -272,7 +279,7 @@ Item {
 					id: rightWidgetLoader
 
 					asynchronous: true
-					sourceComponent: barLayout.widgetComponentForId(parent.widgetId)
+					sourceComponent: barLayout.widgetComponentForId(parent.modelData)
 					anchors.verticalCenter: parent.verticalCenter
 				}
 				HoverHandler {

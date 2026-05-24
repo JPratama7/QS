@@ -1,0 +1,7 @@
+module settings
+SettingsOverlayWindow SettingsOverlayWindow.qml
+SettingsView SettingsView.qml
+SettingToggle components/SettingToggle.qml
+SettingSelect components/SettingSelect.qml
+SettingSection components/SettingSection.qml
+SettingNumber components/SettingNumber.qml
