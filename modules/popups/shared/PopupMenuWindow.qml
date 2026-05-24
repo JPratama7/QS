@@ -2,88 +2,84 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import "../../../types"
 import "../../../services/ui"
+import "../../../types"
 
 PopupWindow {
-    id: popupWindow
+	id: popupWindow
 
-    required property ScreenContext context
+	required property ScreenContext context
 
-    // The source bar window this popup is anchored to — set by ScreenShellDelegate
-    required property PanelWindow barWindow
+	// The source bar window this popup is anchored to — set by ScreenShellDelegate
+	required property PanelWindow barWindow
 
-    anchor.window: popupWindow.barWindow
-    anchor.rect.y: popupWindow.context.barHeight
+	// Horizontal anchor — set via popupRequested signal metadata
+	property int anchorX: 0
+	property Component activeComponent: null
 
-    // Horizontal anchor — set via popupRequested signal metadata
-    property int anchorX: 0
-    anchor.rect.x: popupWindow.anchorX
+	// Track if close was triggered internally to prevent recursive close
+	property bool _internalClose: false
 
-    // qmllint disable missing-property
-    implicitWidth: popupContent.item ? popupContent.item.implicitWidth : 0
-    implicitHeight: popupContent.item ? popupContent.item.implicitHeight : 0
-    // qmllint enable missing-property
+	anchor.window: popupWindow.barWindow
+	anchor.rect.y: popupWindow.context.barHeight
+	anchor.rect.x: popupWindow.anchorX
 
-    // Dismiss on click outside
-    grabFocus: true
+	// qmllint disable missing-property
+	implicitWidth: popupContent.item ? popupContent.item.implicitWidth : 0
+	implicitHeight: popupContent.item ? popupContent.item.implicitHeight : 0
+	// qmllint enable missing-property
 
-    property Component activeComponent: null
+	// Dismiss on click outside
+	grabFocus: true
+	visible: popupWindow.activeComponent !== null
+	color: "transparent"
 
-    // Track if close was triggered internally to prevent recursive close
-    property bool _internalClose: false
+	onActiveComponentChanged: {
+		if (activeComponent)
+			popupContent.sourceComponent = activeComponent;
+		else
+			Qt.callLater(() => {
+				if (popupWindow.activeComponent === null)
+					popupContent.sourceComponent = null;
+			});
+	}
 
-    visible: popupWindow.activeComponent !== null
+	// Detect external dismissal (click outside, Escape, focus loss)
+	// When visible becomes false while activeComponent is set, notify ShellUI
+	// ShellUI will emit popupClosed signal, triggering our onPopupClosed handler
+	onVisibleChanged: {
+		if (!visible && activeComponent !== null && !_internalClose) {
+			ShellUI.closePopup(context.name);
+		}
+		if (!visible) {
+			_internalClose = false;
+		}
+	}
 
-    color: "transparent"
+	// Managed manually — unbind from activeComponent to defer content destruction
+	// Window must hide first before Loader destroys content (avoids Wayland "Invalid size")
+	Loader {
+		id: popupContent
 
-    // Managed manually — unbind from activeComponent to defer content destruction
-    // Window must hide first before Loader destroys content (avoids Wayland "Invalid size")
-    Loader {
-        id: popupContent
-        anchors.fill: parent
-        sourceComponent: null
-    }
+		anchors.fill: parent
+		sourceComponent: null
+	}
+	Connections {
+		function onPopupRequested(screenName: string, popupId: string, component: var, anchorX: int) {
+			if (screenName !== popupWindow.context.name)
+				return;
+			popupWindow.anchorX = anchorX;
+			popupWindow.activeComponent = component;
+			BarVisibility.popupOpen(screenName);
+		}
+		function onPopupClosed(screenName: string) {
+			if (screenName !== popupWindow.context.name)
+				return;
+			popupWindow._internalClose = true;
+			popupWindow.activeComponent = null;
+			BarVisibility.popupClose(screenName);
+		}
 
-    onActiveComponentChanged: {
-        if (activeComponent)
-            popupContent.sourceComponent = activeComponent
-        else
-            Qt.callLater(() => {
-                if (popupWindow.activeComponent === null)
-                    popupContent.sourceComponent = null
-            })
-    }
-
-    Connections {
-        target: ShellUI
-
-        function onPopupRequested(screenName: string, popupId: string, component: var, anchorX: int) {
-            if (screenName !== popupWindow.context.name)
-                return;
-            popupWindow.anchorX = anchorX;
-            popupWindow.activeComponent = component;
-            BarVisibility.popupOpen(screenName);
-        }
-
-        function onPopupClosed(screenName: string) {
-            if (screenName !== popupWindow.context.name)
-                return;
-            popupWindow._internalClose = true;
-            popupWindow.activeComponent = null;
-            BarVisibility.popupClose(screenName);
-        }
-    }
-
-    // Detect external dismissal (click outside, Escape, focus loss)
-    // When visible becomes false while activeComponent is set, notify ShellUI
-    // ShellUI will emit popupClosed signal, triggering our onPopupClosed handler
-    onVisibleChanged: {
-        if (!visible && activeComponent !== null && !_internalClose) {
-            ShellUI.closePopup(context.name);
-        }
-        if (!visible) {
-            _internalClose = false;
-        }
-    }
+		target: ShellUI
+	}
 }
