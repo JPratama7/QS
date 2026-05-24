@@ -25,12 +25,11 @@ ShellWindow {
 	exclusiveZone: BarVisibility.effectiveVisible(context.name) && context.barDisplayMode !== "non_exclusive" ? context.barHeight : 0
 	color: Theme.backgroundColor
 	visible: BarVisibility.effectiveVisible(context.name)
+	anchors.top: context.barEdge === "top"
+	anchors.bottom: context.barEdge === "bottom"
+	anchors.left: true
+	anchors.right: true
 
-	anchors {
-		top: true
-		left: true
-		right: true
-	}
 	HoverHandler {
 		id: barHover
 
