@@ -16,6 +16,9 @@ Singleton {
     // Cliphist open state (screen name of the screen showing cliphist, or "")
     property string _cliphistScreen: ""
 
+    // Settings open state
+    property string _settingsScreen: ""
+
     // Track known screens for removal detection
     property var _knownScreenNames: ([])
 
@@ -33,8 +36,13 @@ Singleton {
     signal cliphistOpened(screenName: string)
     signal cliphistClosed()
 
+    // Emitted when settings opens/closes on a screen
+    signal settingsOpened(screenName: string)
+    signal settingsClosed()
+
     readonly property string launcherScreen: _launcherScreen
     readonly property string cliphistScreen: _cliphistScreen
+    readonly property string settingsScreen: _settingsScreen
 
     // Detect screen removal and clean up state
     Connections {
@@ -55,6 +63,9 @@ Singleton {
                 if (root._cliphistScreen === name) {
                     root.closeCliphist();
                 }
+                if (root._settingsScreen === name) {
+                    root.closeSettings();
+                }
             }
 
             root._knownScreenNames = currentNames;
@@ -73,6 +84,9 @@ Singleton {
         }
         if (root._cliphistScreen !== "") {
             root.closeCliphist();
+        }
+        if (root._settingsScreen !== "") {
+            root.closeSettings();
         }
         root._openScreens[screenName] = true;
         root.popupRequested(screenName, popupId, component, anchorX);
@@ -102,6 +116,9 @@ Singleton {
         if (root._launcherScreen === screenName) {
             return;
         }
+        if (root._settingsScreen !== "") {
+            root.closeSettings();
+        }
         if (root._launcherScreen !== "") {
             root.closeLauncher()
         }
@@ -127,6 +144,9 @@ Singleton {
         if (root._cliphistScreen === screenName) {
             return;
         }
+        if (root._settingsScreen !== "") {
+            root.closeSettings();
+        }
         if (root._cliphistScreen !== "") {
             root.closeCliphist();
         }
@@ -145,5 +165,33 @@ Singleton {
 
     function isCliphistOpen(): bool {
         return root._cliphistScreen !== "";
+    }
+
+    // Settings open/close
+    function openSettings(screenName: string): void {
+        if (root._settingsScreen === screenName) {
+            return;
+        }
+        if (root._settingsScreen !== "") {
+            root.closeSettings();
+        }
+        if (root._launcherScreen !== "") {
+            root.closeLauncher();
+        }
+        if (root._cliphistScreen !== "") {
+            root.closeCliphist();
+        }
+
+        root._settingsScreen = screenName;
+        root.settingsOpened(screenName);
+    }
+
+    function closeSettings(): void {
+        root._settingsScreen = "";
+        root.settingsClosed();
+    }
+
+    function isSettingsOpen(): bool {
+        return root._settingsScreen !== "";
     }
 }
