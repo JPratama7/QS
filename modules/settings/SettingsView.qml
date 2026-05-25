@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import "../../config"
+import "../../services/system"
 import "../../services/ui"
 
 Rectangle {
@@ -151,6 +152,15 @@ Rectangle {
 
 							onToggled: {
 								PersistentConfig.adapterView.dndEnabled = !PersistentConfig.adapterView.dndEnabled;
+							}
+						}
+						SettingDropdown {
+							text: "Time Zone"
+							currentValue: PersistentConfig.adapterView.timeZone
+							options: TimeZone.allTimezones
+
+							onValueChanged: val => {
+								PersistentConfig.adapterView.timeZone = val;
 							}
 						}
 					}
