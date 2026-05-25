@@ -30,10 +30,12 @@ A lightweight, compositor-agnostic Wayland desktop shell built on [Quickshell](h
 - Qt 6.5+
 - [cliphist](https://github.com/sentriz/cliphist) — clipboard history manager (required for the clipboard popup)
 - [wl-clipboard](https://github.com/bugaevc/wl-clipboard) — Wayland clipboard utility (`wl-copy`, used by the clipboard popup)
+- `timedatectl` — timezone detection and configuration (usually provided by `systemd` or `systemd-utils`)
 
 ## Installation
 
 1. Install Quickshell:
+
    ```bash
    # Arch Linux (AUR)
    yay -S quickshell-git
@@ -43,6 +45,7 @@ A lightweight, compositor-agnostic Wayland desktop shell built on [Quickshell](h
    ```
 
 2. Clone this repository:
+
    ```bash
    git clone <repo-url> ~/.config/quickshell/my-shell
    ```
@@ -85,7 +88,15 @@ Edit `config.json` in the shell directory:
   "barWidgetLayout": {
     "left": ["launcher", "workspaces", "activeWindow"],
     "center": ["clock"],
-    "right": ["network", "volume", "battery", "idleInhibitor", "notifications", "tray", "session"]
+    "right": [
+      "network",
+      "volume",
+      "battery",
+      "idleInhibitor",
+      "notifications",
+      "tray",
+      "session"
+    ]
   },
   "barWidgetLayoutPerScreen": {}
 }
@@ -93,12 +104,12 @@ Edit `config.json` in the shell directory:
 
 ### Display Modes
 
-| Mode | Behavior |
-|------|----------|
-| `visible` | Always visible, reserves screen space |
-| `auto_hide` | Hidden by default, appears on edge hover |
-| `hidden` | Never visible |
-| `non_exclusive` | Visible but doesn't reserve space |
+| Mode            | Behavior                                 |
+| --------------- | ---------------------------------------- |
+| `visible`       | Always visible, reserves screen space    |
+| `auto_hide`     | Hidden by default, appears on edge hover |
+| `hidden`        | Never visible                            |
+| `non_exclusive` | Visible but doesn't reserve space        |
 
 ### Excluding Screens
 
@@ -119,7 +130,15 @@ Configure widgets per zone (left/center/right):
   "barWidgetLayout": {
     "left": ["launcher", "workspaces", "activeWindow"],
     "center": ["clock"],
-    "right": ["network", "volume", "battery", "idleInhibitor", "notifications", "tray", "session"]
+    "right": [
+      "network",
+      "volume",
+      "battery",
+      "idleInhibitor",
+      "notifications",
+      "tray",
+      "session"
+    ]
   }
 }
 ```
@@ -263,7 +282,6 @@ See [AGENTS.md](./AGENTS.md) for development guidelines and conventions.
 ## License
 
 [GPL 2](./LICENSE.md)
-
 
 ## Credits
 
