@@ -161,6 +161,7 @@ Rectangle {
 
 							onValueChanged: val => {
 								PersistentConfig.adapterView.timeZone = val;
+								TimeZone.setSystemTimezone(val);
 							}
 						}
 					}
