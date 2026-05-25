@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "../../../config"
+import "../../../services/system"
 
 Item {
 	id: root
@@ -29,10 +30,10 @@ Item {
 	implicitHeight: contentColumn.implicitHeight + Theme.paddingNormal * 2
 
 	Component.onCompleted: {
-		const now = new Date();
-		root._todayYear = now.getFullYear();
-		root._todayMonth = now.getMonth();
-		root._todayDate = now.getDate();
+		const today = TimeZone.getToday(ShellConfig.timeZone);
+		root._todayYear = today.year;
+		root._todayMonth = today.month;
+		root._todayDate = today.day;
 		root._displayYear = root._todayYear;
 		root._displayMonth = root._todayMonth;
 	}
