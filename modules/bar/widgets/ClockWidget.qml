@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import "../../../components/bar"
 import "../../../config"
+import "../../../services/system"
 import "../../../services/ui"
 import "../../popups/calendar"
 
@@ -33,7 +34,7 @@ BaseWidget {
 		id: textItem
 
 		text: {
-			return Qt.formatDateTime(systemClock.date, "hh:mm ddd");
+			return TimeZone.formatTime(systemClock.date, "hh:mm ddd", ShellConfig.timeZone);
 		}
 		color: Theme.foregroundColor
 		font.pixelSize: Theme.fontSizeNormal
