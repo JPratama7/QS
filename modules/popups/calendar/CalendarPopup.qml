@@ -87,12 +87,24 @@ Item {
 					}
 				}
 			}
-			Text {
+			Column {
 				anchors.centerIn: parent
-				text: root.monthName(root._displayMonth) + " " + root._displayYear
-				color: Theme.foregroundColor
-				font.pixelSize: Theme.fontSizeNormal
-				font.family: Theme.fontFamily
+				spacing: 2
+
+				Text {
+					text: root.monthName(root._displayMonth) + " " + root._displayYear
+					color: Theme.foregroundColor
+					font.pixelSize: Theme.fontSizeNormal
+					font.family: Theme.fontFamily
+					anchors.horizontalCenter: parent.horizontalCenter
+				}
+				Text {
+					text: ShellConfig.timeZone || "System"
+					color: Theme.mutedColor
+					font.pixelSize: Theme.fontSizeSmall
+					font.family: Theme.fontFamily
+					anchors.horizontalCenter: parent.horizontalCenter
+				}
 			}
 			Text {
 				id: navNext
