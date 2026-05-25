@@ -7,8 +7,8 @@ QtObject {
 
 	// Primary screen name (empty string = first screen is treated as primary)
 	readonly property string primaryScreen: ""
-	// Time zone for clock display ("local" = system default)
-	readonly property string timeZone: "local"
+	// Time zone for clock display (empty string = system default)
+	readonly property string timeZone: ""
 	// Bar defaults
 	readonly property int barHeight: 32
 	readonly property string barEdge: "top"
