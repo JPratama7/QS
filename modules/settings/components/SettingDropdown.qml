@@ -29,7 +29,7 @@ ColumnLayout {
 			Layout.fillWidth: true
 		}
 		Rectangle {
-			Layout.preferredWidth: PersistentConfig.adapterView.settings?.components?.select?.width || 140
+			Layout.preferredWidth: PersistentConfig.adapterView.settings?.components?.select?.width || 100
 			Layout.preferredHeight: PersistentConfig.adapterView.settings?.components?.select?.height || 30
 			radius: Theme.radiusSmall
 			color: Theme.surfaceColor
