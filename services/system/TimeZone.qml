@@ -4,6 +4,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../../config"
 
 Singleton {
 	id: root
@@ -11,10 +12,17 @@ Singleton {
 	property var allTimezones: []
 	property bool _loaded: false
 	property string _buffer: ""
-	readonly property var _fallbackTimezones: ["local", "UTC", "Africa/Cairo", "Africa/Johannesburg", "Africa/Lagos", "America/Anchorage", "America/Bogota", "America/Chicago", "America/Denver", "America/Lima", "America/Los_Angeles", "America/Mexico_City", "America/New_York", "America/Phoenix", "America/Sao_Paulo", "America/Toronto", "Asia/Bangkok", "Asia/Dubai", "Asia/Hong_Kong", "Asia/Jakarta", "Asia/Kolkata", "Asia/Manila", "Asia/Seoul", "Asia/Shanghai", "Asia/Singapore", "Asia/Taipei", "Asia/Tokyo", "Australia/Brisbane", "Australia/Melbourne", "Australia/Perth", "Australia/Sydney", "Europe/Amsterdam", "Europe/Athens", "Europe/Berlin", "Europe/Brussels", "Europe/Budapest", "Europe/Copenhagen", "Europe/Dublin", "Europe/Helsinki", "Europe/Istanbul", "Europe/Lisbon", "Europe/London", "Europe/Madrid", "Europe/Moscow", "Europe/Oslo", "Europe/Paris", "Europe/Prague", "Europe/Rome", "Europe/Stockholm", "Europe/Vienna", "Europe/Warsaw", "Europe/Zurich", "Pacific/Auckland", "Pacific/Honolulu"]
+	property string systemTimezone: ""
 
+	function setSystemTimezone(timeZone) {
+		if (timeZone === "") {
+			return;
+		}
+		setTzProcess.command = ["timedatectl", "set-timezone", timeZone];
+		setTzProcess.running = true;
+	}
 	function formatTime(dateTime, formatHint, timeZone) {
-		if (!timeZone || timeZone === "local" || typeof Intl === 'undefined') {
+		if (!timeZone || typeof Intl === 'undefined') {
 			return Qt.formatDateTime(dateTime, formatHint);
 		}
 		try {
@@ -38,7 +46,7 @@ Singleton {
 		}
 	}
 	function getToday(timeZone) {
-		if (!timeZone || timeZone === "local" || typeof Intl === 'undefined') {
+		if (!timeZone || typeof Intl === 'undefined') {
 			const now = new Date();
 			return {
 				year: now.getFullYear(),
@@ -97,6 +105,7 @@ Singleton {
 
 	Component.onCompleted: {
 		tzProcess.running = true;
+		detectTzProcess.running = true;
 	}
 
 	Process {
@@ -114,13 +123,35 @@ Singleton {
 			if (!running) {
 				const lines = root._buffer.split("\n").filter(l => l.trim() !== "");
 				if (lines.length > 0) {
-					root.allTimezones = ["local", ...lines];
+					root.allTimezones = lines;
 				} else {
-					root.allTimezones = root._fallbackTimezones;
+					console.error("TimeZone: timedatectl list-timezones returned no data");
 				}
 				root._buffer = "";
 				root._loaded = true;
 			}
 		}
+	}
+	Process {
+		id: detectTzProcess
+
+		command: ["timedatectl", "show", "-P", "Timezone"]
+
+		stdout: SplitParser {
+			onRead: data => {
+				root.systemTimezone = data.trim();
+			}
+		}
+
+		onRunningChanged: {
+			if (!running && root.systemTimezone !== "") {
+				if (PersistentConfig.adapterView.timeZone === "") {
+					PersistentConfig.adapterView.timeZone = root.systemTimezone;
+				}
+			}
+		}
+	}
+	Process {
+		id: setTzProcess
 	}
 }
