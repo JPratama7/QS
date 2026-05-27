@@ -160,9 +160,18 @@ Rectangle {
 							options: TimeZone.allTimezones
 
 							onValueChanged: val => {
-								PersistentConfig.adapterView.timeZone = val;
 								TimeZone.setSystemTimezone(val);
 							}
+						}
+						Connections {
+							function onTimezoneSetSuccess(timeZone) {
+								PersistentConfig.adapterView.timeZone = timeZone;
+							}
+							function onTimezoneSetFailed(timeZone, error) {
+								console.error("Settings: failed to set timezone:", error);
+							}
+
+							target: TimeZone
 						}
 					}
 
