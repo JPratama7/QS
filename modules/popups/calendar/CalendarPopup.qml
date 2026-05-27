@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "../../../config"
+import "../../../services/system"
 
 Item {
 	id: root
@@ -29,10 +30,10 @@ Item {
 	implicitHeight: contentColumn.implicitHeight + Theme.paddingNormal * 2
 
 	Component.onCompleted: {
-		const now = new Date();
-		root._todayYear = now.getFullYear();
-		root._todayMonth = now.getMonth();
-		root._todayDate = now.getDate();
+		const today = TimeZone.getToday(ShellConfig.timeZone);
+		root._todayYear = today.year;
+		root._todayMonth = today.month;
+		root._todayDate = today.day;
 		root._displayYear = root._todayYear;
 		root._displayMonth = root._todayMonth;
 	}
@@ -86,12 +87,24 @@ Item {
 					}
 				}
 			}
-			Text {
+			Column {
 				anchors.centerIn: parent
-				text: root.monthName(root._displayMonth) + " " + root._displayYear
-				color: Theme.foregroundColor
-				font.pixelSize: Theme.fontSizeNormal
-				font.family: Theme.fontFamily
+				spacing: 2
+
+				Text {
+					text: root.monthName(root._displayMonth) + " " + root._displayYear
+					color: Theme.foregroundColor
+					font.pixelSize: Theme.fontSizeNormal
+					font.family: Theme.fontFamily
+					anchors.horizontalCenter: parent.horizontalCenter
+				}
+				Text {
+					text: ShellConfig.timeZone || "System"
+					color: Theme.mutedColor
+					font.pixelSize: Theme.fontSizeSmall
+					font.family: Theme.fontFamily
+					anchors.horizontalCenter: parent.horizontalCenter
+				}
 			}
 			Text {
 				id: navNext

@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import "../../config"
+import "../../services/system"
 import "../../services/ui"
 
 Rectangle {
@@ -152,6 +153,25 @@ Rectangle {
 							onToggled: {
 								PersistentConfig.adapterView.dndEnabled = !PersistentConfig.adapterView.dndEnabled;
 							}
+						}
+						SettingDropdown {
+							text: "Time Zone"
+							currentValue: PersistentConfig.adapterView.timeZone
+							options: TimeZone.allTimezones
+
+							onValueChanged: val => {
+								TimeZone.setSystemTimezone(val);
+							}
+						}
+						Connections {
+							function onTimezoneSetSuccess(timeZone) {
+								PersistentConfig.adapterView.timeZone = timeZone;
+							}
+							function onTimezoneSetFailed(timeZone, error) {
+								console.error("Settings: failed to set timezone:", error);
+							}
+
+							target: TimeZone
 						}
 					}
 

@@ -9,3 +9,4 @@ singleton Power Power.qml
 singleton SessionActions SessionActions.qml
 singleton SystemMonitor SystemMonitor.qml
 singleton Tray Tray.qml
+singleton TimeZone TimeZone.qml
