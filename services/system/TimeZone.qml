@@ -13,11 +13,18 @@ Singleton {
 	property bool _loaded: false
 	property string _buffer: ""
 	property string systemTimezone: ""
+	property string _lastSetTimezone: ""
+	property string _setTzError: ""
+
+	signal timezoneSetSuccess(string timeZone)
+	signal timezoneSetFailed(string timeZone, string error)
 
 	function setSystemTimezone(timeZone) {
 		if (timeZone === "") {
 			return;
 		}
+		root._lastSetTimezone = timeZone;
+		root._setTzError = "";
 		setTzProcess.command = ["timedatectl", "set-timezone", timeZone];
 		setTzProcess.running = true;
 	}
@@ -167,5 +174,23 @@ Singleton {
 	}
 	Process {
 		id: setTzProcess
+
+		stderr: SplitParser {
+			onRead: data => {
+				root._setTzError += data;
+			}
+		}
+
+		onRunningChanged: {
+			if (!running) {
+				if (root._setTzError !== "") {
+					console.error("TimeZone: set-timezone failed:", root._setTzError);
+					root.timezoneSetFailed(root._lastSetTimezone, root._setTzError);
+				} else {
+					root.timezoneSetSuccess(root._lastSetTimezone);
+				}
+				root._setTzError = "";
+			}
+		}
 	}
 }
