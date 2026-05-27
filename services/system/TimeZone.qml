@@ -102,6 +102,13 @@ Singleton {
 			};
 		}
 	}
+	function _applyDetectedTimezone() {
+		if (!PersistentConfig.readyToWrite)
+			return;
+		if (PersistentConfig.adapterView.timeZone === "") {
+			PersistentConfig.adapterView.timeZone = root.systemTimezone;
+		}
+	}
 
 	Component.onCompleted: {
 		tzProcess.running = true;
@@ -132,6 +139,15 @@ Singleton {
 			}
 		}
 	}
+	Connections {
+		function onReadyToWriteChanged() {
+			if (PersistentConfig.readyToWrite && root.systemTimezone !== "") {
+				root._applyDetectedTimezone();
+			}
+		}
+
+		target: PersistentConfig
+	}
 	Process {
 		id: detectTzProcess
 
@@ -145,9 +161,7 @@ Singleton {
 
 		onRunningChanged: {
 			if (!running && root.systemTimezone !== "") {
-				if (PersistentConfig.adapterView.timeZone === "") {
-					PersistentConfig.adapterView.timeZone = root.systemTimezone;
-				}
+				root._applyDetectedTimezone();
 			}
 		}
 	}
