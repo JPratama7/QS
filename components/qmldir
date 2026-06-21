@@ -2,3 +2,4 @@ module components
 
 ShellWindow containers/ShellWindow.qml
 BaseWidget bar/BaseWidget.qml
+SvgIcon SvgIcon.qml
