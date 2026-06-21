@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import Quickshell
+import "../../../components"
 import "../../../config"
 import "../../../services/ui"
 import "."
@@ -55,11 +56,10 @@ Item {
 				left: parent.left
 				leftMargin: Theme.paddingSmall
 			}
-			Text {
-				text: "‹"
+			SvgIcon {
+				source: "icons/outline/chevron-left.svg"
 				color: Theme.accentColor
-				font.pixelSize: Theme.fontSizeSmall
-				font.family: Theme.fontFamily
+				iconSize: Theme.fontSizeSmall
 				anchors.verticalCenter: parent.verticalCenter
 			}
 			Text {

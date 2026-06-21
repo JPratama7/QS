@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
+import "../../../components"
 import "../../../config"
 
 ColumnLayout {
@@ -14,7 +15,6 @@ ColumnLayout {
 	Layout.fillWidth: true
 	spacing: 10
 
-	// Header row with title and expand/collapse indicator
 	Item {
 		Layout.fillWidth: true
 		Layout.preferredHeight: headerRow.implicitHeight
@@ -32,10 +32,10 @@ ColumnLayout {
 				font.bold: true
 				Layout.fillWidth: true
 			}
-			Text {
-				text: root.expanded ? "\u25BC" : "\u25B6"
+			SvgIcon {
+				source: root.expanded ? "icons/outline/chevron-down.svg" : "icons/outline/chevron-right.svg"
 				color: Theme.foregroundColor
-				font.pixelSize: Theme.fontSizeNormal
+				iconSize: Theme.fontSizeNormal
 			}
 		}
 		MouseArea {

@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
+import "../../../components"
 import "../../../config"
 
 RowLayout {
@@ -35,12 +36,11 @@ RowLayout {
 			border.color: Theme.surfaceColor
 			border.width: 1
 
-			Text {
+			SvgIcon {
 				anchors.centerIn: parent
-				text: "-"
+				source: "icons/outline/minus.svg"
 				color: Theme.foregroundColor
-				font.pixelSize: Theme.fontSizeLarge
-				font.bold: true
+				iconSize: Theme.fontSizeLarge
 			}
 			MouseArea {
 				anchors.fill: parent
@@ -75,12 +75,11 @@ RowLayout {
 			border.color: Theme.surfaceColor
 			border.width: 1
 
-			Text {
+			SvgIcon {
 				anchors.centerIn: parent
-				text: "+"
+				source: "icons/outline/plus.svg"
 				color: Theme.foregroundColor
-				font.pixelSize: Theme.fontSizeLarge
-				font.bold: true
+				iconSize: Theme.fontSizeLarge
 			}
 			MouseArea {
 				anchors.fill: parent

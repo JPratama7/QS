@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import "../../../components"
 import "../../../config"
 import "../../../services/system"
 
@@ -62,13 +63,12 @@ Item {
 			width: parent.width
 			height: navPrev.implicitHeight + Theme.paddingSmall * 2
 
-			Text {
+			SvgIcon {
 				id: navPrev
 
-				text: "<"
+				source: "icons/outline/chevron-left.svg"
 				color: Theme.accentColor
-				font.pixelSize: Theme.fontSizeLarge
-				font.family: Theme.fontFamily
+				iconSize: Theme.fontSizeLarge
 
 				anchors {
 					left: parent.left
@@ -106,13 +106,12 @@ Item {
 					anchors.horizontalCenter: parent.horizontalCenter
 				}
 			}
-			Text {
+			SvgIcon {
 				id: navNext
 
-				text: ">"
+				source: "icons/outline/chevron-right.svg"
 				color: Theme.accentColor
-				font.pixelSize: Theme.fontSizeLarge
-				font.family: Theme.fontFamily
+				iconSize: Theme.fontSizeLarge
 
 				anchors {
 					right: parent.right

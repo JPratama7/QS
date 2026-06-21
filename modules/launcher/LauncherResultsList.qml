@@ -52,9 +52,12 @@ Item {
 					left: parent.left
 					leftMargin: Theme.paddingSmall
 				}
-				IconImage {
+				Image {
 					width: Theme.iconSizeSmall
 					height: Theme.iconSizeSmall
+					fillMode: Image.PreserveAspectFit
+					sourceSize.width: Theme.iconSizeSmall
+					sourceSize.height: Theme.iconSizeSmall
 					source: AppIcons.iconFromName(resultRow.modelData.icon)
 				}
 				Column {

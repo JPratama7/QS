@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell.Services.Notifications as QuickshellNotification
 import Quickshell.Widgets
+import "../../../components"
 import "../../../config"
 import "../../../services/system"
 
@@ -58,19 +59,21 @@ Item {
 			}
 
 			// Resolved icon (image > appIcon > desktopEntry)
-			IconImage {
+			Image {
 				anchors.fill: parent
 				anchors.margins: Theme.paddingSmall
+				fillMode: Image.PreserveAspectFit
+				sourceSize.width: toast.iconSize
+				sourceSize.height: toast.iconSize
 				source: toast.resolvedIcon
 				visible: toast.resolvedIcon !== ""
 			}
 
-			// Fallback bell emoji
-			Text {
+			// Fallback bell icon
+			SvgIcon {
 				anchors.centerIn: parent
-				text: "🔔"
-				font.pixelSize: Theme.iconSizeSmall
-				visible: toast.resolvedIcon === ""
+				source: "icons/outline/bell.svg"
+				iconSize: Theme.iconSizeSmall
 				color: {
 					if (toast.notification.urgency === QuickshellNotification.NotificationUrgency.Critical)
 						return Theme.errorColor;
@@ -78,6 +81,7 @@ Item {
 						return Theme.mutedColor;
 					return Theme.accentColor;
 				}
+				visible: toast.resolvedIcon === ""
 			}
 		}
 		Column {
@@ -111,15 +115,25 @@ Item {
 				wrapMode: Text.WordWrap
 				visible: text.length > 0
 			}
-			Text {
+			Row {
 				id: expandIndicator
 
 				visible: bodyText.visible && (bodyText.truncated || toast.bodyExpanded)
-				text: toast.bodyExpanded ? "▲ show less" : "▼ show more"
-				color: Theme.accentColor
-				font.pixelSize: Theme.fontSizeSmall - 1
-				font.family: Theme.fontFamily
+				spacing: 4
 
+				SvgIcon {
+					source: toast.bodyExpanded ? "icons/outline/chevron-up.svg" : "icons/outline/chevron-down.svg"
+					color: Theme.accentColor
+					iconSize: Theme.fontSizeSmall - 1
+					anchors.verticalCenter: parent.verticalCenter
+				}
+				Text {
+					text: toast.bodyExpanded ? "show less" : "show more"
+					color: Theme.accentColor
+					font.pixelSize: Theme.fontSizeSmall - 1
+					font.family: Theme.fontFamily
+					anchors.verticalCenter: parent.verticalCenter
+				}
 				MouseArea {
 					anchors.fill: parent
 					cursorShape: Qt.PointingHandCursor
@@ -143,12 +157,11 @@ Item {
 				radius: Theme.radiusSmall
 				color: dismissButton.containsMouse ? Qt.alpha(Theme.errorColor, 0.2) : "transparent"
 			}
-			Text {
+			SvgIcon {
 				anchors.centerIn: parent
-				text: "✕"
+				source: "icons/outline/x.svg"
 				color: dismissButton.containsMouse ? Theme.errorColor : Theme.mutedColor
-				font.pixelSize: Theme.fontSizeSmall
-				font.family: Theme.fontFamily
+				iconSize: Theme.fontSizeSmall
 			}
 		}
 	}

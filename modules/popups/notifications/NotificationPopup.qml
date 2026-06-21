@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell.Services.Notifications as QuickshellNotifications
 import Quickshell.Widgets
+import "../../../components"
 import "../../../config"
 import "../../../services/system"
 
@@ -155,6 +156,8 @@ Item {
 			visible: Notification.trackedList.length > 0
 			clip: true
 			spacing: Theme.spacingSmall
+			reuseItems: true
+			cacheBuffer: 100
 			model: Notification.trackedList
 
 			delegate: Item {
@@ -202,19 +205,21 @@ Item {
 						}
 
 						// Resolved icon (image > appIcon > desktopEntry)
-						IconImage {
+						Image {
 							anchors.fill: parent
 							anchors.margins: Theme.paddingSmall
+							fillMode: Image.PreserveAspectFit
+							sourceSize.width: notificationItem.iconSize
+							sourceSize.height: notificationItem.iconSize
 							source: notificationItem.modelData.image || (notificationItem.modelData.appIcon && AppIcons.iconFromName(notificationItem.modelData.appIcon)) || (notificationItem.modelData.desktopEntry && AppIcons.iconForAppId(notificationItem.modelData.desktopEntry)) || ""
 							visible: source !== ""
 						}
 
-						// Fallback bell emoji
-						Text {
+						// Fallback bell icon
+						SvgIcon {
 							anchors.centerIn: parent
-							text: "🔔"
-							font.pixelSize: Theme.iconSizeSmall
-							visible: !notificationItem.modelData.image && !notificationItem.modelData.appIcon && !notificationItem.modelData.desktopEntry
+							source: "icons/outline/bell.svg"
+							iconSize: Theme.iconSizeSmall
 							color: {
 								if (notificationItem.modelData.urgency === QuickshellNotifications.NotificationUrgency.Critical)
 									return Theme.errorColor;
@@ -222,6 +227,7 @@ Item {
 									return Theme.mutedColor;
 								return Theme.accentColor;
 							}
+							visible: !notificationItem.modelData.image && !notificationItem.modelData.appIcon && !notificationItem.modelData.desktopEntry
 						}
 					}
 					Column {
@@ -253,15 +259,25 @@ Item {
 							wrapMode: Text.WordWrap
 							visible: text.length > 0
 						}
-						Text {
+						Row {
 							id: expandIndicator
 
 							visible: bodyText.visible && (bodyText.truncated || notificationItem.bodyExpanded)
-							text: notificationItem.bodyExpanded ? "▲ show less" : "▼ show more"
-							color: Theme.accentColor
-							font.pixelSize: Theme.fontSizeSmall - 1
-							font.family: Theme.fontFamily
+							spacing: 4
 
+							SvgIcon {
+								source: notificationItem.bodyExpanded ? "icons/outline/chevron-up.svg" : "icons/outline/chevron-down.svg"
+								color: Theme.accentColor
+								iconSize: Theme.fontSizeSmall - 1
+								anchors.verticalCenter: parent.verticalCenter
+							}
+							Text {
+								text: notificationItem.bodyExpanded ? "show less" : "show more"
+								color: Theme.accentColor
+								font.pixelSize: Theme.fontSizeSmall - 1
+								font.family: Theme.fontFamily
+								anchors.verticalCenter: parent.verticalCenter
+							}
 							MouseArea {
 								anchors.fill: parent
 								cursorShape: Qt.PointingHandCursor
@@ -288,12 +304,11 @@ Item {
 							radius: Theme.radiusSmall
 							color: dismissButton.containsMouse ? Qt.alpha(Theme.errorColor, 0.2) : "transparent"
 						}
-						Text {
+						SvgIcon {
 							anchors.centerIn: parent
-							text: "✕"
+							source: "icons/outline/x.svg"
 							color: dismissButton.containsMouse ? Theme.errorColor : Theme.mutedColor
-							font.pixelSize: Theme.fontSizeSmall
-							font.family: Theme.fontFamily
+							iconSize: Theme.fontSizeSmall
 						}
 					}
 				}
