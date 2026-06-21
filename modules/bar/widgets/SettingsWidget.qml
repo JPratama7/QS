@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "../../../components/bar"
+import "../../../components"
 import "../../../config"
 import "../../../services/ui"
 
@@ -30,14 +31,13 @@ BaseWidget {
 		radius: Theme.radiusSmall
 		color: mouseArea.containsMouse ? Qt.alpha(Theme.foregroundColor, 0.1) : "transparent"
 	}
-	Text {
+	SvgIcon {
 		id: label
 
 		anchors.centerIn: parent
-		text: "\u2699"
+		source: "icons/outline/settings.svg"
 		color: Theme.foregroundColor
-		font.pixelSize: Theme.fontSizeNormal
-		font.family: Theme.fontFamily
+		iconSize: Theme.fontSizeNormal
 	}
 	MouseArea {
 		id: mouseArea

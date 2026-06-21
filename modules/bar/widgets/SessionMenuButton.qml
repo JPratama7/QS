@@ -2,50 +2,51 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import "../../../config"
 import "../../../components/bar"
+import "../../../components"
+import "../../../config"
 import "../../../services/ui"
 import "../../popups/session"
 
 BaseWidget {
-    id: widget
+	id: widget
 
-    required property string screenName
-    required property PanelWindow barWindow
+	required property string screenName
+	required property PanelWindow barWindow
 
-    tooltipComponent: Component {
-        Text {
-            text: "Session"
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.foregroundColor
-        }
-    }
+	implicitWidth: label.implicitWidth
+	implicitHeight: label.implicitHeight
 
-    implicitWidth: label.implicitWidth
-    implicitHeight: label.implicitHeight
+	tooltipComponent: Component {
+		Text {
+			text: "Session"
+			font.pixelSize: Theme.fontSizeSmall
+			color: Theme.foregroundColor
+		}
+	}
 
-    Text {
-        id: label
-        anchors.centerIn: parent
-        text: "\u23FB"
-        color: Theme.foregroundColor
-        font.pixelSize: Theme.fontSizeNormal
-        font.family: Theme.fontFamily
-    }
+	SvgIcon {
+		id: label
 
-    MouseArea {
-        anchors.fill: parent
-        cursorShape: Qt.PointingHandCursor
-        onClicked: {
-            const pos = widget.mapToItem(null, 0, 0);
-            ShellUI.openPopup(widget.screenName, "session", sessionMenuComponent, pos.x);
-        }
-    }
+		anchors.centerIn: parent
+		source: "icons/outline/power.svg"
+		color: Theme.foregroundColor
+		iconSize: Theme.fontSizeNormal
+	}
+	MouseArea {
+		anchors.fill: parent
+		cursorShape: Qt.PointingHandCursor
 
-    Component {
-        id: sessionMenuComponent
-        SessionMenu {
-            screenName: widget.screenName
-        }
-    }
+		onClicked: {
+			const pos = widget.mapToItem(null, 0, 0);
+			ShellUI.openPopup(widget.screenName, "session", sessionMenuComponent, pos.x);
+		}
+	}
+	Component {
+		id: sessionMenuComponent
+
+		SessionMenu {
+			screenName: widget.screenName
+		}
+	}
 }

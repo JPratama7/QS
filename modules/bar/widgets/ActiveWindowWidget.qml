@@ -57,9 +57,12 @@ BaseWidget {
 		spacing: Theme.spacingSmall
 		visible: widget.activeWindow !== null
 
-		IconImage {
+		Image {
 			width: Theme.iconSizeSmall
 			height: Theme.iconSizeSmall
+			fillMode: Image.PreserveAspectFit
+			sourceSize.width: Theme.iconSizeSmall
+			sourceSize.height: Theme.iconSizeSmall
 			source: AppIcons.iconForAppId(widget.activeWindow?.appId ?? "")
 		}
 		Text {

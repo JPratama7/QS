@@ -1,35 +1,36 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import "../../../config"
 import "../../../components/bar"
+import "../../../components"
+import "../../../config"
 import "../../../services/system"
 
 BaseWidget {
-    id: widget
+	id: widget
 
-    tooltipComponent: Component {
-        Text {
-            text: Idle.inhibited ? "Idle Inhibitor: Active" : "Idle Inhibitor: Inactive"
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.foregroundColor
-        }
-    }
+	implicitWidth: textItem.implicitWidth
+	implicitHeight: textItem.implicitHeight
 
-    implicitWidth: textItem.implicitWidth
-    implicitHeight: textItem.implicitHeight
+	tooltipComponent: Component {
+		Text {
+			text: Idle.inhibited ? "Idle Inhibitor: Active" : "Idle Inhibitor: Inactive"
+			font.pixelSize: Theme.fontSizeSmall
+			color: Theme.foregroundColor
+		}
+	}
 
-    Text {
-        id: textItem
-        text: "\u23F1" // Hourglass icon
-        font.pixelSize: Theme.fontSizeNormal
-        font.family: Theme.fontFamily
-        color: Idle.inhibited ? Theme.accentColor : Theme.mutedColor
-    }
+	SvgIcon {
+		id: textItem
 
-    MouseArea {
-        anchors.fill: parent
-        cursorShape: Qt.PointingHandCursor
-        onClicked: Idle.toggle()
-    }
+		source: "icons/outline/hourglass.svg"
+		iconSize: Theme.fontSizeNormal
+		color: Idle.inhibited ? Theme.accentColor : Theme.mutedColor
+	}
+	MouseArea {
+		anchors.fill: parent
+		cursorShape: Qt.PointingHandCursor
+
+		onClicked: Idle.toggle()
+	}
 }

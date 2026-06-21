@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "../../../components/bar"
+import "../../../components"
 import "../../../config"
 import "../../../services/system"
 
@@ -69,16 +70,13 @@ BaseWidget {
 
 		spacing: 3
 
-		Text {
+		SvgIcon {
 			id: iconItem
 
-			// 🔌 when charging, 🔋 when on battery
-			text: Power.charging ? "🔌" : "🔋"
-			font.pixelSize: Theme.fontSizeSmall
-			font.family: Theme.fontFamily
+			source: Power.charging ? "icons/outline/bolt.svg" : "icons/outline/battery.svg"
 			color: widget._textColor
+			iconSize: Theme.fontSizeSmall
 			height: textItem.height
-			verticalAlignment: Text.AlignVCenter
 		}
 		Text {
 			id: textItem

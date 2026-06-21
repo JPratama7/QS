@@ -43,10 +43,13 @@ BaseWidget {
 					radius: Theme.radiusSmall
 					color: appItem.modelData?.activated ? Qt.alpha(Theme.accentColor, 0.3) : "transparent"
 
-					IconImage {
+					Image {
 						anchors.centerIn: parent
 						width: Theme.iconSizeSmall
 						height: Theme.iconSizeSmall
+						fillMode: Image.PreserveAspectFit
+						sourceSize.width: Theme.iconSizeSmall
+						sourceSize.height: Theme.iconSizeSmall
 						source: AppIcons.iconForAppId(appItem.modelData?.appId ?? "")
 					}
 				}
