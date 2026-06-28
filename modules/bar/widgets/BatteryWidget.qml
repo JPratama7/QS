@@ -9,6 +9,11 @@ import "../../../services/system"
 BaseWidget {
 	id: widget
 
+	readonly property string _displayMode: {
+		const widgets = (ShellConfig.bar || {}).widgets || {};
+		const mode = widgets.battery ? widgets.battery.displayMode : undefined;
+		return (mode === "text" || mode === "icon" || mode === "both") ? mode : "both";
+	}
 	readonly property color _textColor: {
 		if (Power.charging)
 			return "#3b82f6";
@@ -68,24 +73,35 @@ BaseWidget {
 	Row {
 		id: row
 
-		spacing: 3
+		spacing: 5
+		anchors.verticalCenter: parent.verticalCenter
 
-		SvgIcon {
-			id: iconItem
-
-			source: Power.charging ? "icons/outline/bolt.svg" : "icons/outline/battery.svg"
-			color: widget._textColor
-			iconSize: Theme.fontSizeSmall
-			height: textItem.height
-		}
 		Text {
 			id: textItem
 
+			visible: widget._displayMode === "text" || widget._displayMode === "both"
 			text: Power.percent + "%"
 			color: widget._textColor
 			font.pixelSize: Theme.fontSizeSmall
 			font.family: Theme.fontFamily
-			verticalAlignment: Text.AlignVCenter
+			anchors.verticalCenter: parent.verticalCenter
+		}
+		SvgIcon {
+			id: iconItem
+
+			visible: widget._displayMode === "icon" || widget._displayMode === "both"
+			source: {
+				if (Power.charging)
+					return "icons/battery-charge-minimalistic-svgrepo-com.svg";
+				if (Power.percent < 20)
+					return "icons/battery-low-minimalistic-svgrepo-com.svg";
+				if (Power.percent < 60)
+					return "icons/battery-half-minimalistic-svgrepo-com.svg";
+				return "icons/battery-full-minimalistic-svgrepo-com.svg";
+			}
+			color: widget._textColor
+			iconSize: Theme.iconSizeSmall
+			anchors.verticalCenter: parent.verticalCenter
 		}
 	}
 }
