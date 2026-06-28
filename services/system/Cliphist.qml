@@ -90,6 +90,7 @@ Singleton {
     function close(): void {
         root.query = "";
         root.selectedIndex = -1;
+        root.allEntries = [];
         ShellUI.closeCliphist();
     }
 
