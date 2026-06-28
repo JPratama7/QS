@@ -38,7 +38,7 @@ BaseWidget {
 		// CPU
 		Text {
 			text: "CPU " + Math.round(SystemMonitor.cpuUsage * 100) + "%"
-			color: SystemMonitor.cpuUsage > 0.8 ? "#ef4444" : Theme.foregroundColor
+			color: SystemMonitor.cpuUsage > 0.8 ? Theme.errorColor : Theme.foregroundColor
 			font.pixelSize: Theme.fontSizeSmall
 			font.family: Theme.fontFamily
 		}
@@ -46,7 +46,7 @@ BaseWidget {
 		// RAM
 		Text {
 			text: "RAM " + widget._ramText
-			color: SystemMonitor.ramUsage > 0.9 ? "#ef4444" : Theme.foregroundColor
+			color: SystemMonitor.ramUsage > 0.9 ? Theme.errorColor : Theme.foregroundColor
 			font.pixelSize: Theme.fontSizeSmall
 			font.family: Theme.fontFamily
 		}
@@ -55,7 +55,7 @@ BaseWidget {
 		Text {
 			visible: SystemMonitor.temperature > 0
 			text: SystemMonitor.temperature + "°C"
-			color: SystemMonitor.temperature > 80 ? "#ef4444" : Theme.foregroundColor
+			color: SystemMonitor.temperature > 80 ? Theme.errorColor : Theme.foregroundColor
 			font.pixelSize: Theme.fontSizeSmall
 			font.family: Theme.fontFamily
 		}

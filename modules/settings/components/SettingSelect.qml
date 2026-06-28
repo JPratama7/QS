@@ -9,7 +9,7 @@ RowLayout {
 
 	property string text: ""
 	property string currentValue: ""
-	property var options: [] // Array of string options
+	property var options: ([]) // Array of string options
 
 	signal valueChanged(string newValue)
 

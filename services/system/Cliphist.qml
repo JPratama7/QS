@@ -10,7 +10,7 @@ Singleton {
     id: root
 
     // All raw entries from `cliphist list` (each line as-is, includes ID prefix)
-    property var allEntries: []
+    property var allEntries: ([])
 
     // Search query — filters allEntries
     property string query: ""
@@ -48,6 +48,10 @@ Singleton {
             }
         }
 
+        stderr: SplitParser {
+            onRead: data => console.warn("Cliphist list error:", data)
+        }
+
         onRunningChanged: {
             if (!running) {
                 const lines = root._listBuffer.split("\n").filter(l => l.trim() !== "");
@@ -62,6 +66,10 @@ Singleton {
     Process {
         id: copyProcess
         command: ["sh", "-c", "cliphist decode | wl-copy"]
+
+        stderr: SplitParser {
+            onRead: data => console.warn("Cliphist copy error:", data)
+        }
     }
 
     // Refresh entries from cliphist

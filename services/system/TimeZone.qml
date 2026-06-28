@@ -9,7 +9,7 @@ import "../../config"
 Singleton {
 	id: root
 
-	property var allTimezones: []
+	property var allTimezones: ([])
 	property bool _loaded: false
 	property string _buffer: ""
 	property string systemTimezone: ""
@@ -164,6 +164,10 @@ Singleton {
 			onRead: data => {
 				root.systemTimezone = data.trim();
 			}
+		}
+
+		stderr: SplitParser {
+			onRead: data => console.warn("TimeZone detect error:", data)
 		}
 
 		onRunningChanged: {

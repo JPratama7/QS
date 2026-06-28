@@ -13,7 +13,7 @@ Singleton {
 	property string query: ""
 
 	// Result state — updated whenever query changes
-	property var results: []
+	property var results: ([])
 
 	// Selection index — -1 means nothing selected
 	property int selectedIndex: -1

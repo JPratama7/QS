@@ -9,7 +9,7 @@ ColumnLayout {
 
 	property string text: ""
 	property string currentValue: ""
-	property var options: []
+	property var options: ([])
 	property bool _expanded: false
 
 	signal valueChanged(string newValue)
@@ -143,10 +143,6 @@ ColumnLayout {
 					height: 26
 					radius: Theme.radiusSmall
 					color: mouseArea.containsMouse ? Qt.alpha(Theme.accentColor, 0.15) : "transparent"
-
-					Component.onCompleted: {
-						console.log("modelData:", modelData);
-					}
 
 					Text {
 						anchors.left: parent.left

@@ -25,7 +25,7 @@ QtObject {
 	property bool available: true
 
 	// Sorted toplevel list
-	property var toplevels: []
+	property var toplevels: ([])
 
 	// Sort strategy for toplevels
 	property int sortMode: CompositorBackend.ToplevelSort.WorkspaceId

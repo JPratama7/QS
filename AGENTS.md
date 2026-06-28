@@ -364,35 +364,6 @@ LazyLoader {
 
 ## Debugging Lessons Learned
 
-### QML Property Initialization Issues
-
-**Problem**: `property var toastQueue: []` doesn't properly initialize arrays in QML singletons.
-
-**Root Cause**: QML doesn't properly initialize `var` properties with array literals at declaration time. The array literal gets evaluated before the property system is fully ready, leading to `undefined` values.
-
-**Solution**:
-
-```qml
-// ❌ Wrong - causes undefined errors
-property var toastQueue: []
-
-// ✅ Correct - proper initialization
-property var toastQueue
-Component.onCompleted: {
-    toastQueue = [];
-}
-```
-
-**Safety Pattern**: Always add null checks when accessing potentially undefined arrays:
-
-```qml
-// ❌ Unsafe - crashes if undefined
-visible: Notification.toastQueue.length > 0
-
-// ✅ Safe - handles undefined gracefully
-visible: (Notification.toastQueue || []).length > 0
-```
-
 ### Repeater Delegate Pattern Selection
 
 **Problem**: Complex `Loader + Component` pattern in Repeater delegates failed to render dynamic notification data.
@@ -443,7 +414,7 @@ delegate: Text {
 
 1. **Add Debug Output**: Insert temporary Text elements to show data counts and states
 2. **Simplify First**: Replace complex delegates with simple Text items to verify data flow
-3. **Check Property Initialization**: Ensure `var` properties are properly initialized in `Component.onCompleted`
+3. **Check Property Initialization**: Ensure `var` properties with array literals use the disambiguated form `property var foo: ([])`, or initialize in `Component.onCompleted` if the platform requires it.
 4. **Verify Data Sources**: Confirm the data source (e.g., `trackedList` vs `trackedNotifications`) works correctly
 5. **Test Incrementally**: Start with basic functionality, then add complexity
 
@@ -452,7 +423,7 @@ delegate: Text {
 - **Singleton Initialization**: Singletons may not be fully initialized when other components first access them
 - **Property Binding Evaluation**: Property bindings are evaluated before `Component.onCompleted` handlers run
 - **Component Lifecycle**: `Loader.onLoaded` may fire before the loaded component is ready to accept properties
-- **Array vs List Properties**: `property var` with arrays needs explicit initialization, `list<Type>` properties work more reliably
+- **Array vs List Properties**: `property var` with array literals should use the parenthesized form `property var foo: ([])`) to avoid parse ambiguity; `list<Type>` properties work more reliably.
 
 ### Performance vs Simplicity Trade-off
 

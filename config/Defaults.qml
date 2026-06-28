@@ -47,7 +47,7 @@ QtObject {
 	// Notification history cap — 0 means unlimited
 	readonly property int notificationMaxHistory: 100
 	// Tray defaults
-	readonly property var trayHiddenIds: []
+	readonly property var trayHiddenIds: ([])
 	readonly property int trayMenuMaxHeight: 400
 	// Settings panel component dimensions
 	readonly property var settings: {
