@@ -308,6 +308,21 @@ Rectangle {
 									PersistentConfig.adapterView.bar = newBar;
 								}
 							}
+							SettingSelect {
+								text: "Battery Display Mode"
+								currentValue: (PersistentConfig.adapterView.bar && PersistentConfig.adapterView.bar.widgets && PersistentConfig.adapterView.bar.widgets.battery && PersistentConfig.adapterView.bar.widgets.battery.displayMode) || "both"
+								options: ["both", "text", "icon"]
+							
+								onValueChanged: val => {
+									const newBar = JSON.parse(JSON.stringify(PersistentConfig.adapterView.bar || {}));
+									if (!newBar.widgets)
+										newBar.widgets = {};
+									if (!newBar.widgets.battery)
+										newBar.widgets.battery = {};
+									newBar.widgets.battery.displayMode = val;
+									PersistentConfig.adapterView.bar = newBar;
+								}
+							}
 							SettingNumber {
 								text: "Active Window Max Text Width"
 								currentValue: (PersistentConfig.adapterView.bar && PersistentConfig.adapterView.bar.widgets && PersistentConfig.adapterView.bar.widgets.activeWindow && PersistentConfig.adapterView.bar.widgets.activeWindow.maxTextWidth) !== undefined ? PersistentConfig.adapterView.bar.widgets.activeWindow.maxTextWidth : 200
