@@ -28,6 +28,9 @@ QtObject {
 			},
 			"systemMonitor": {
 				"ramFormat": "percent"
+			},
+			"battery": {
+				"displayMode": "both"
 			}
 		}
 	}

@@ -70,6 +70,11 @@ QtObject {
 		const fmt = widgetsConfig.systemMonitor?.ramFormat;
 		return (fmt === "used" || fmt === "used/total") ? fmt : "percent";
 	}
+	function batteryDisplayMode(): string {
+		const widgetsConfig = config.barWidgetsConfig();
+		const mode = widgetsConfig.battery?.displayMode;
+		return (mode === "text" || mode === "icon" || mode === "both") ? mode : "both";
+	}
 	function normalizedBarWidgetLayout(layout: var): var {
 		const source = layout || {};
 		const seen = ({});
