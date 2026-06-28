@@ -14,6 +14,18 @@ Singleton {
 
 	// Screen states - ScreenState instances keyed by screen name
 	property var screenStates: ({})
+	readonly property bool anyVisible: {
+		const states = service.screenStates;
+		let hasState = false;
+		for (const screenName in states) {
+			hasState = true;
+			const state = states[screenName];
+			if (state && state.effectiveVisible) {
+				return true;
+			}
+		}
+		return !hasState;
+	}
 
 	// Hide timers keyed by screen name
 	readonly property var _hideTimers: ({})
