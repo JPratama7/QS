@@ -53,6 +53,8 @@ QtObject {
 	readonly property real barWidgetScale: (PersistentConfig.adapter.bar || {}).widgets?.scale || 1.0
 	readonly property var barWidgetScalePerScreen: PersistentConfig.adapter.barWidgetScalePerScreen
 
+	readonly property int barIconSize: (PersistentConfig.adapter.bar || {}).widgets?.iconSize || Defaults.bar.widgets.iconSize
+
 	function widgetScaleForScreen(screenName: string): real {
 		const perScreen = PersistentConfig.adapter.barWidgetScalePerScreen;
 		const scale = perScreen && perScreen[screenName];
