@@ -20,6 +20,7 @@ QtObject {
 		},
 		"widgets": {
 			"scale": 1,
+			"iconSize": 16,
 			"workspaces": {
 				"showText": true
 			},
