@@ -127,6 +127,9 @@ Singleton {
 		root._recomputeEarliestExpiry();
 		toastSweepTimer.scheduleNext();
 	}
+	Component.onDestruction: {
+		server.destroy();
+	}
 
 	NotificationServer {
 		id: server
