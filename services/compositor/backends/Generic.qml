@@ -45,7 +45,7 @@ CompositorBackend {
 		return false;
 	}
 	function switchWorkspace(screenName: string, workspaceId: int): void {
-		console.log("GenericBackend: switchWorkspace not supported");
+		console.warn("GenericBackend: switchWorkspace not supported");
 	}
 
 	backendId: "generic"
