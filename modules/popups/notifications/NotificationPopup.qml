@@ -259,30 +259,31 @@ Item {
 							wrapMode: Text.WordWrap
 							visible: text.length > 0
 						}
-						Row {
-							id: expandIndicator
-
+						MouseArea {
 							visible: bodyText.visible && (bodyText.truncated || notificationItem.bodyExpanded)
-							spacing: 4
+							width: row.implicitWidth
+							height: row.implicitHeight
+							cursorShape: Qt.PointingHandCursor
 
-							SvgIcon {
-								source: notificationItem.bodyExpanded ? "icons/outline/chevron-up.svg" : "icons/outline/chevron-down.svg"
-								color: Theme.accentColor
-								iconSize: Theme.fontSizeSmall - 1
-								anchors.verticalCenter: parent.verticalCenter
-							}
-							Text {
-								text: notificationItem.bodyExpanded ? "show less" : "show more"
-								color: Theme.accentColor
-								font.pixelSize: Theme.fontSizeSmall - 1
-								font.family: Theme.fontFamily
-								anchors.verticalCenter: parent.verticalCenter
-							}
-							MouseArea {
-								anchors.fill: parent
-								cursorShape: Qt.PointingHandCursor
+							onClicked: root._setExpanded(notificationItem.modelData.id, !notificationItem.bodyExpanded)
 
-								onClicked: root._setExpanded(notificationItem.modelData.id, !notificationItem.bodyExpanded)
+							Row {
+								id: row
+								spacing: 4
+
+								SvgIcon {
+									source: notificationItem.bodyExpanded ? "icons/outline/chevron-up.svg" : "icons/outline/chevron-down.svg"
+									color: Theme.accentColor
+									iconSize: Theme.fontSizeSmall - 1
+									anchors.verticalCenter: parent.verticalCenter
+								}
+								Text {
+									text: notificationItem.bodyExpanded ? "show less" : "show more"
+									color: Theme.accentColor
+									font.pixelSize: Theme.fontSizeSmall - 1
+									font.family: Theme.fontFamily
+									anchors.verticalCenter: parent.verticalCenter
+								}
 							}
 						}
 					}

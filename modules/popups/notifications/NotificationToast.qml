@@ -115,24 +115,31 @@ Item {
 				wrapMode: Text.WordWrap
 				visible: text.length > 0
 			}
-			Row {
+			Item {
 				id: expandIndicator
 
 				visible: bodyText.visible && (bodyText.truncated || toast.bodyExpanded)
-				spacing: 4
+				implicitWidth: rowContent.implicitWidth
+				implicitHeight: rowContent.implicitHeight
 
-				SvgIcon {
-					source: toast.bodyExpanded ? "icons/outline/chevron-up.svg" : "icons/outline/chevron-down.svg"
-					color: Theme.accentColor
-					iconSize: Theme.fontSizeSmall - 1
-					anchors.verticalCenter: parent.verticalCenter
-				}
-				Text {
-					text: toast.bodyExpanded ? "show less" : "show more"
-					color: Theme.accentColor
-					font.pixelSize: Theme.fontSizeSmall - 1
-					font.family: Theme.fontFamily
-					anchors.verticalCenter: parent.verticalCenter
+				Row {
+					id: rowContent
+
+					spacing: 4
+
+					SvgIcon {
+						source: toast.bodyExpanded ? "icons/outline/chevron-up.svg" : "icons/outline/chevron-down.svg"
+						color: Theme.accentColor
+						iconSize: Theme.fontSizeSmall - 1
+						anchors.verticalCenter: parent.verticalCenter
+					}
+					Text {
+						text: toast.bodyExpanded ? "show less" : "show more"
+						color: Theme.accentColor
+						font.pixelSize: Theme.fontSizeSmall - 1
+						font.family: Theme.fontFamily
+						anchors.verticalCenter: parent.verticalCenter
+					}
 				}
 				MouseArea {
 					anchors.fill: parent
