@@ -58,11 +58,11 @@ BaseWidget {
 		visible: widget.activeWindow !== null
 
 		Image {
-			width: Theme.iconSizeSmall
-			height: Theme.iconSizeSmall
+			width: ShellConfig.barIconSize
+			height: ShellConfig.barIconSize
 			fillMode: Image.PreserveAspectFit
-			sourceSize.width: Theme.iconSizeSmall
-			sourceSize.height: Theme.iconSizeSmall
+			sourceSize.width: ShellConfig.barIconSize
+			sourceSize.height: ShellConfig.barIconSize
 			source: AppIcons.iconForAppId(widget.activeWindow?.appId ?? "")
 		}
 		Text {

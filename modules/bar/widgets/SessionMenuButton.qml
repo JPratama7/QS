@@ -31,7 +31,7 @@ BaseWidget {
 		anchors.centerIn: parent
 		source: "icons/outline/power.svg"
 		color: Theme.foregroundColor
-		iconSize: Theme.fontSizeNormal
+		iconSize: ShellConfig.barIconSize
 	}
 	MouseArea {
 		anchors.fill: parent

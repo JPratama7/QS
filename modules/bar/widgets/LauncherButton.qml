@@ -33,7 +33,7 @@ BaseWidget {
 		anchors.centerIn: parent
 		source: "icons/outline/menu-2.svg"
 		color: Theme.foregroundColor
-		iconSize: Theme.fontSizeNormal
+		iconSize: ShellConfig.barIconSize
 	}
 	MouseArea {
 		id: mouseArea

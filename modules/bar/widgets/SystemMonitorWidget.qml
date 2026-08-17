@@ -8,11 +8,7 @@ import "../../../services/system"
 BaseWidget {
 	id: widget
 
-	readonly property string _ramFormat: {
-		const widgets = (ShellConfig.bar || {}).widgets || {};
-		const fmt = widgets.systemMonitor ? widgets.systemMonitor.ramFormat : undefined;
-		return (fmt === "used" || fmt === "used/total") ? fmt : "percent";
-	}
+	readonly property string _ramFormat: ShellConfig.systemMonitorRamFormat()
 	readonly property string _ramAbsolute: SystemMonitor.useGB ? SystemMonitor.ramUsedGB.toFixed(1) + "/" + SystemMonitor.ramTotalGB.toFixed(1) + " GB" : SystemMonitor.ramUsedMB + "/" + SystemMonitor.ramTotalMB + " MB"
 	readonly property string _ramUsed: SystemMonitor.useGB ? SystemMonitor.ramUsedGB.toFixed(1) + " GB" : SystemMonitor.ramUsedMB + " MB"
 	readonly property string _ramText: {

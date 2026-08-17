@@ -22,10 +22,6 @@ BaseWidget {
 		}
 	}
 
-	Component.onCompleted: {
-		console.log("Settings is loaded");
-	}
-
 	Rectangle {
 		anchors.fill: parent
 		radius: Theme.radiusSmall
@@ -37,7 +33,7 @@ BaseWidget {
 		anchors.centerIn: parent
 		source: "icons/outline/settings.svg"
 		color: Theme.foregroundColor
-		iconSize: Theme.fontSizeNormal
+		iconSize: ShellConfig.barIconSize
 	}
 	MouseArea {
 		id: mouseArea

@@ -37,7 +37,7 @@ BaseWidget {
 		SvgIcon {
 			source: widget.isDnd ? "icons/outline/bell-off.svg" : (widget.hasUnread ? "icons/outline/bell-ringing.svg" : "icons/outline/bell.svg")
 			color: widget.isDnd ? Theme.accentColor : (widget.hasUnread ? Theme.foregroundColor : Theme.mutedColor)
-			iconSize: Theme.fontSizeSmall
+			iconSize: ShellConfig.barIconSize
 		}
 		Text {
 			visible: widget.hasUnread

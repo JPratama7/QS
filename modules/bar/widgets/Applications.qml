@@ -27,8 +27,8 @@ BaseWidget {
 
 				required property Toplevel modelData
 
-				implicitWidth: Theme.iconSizeSmall + Theme.paddingSmall * 2
-				implicitHeight: Theme.iconSizeSmall + Theme.paddingSmall * 2
+				implicitWidth: ShellConfig.barIconSize + Theme.paddingSmall * 2
+				implicitHeight: ShellConfig.barIconSize + Theme.paddingSmall * 2
 
 				tooltipComponent: Component {
 					Text {
@@ -45,20 +45,26 @@ BaseWidget {
 
 					Image {
 						anchors.centerIn: parent
-						width: Theme.iconSizeSmall
-						height: Theme.iconSizeSmall
+						width: ShellConfig.barIconSize
+						height: ShellConfig.barIconSize
 						fillMode: Image.PreserveAspectFit
-						sourceSize.width: Theme.iconSizeSmall
-						sourceSize.height: Theme.iconSizeSmall
+						sourceSize.width: ShellConfig.barIconSize
+						sourceSize.height: ShellConfig.barIconSize
 						source: AppIcons.iconForAppId(appItem.modelData?.appId ?? "")
 					}
 				}
 				MouseArea {
 					anchors.fill: parent
 					cursorShape: Qt.PointingHandCursor
+					acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-					onClicked: {
-						if (appItem.modelData) {
+					onClicked: (mouse) => {
+						if (!appItem.modelData) {
+							return;
+						}
+						if (mouse.button === Qt.RightButton) {
+							appItem.modelData.close();
+						} else {
 							appItem.modelData.activate();
 						}
 					}

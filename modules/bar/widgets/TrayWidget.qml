@@ -41,8 +41,8 @@ BaseWidget {
 
                 required property SystemTrayItem modelData
 
-                width: Theme.iconSizeSmall
-                height: Theme.iconSizeSmall
+                width: ShellConfig.barIconSize
+                height: ShellConfig.barIconSize
 
                 Image {
                     anchors.fill: parent

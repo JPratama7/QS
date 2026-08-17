@@ -9,11 +9,7 @@ import "../../../services/system"
 BaseWidget {
 	id: widget
 
-	readonly property string _displayMode: {
-		const widgets = (ShellConfig.bar || {}).widgets || {};
-		const mode = widgets.battery ? widgets.battery.displayMode : undefined;
-		return (mode === "text" || mode === "icon" || mode === "both") ? mode : "both";
-	}
+	readonly property string _displayMode: ShellConfig.batteryDisplayMode()
 	readonly property color _textColor: {
 		if (Power.charging)
 			return "#3b82f6";
@@ -100,7 +96,7 @@ BaseWidget {
 				return "icons/battery-full-minimalistic-svgrepo-com.svg";
 			}
 			color: widget._textColor
-			iconSize: Theme.iconSizeSmall
+			iconSize: ShellConfig.barIconSize
 			anchors.verticalCenter: parent.verticalCenter
 		}
 	}

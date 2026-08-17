@@ -24,7 +24,7 @@ BaseWidget {
 		id: textItem
 
 		source: "icons/outline/hourglass.svg"
-		iconSize: Theme.fontSizeNormal
+		iconSize: ShellConfig.barIconSize
 		color: Idle.inhibited ? Theme.accentColor : Theme.mutedColor
 	}
 	MouseArea {
