@@ -93,6 +93,7 @@ CompositorBackend {
 		return false;
 	}
 	function switchWorkspace(screenName: string, workspaceId: int): void {
+		Hyprland.dispatch("focusmonitor " + screenName);
 		Hyprland.dispatch("workspace " + String(workspaceId));
 	}
 
