@@ -4,6 +4,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../ui"
 
 Singleton {
 	id: service
@@ -101,7 +102,7 @@ Singleton {
 	Timer {
 		interval: 5000
 		repeat: true
-		running: true
+		running: BarVisibility.anyVisible
 		triggeredOnStart: true
 
 		onTriggered: {
