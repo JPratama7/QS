@@ -1,0 +1,5 @@
+module emoji
+EmojiOverlayWindow EmojiOverlayWindow.qml
+EmojiView EmojiView.qml
+EmojiSearchField EmojiSearchField.qml
+EmojiResultsList EmojiResultsList.qml
