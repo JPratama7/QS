@@ -44,7 +44,7 @@ Singleton {
 
         stdout: SplitParser {
             onRead: data => {
-                root._listBuffer += data;
+                root._listBuffer += data + "\n";
             }
         }
 
@@ -66,6 +66,7 @@ Singleton {
     Process {
         id: copyProcess
         command: ["sh", "-c", "cliphist decode | wl-copy"]
+        stdinEnabled: true
 
         stderr: SplitParser {
             onRead: data => console.warn("Cliphist copy error:", data)
@@ -123,8 +124,10 @@ Singleton {
 
     // Copy a specific raw cliphist entry (with ID prefix) to clipboard
     function copyEntry(entry: string): void {
-        copyProcess.stdin = entry + "\n";
+        copyProcess.stdinEnabled = true;
         copyProcess.running = true;
+        copyProcess.write(entry + "\n");
+        copyProcess.stdinEnabled = false; // close stdin → EOF → cliphist decode + wl-copy
     }
 
     onQueryChanged: {

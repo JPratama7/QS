@@ -2,5 +2,6 @@ module ipc
 Ipc Ipc.qml
 Launcher Launcher.qml
 Cliphist Cliphist.qml
+Emoji Emoji.qml
 
 Settings Settings.qml

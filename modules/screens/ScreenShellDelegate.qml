@@ -5,6 +5,7 @@ import "../../services/ui"
 import "../../types"
 import "../bar"
 import "../cliphist"
+import "../emoji"
 import "../launcher"
 import "../popups/notifications"
 import "../popups/shared"
@@ -99,6 +100,37 @@ Item {
 			function onCliphistClosed(): void {
 				if (cliphistLoader.active) {
 					cliphistLoader.active = false;
+				}
+			}
+
+			target: ShellUI
+		}
+	}
+
+	Loader {
+		id: emojiLoader
+
+		active: false
+		asynchronous: true
+
+		sourceComponent: EmojiOverlayWindow {
+			screenName: delegate.context.name
+		}
+
+		onLoaded: {
+			item.visible = true;
+			item.reset();
+		}
+
+		Connections {
+			function onEmojiOpened(screenName: string): void {
+				if (screenName === delegate.context.name) {
+					emojiLoader.active = true;
+				}
+			}
+			function onEmojiClosed(): void {
+				if (emojiLoader.active) {
+					emojiLoader.active = false;
 				}
 			}
 
