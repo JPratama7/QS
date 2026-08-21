@@ -19,11 +19,15 @@ Singleton {
 	// Settings open state
 	property string _settingsScreen: ""
 
+	// Emoji picker open state
+	property string _emojiScreen: ""
+
 	// Track known screens for removal detection
 	property var _knownScreenNames: ([])
 	readonly property string launcherScreen: _launcherScreen
 	readonly property string cliphistScreen: _cliphistScreen
 	readonly property string settingsScreen: _settingsScreen
+	readonly property string emojiScreen: _emojiScreen
 
 	// Emitted when a widget requests a popup — carries the component to render and anchor X
 	signal popupRequested(screenName: string, popupId: string, component: var, anchorX: int)
@@ -43,6 +47,10 @@ Singleton {
 	signal settingsOpened(screenName: string)
 	signal settingsClosed
 
+	// Emitted when emoji picker opens/closes on a screen
+	signal emojiOpened(screenName: string)
+	signal emojiClosed
+
 	// Open a named popup on a screen with the component to render and optional anchor X position
 	function openPopup(screenName: string, popupId: string, component: var, anchorX: int): void {
 		// Close launcher and cliphist if open on any screen
@@ -54,6 +62,9 @@ Singleton {
 		}
 		if (root._settingsScreen !== "") {
 			root.closeSettings();
+		}
+		if (root._emojiScreen !== "") {
+			root.closeEmoji();
 		}
 		root._openScreens[screenName] = true;
 		root.popupRequested(screenName, popupId, component, anchorX);
@@ -92,6 +103,9 @@ Singleton {
 		if (root._cliphistScreen !== "") {
 			root.closeCliphist();
 		}
+		if (root._emojiScreen !== "") {
+			root.closeEmoji();
+		}
 
 		root._launcherScreen = screenName;
 		root.launcherOpened(screenName);
@@ -117,6 +131,9 @@ Singleton {
 		}
 		if (root._launcherScreen !== "") {
 			root.closeLauncher();
+		}
+		if (root._emojiScreen !== "") {
+			root.closeEmoji();
 		}
 
 		root._cliphistScreen = screenName;
@@ -144,6 +161,9 @@ Singleton {
 		if (root._cliphistScreen !== "") {
 			root.closeCliphist();
 		}
+		if (root._emojiScreen !== "") {
+			root.closeEmoji();
+		}
 
 		root._settingsScreen = screenName;
 		root.settingsOpened(screenName);
@@ -158,9 +178,41 @@ Singleton {
 		return root._settingsScreen !== "";
 	}
 
+	// Emoji picker open/close
+	function openEmoji(screenName: string): void {
+		if (root._emojiScreen === screenName) {
+			return;
+		}
+		if (root._settingsScreen !== "") {
+			root.closeSettings();
+		}
+		if (root._emojiScreen !== "") {
+			root.closeEmoji();
+		}
+		if (root._launcherScreen !== "") {
+			root.closeLauncher();
+		}
+		if (root._cliphistScreen !== "") {
+			root.closeCliphist();
+		}
+
+		root._emojiScreen = screenName;
+		root.emojiOpened(screenName);
+	}
+	function closeEmoji(): void {
+		if (root._emojiScreen !== "") {
+			root._emojiScreen = "";
+			root.emojiClosed();
+		}
+	}
+	function isEmojiOpen(): bool {
+		return root._emojiScreen !== "";
+	}
+
 	onLauncherClosed: gcTimer.restart()
 	onCliphistClosed: gcTimer.restart()
 	onSettingsClosed: gcTimer.restart()
+	onEmojiClosed: gcTimer.restart()
 	Component.onCompleted: {
 		root._knownScreenNames = Quickshell.screens.map(s => s.name);
 	}
@@ -184,6 +236,9 @@ Singleton {
 				}
 				if (root._settingsScreen === name) {
 					root.closeSettings();
+				}
+				if (root._emojiScreen === name) {
+					root.closeEmoji();
 				}
 			}
 
