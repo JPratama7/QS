@@ -30,4 +30,5 @@ QtObject {
     readonly property int radiusSmall: 4
     readonly property int radiusNormal: 8
     readonly property int radiusLarge: 12
+    readonly property int listHighlightDuration: 150
 }
