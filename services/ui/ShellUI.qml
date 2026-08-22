@@ -66,7 +66,7 @@ Singleton {
 		if (root._emojiScreen !== "") {
 			root.closeEmoji();
 		}
-		root._openScreens[screenName] = true;
+		root._openScreens[screenName] = popupId;
 		root.popupRequested(screenName, popupId, component, anchorX);
 	}
 
@@ -76,6 +76,11 @@ Singleton {
 			return;
 		delete root._openScreens[screenName];
 		root.popupClosed(screenName);
+	}
+
+	// Check whether a specific popup is open on a screen
+	function isPopupOpen(screenName: string, popupId: string): bool {
+		return root._openScreens[screenName] === popupId;
 	}
 
 	// Close all open popups across all screens
