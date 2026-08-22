@@ -23,6 +23,8 @@ Item {
             radius: Theme.radiusSmall
         }
         highlightFollowsCurrentItem: true
+        highlightMoveDuration: Theme.listHighlightDuration
+        highlightResizeDuration: Theme.listHighlightDuration
         currentIndex: Cliphist.selectedIndex
     }
 

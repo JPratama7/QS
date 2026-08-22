@@ -21,6 +21,8 @@ Item {
 		spacing: Theme.spacingSmall
 		clip: true
 		highlightFollowsCurrentItem: true
+		highlightMoveDuration: Theme.listHighlightDuration
+		highlightResizeDuration: Theme.listHighlightDuration
 		currentIndex: Launcher.selectedIndex
 
 		highlight: Rectangle {

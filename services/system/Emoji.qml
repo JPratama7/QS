@@ -11,6 +11,7 @@ Singleton {
 
     // Raw dataset: [{ "c": "😀", "n": "grinning face", "k": ["face", "grin"] }, ...]
     property var allEmojis: ([])
+    property bool _dataLoaded: false
 
     // Search query — empty query = browse mode (full list)
     property string query: ""
@@ -47,10 +48,10 @@ Singleton {
         id: emojiFile
         path: Quickshell.shellDir + "/data/emojis.json"
         watchChanges: false
-        Component.onCompleted: reload()
         onLoaded: {
             try {
                 root.allEmojis = JSON.parse(emojiFile.text());
+                root._dataLoaded = true;
                 root.selectedIndex = root.allEmojis.length > 0 ? 0 : -1;
             } catch (e) {
                 console.error("Emoji: failed to parse data/emojis.json:", e);
@@ -72,6 +73,9 @@ Singleton {
 
     // Open the emoji popup on a given screen
     function open(screenName: string): void {
+        if (!root._dataLoaded) {
+            emojiFile.reload();
+        }
         root.query = "";
         root.selectedIndex = -1;
         ShellUI.openEmoji(screenName);
