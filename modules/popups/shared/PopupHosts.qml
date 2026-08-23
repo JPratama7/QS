@@ -7,9 +7,6 @@ import "../vpn"
 QtObject {
     id: root
 
-    VpnMenuHost {
-    }
-
-    NetworkMenuHost {
-    }
+    property VpnMenuHost vpnHost: VpnMenuHost {}
+    property NetworkMenuHost networkHost: NetworkMenuHost {}
 }

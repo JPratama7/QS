@@ -34,7 +34,6 @@ PopupWindow {
 	visible: popupWindow.activeComponent !== null
 	color: "transparent"
 
-	Component.onCompleted: console.log("PMW: completed context=" + popupWindow.context.name + " barWindow=" + !!popupWindow.barWindow)
 	onActiveComponentChanged: {
 		if (activeComponent)
 			popupContent.sourceComponent = activeComponent;
