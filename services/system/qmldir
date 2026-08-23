@@ -11,3 +11,4 @@ singleton SessionActions SessionActions.qml
 singleton SystemMonitor SystemMonitor.qml
 singleton Tray Tray.qml
 singleton TimeZone TimeZone.qml
+singleton Vpn Vpn.qml
