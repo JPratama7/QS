@@ -1,0 +1,9 @@
+module popups.network
+NetworkMenu NetworkMenu.qml
+NetworkMenuHost NetworkMenuHost.qml
+NetworkMenuPage NetworkMenuPage.qml
+NetworkMenuRow NetworkMenuRow.qml
+NetworkMainPage NetworkMainPage.qml
+NetworkWifiPage NetworkWifiPage.qml
+NetworkActionPage NetworkActionPage.qml
+NetworkEthernetPage NetworkEthernetPage.qml
