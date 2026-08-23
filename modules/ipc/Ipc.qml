@@ -10,4 +10,8 @@ QtObject {
 	}
 	readonly property Settings settings: Settings {
 	}
+	readonly property Vpn vpn: Vpn {
+	}
+	readonly property Network network: Network {
+	}
 }
