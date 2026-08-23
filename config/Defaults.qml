@@ -78,7 +78,7 @@ QtObject {
 	readonly property var barWidgetLayout: {
 		"left": ["launcher", "workspaces", "activeWindow"],
 		"center": ["clock"],
-		"right": ["network", "volume", "battery", "idleInhibitor", "notifications", "tray", "settings", "session"]
+		"right": ["network", "vpn", "volume", "battery", "idleInhibitor", "notifications", "tray", "settings", "session"]
 	}
 	readonly property var barWidgetLayoutPerScreen: ({})
 }
