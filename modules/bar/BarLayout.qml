@@ -53,6 +53,8 @@ Item {
 			return taskbar;
 		case "systemMonitor":
 			return systemMonitorComp;
+		case "vpn":
+			return vpnComp;
 		}
 		return null;
 	}
@@ -109,6 +111,8 @@ Item {
 		id: networkComp
 
 		NetworkWidget {
+			screenName: barLayout.screenName
+			barWindow: barLayout.barWindow
 			widgetScale: barLayout.widgetScale
 		}
 	}
@@ -172,6 +176,15 @@ Item {
 		id: systemMonitorComp
 
 		SystemMonitorWidget {
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
+		id: vpnComp
+
+		VpnWidget {
+			screenName: barLayout.screenName
+			barWindow: barLayout.barWindow
 			widgetScale: barLayout.widgetScale
 		}
 	}
