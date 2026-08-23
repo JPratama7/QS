@@ -4,6 +4,7 @@
 import QtQuick
 import Quickshell
 import "modules/ipc"
+import "modules/popups/shared"
 import "modules/screens"
 
 ShellRoot {
@@ -13,6 +14,9 @@ ShellRoot {
     }
 
     Ipc {
+    }
+
+    PopupHosts {
     }
 
 }
