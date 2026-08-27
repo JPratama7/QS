@@ -36,8 +36,13 @@ Item {
     }
 
     Component.onCompleted: {
+        Vpn.menuOpen = true;
         opacity = 1;
         entranceSlide.y = 0;
+    }
+
+    Component.onDestruction: {
+        Vpn.menuOpen = false;
     }
 
     Connections {

@@ -44,6 +44,10 @@ Singleton {
     // to the password page (plan §5.3 connect flow).
     signal connectFailed()
 
+    // True while the VPN popup menu is open. Polling slows down when closed —
+    // the bar indicator stays fresh enough, but wakeups drop 6x.
+    property bool menuOpen: false
+
     function isConnected(name: string): bool {
         return root.connectedPids[name] !== undefined;
     }
@@ -239,7 +243,7 @@ Singleton {
     // (plan §3 finding 5). The binding starts/stops polling as the map fills/empties.
     Timer {
         id: scanTimer
-        interval: 5000
+        interval: root.menuOpen ? 5000 : 30000
         repeat: true
         running: root.connected
         onTriggered: root._scan()

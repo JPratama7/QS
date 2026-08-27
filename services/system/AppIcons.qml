@@ -9,13 +9,20 @@ Singleton {
 	property var _cache: ({})
 	readonly property int _maxCacheSize: 500
 
-	function _invalidateCache(): void {
-		root._cache = {};
+	// Evict the oldest-inserted entries. Cache keys are non-numeric strings, so
+	// Object.keys() order is insertion order. Partial eviction beats a full wipe:
+	// desktop-entry changes rarely affect most already-resolved icon paths.
+	function _evictOldest(count: int): void {
+		const keys = Object.keys(root._cache);
+		const removeCount = Math.min(count, keys.length);
+		for (let i = 0; i < removeCount; i++) {
+			delete root._cache[keys[i]];
+		}
 	}
 	function _addToCache(key, value) {
 		root._cache[key] = value;
 		if (Object.keys(root._cache).length > root._maxCacheSize) {
-			root._invalidateCache();
+			root._evictOldest(Math.floor(root._maxCacheSize / 2));
 		}
 	}
 	function iconFromName(iconName, fallbackName) {
@@ -74,10 +81,10 @@ Singleton {
 		return result;
 	}
 
-	// Invalidate when desktop entries change (new/removed apps, icon updates)
+	// New/removed apps: drop the oldest half, keep the rest resolvable
 	Connections {
 		function onApplicationsChanged() {
-			root._invalidateCache();
+			root._evictOldest(Math.floor(Object.keys(root._cache).length / 2));
 		}
 
 		target: DesktopEntries

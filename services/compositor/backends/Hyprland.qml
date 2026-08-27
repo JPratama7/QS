@@ -11,7 +11,14 @@ CompositorBackend {
 
 	property bool _dirty: true
 
+	// Per-screen workspaces cache: rebuilt once per change batch, not once per
+	// widget binding evaluation. Array identity is kept while the workspace id
+	// set is unchanged, so Repeaters don't churn delegates on window-only churn.
+	property var _workspacesCache: ({})
+	property bool _workspacesDirty: true
+
 	function _markDirty(): void {
+		backend._workspacesDirty = true;
 		if (_dirty && debounce.running)
 			return;
 		_dirty = true;
@@ -49,18 +56,44 @@ CompositorBackend {
 		const monitor = Hyprland.monitors.values.find(m => m.name === screenName);
 		return monitor ? monitor.activeWorkspace?.id ?? 0 : 0;
 	}
-	function workspacesForScreen(screenName: string): var {
+	function _sameWorkspaceIds(a: var, b: var): bool {
+		if (!a || !b || a.length !== b.length)
+			return false;
+		for (let i = 0; i < a.length; i++) {
+			if (a[i] !== b[i])
+				return false;
+		}
+		return true;
+	}
+	function _rebuildWorkspaces(): void {
 		const workspaces = Hyprland.workspaces?.values;
-		if (!workspaces)
-			return [];
-
-		const monitor = Hyprland.monitors.values.find(monitor => monitor.name === screenName);
-		return workspaces.filter(ws => ws.monitor === monitor).map(ws => ({
-					"id": ws.id,
-					"name": ws.name,
-					"monitor": ws.monitor,
-					"windows": ws.windows
-				}));
+		const monitors = Hyprland.monitors?.values;
+		const cache = {};
+		if (workspaces && monitors) {
+			for (const monitor of monitors) {
+				const list = workspaces.filter(ws => ws.monitor === monitor).map(ws => ({
+							"id": ws.id,
+							"name": ws.name,
+							"monitor": ws.monitor,
+							"windows": ws.windows
+						}));
+				const previous = backend._workspacesCache[monitor.name];
+				// Keep the previous array when only windows/name changed — the
+				// widgets render id + active state, so a stable identity avoids
+				// Repeater teardown/recreate churn.
+				if (_sameWorkspaceIds(previous, list))
+					cache[monitor.name] = previous;
+				else
+					cache[monitor.name] = list;
+			}
+		}
+		backend._workspacesCache = cache;
+		backend._workspacesDirty = false;
+	}
+	function workspacesForScreen(screenName: string): var {
+		if (backend._workspacesDirty)
+			backend._rebuildWorkspaces();
+		return backend._workspacesCache[screenName] || [];
 	}
 	function activeWindowForScreen(screenName: string): var {
 		const active = Hyprland.activeToplevel;
@@ -124,6 +157,20 @@ CompositorBackend {
 		}
 
 		target: Hyprland
+	}
+	Connections {
+		function onValuesChanged(): void {
+			backend._markDirty();
+		}
+
+		target: Hyprland.workspaces
+	}
+	Connections {
+		function onValuesChanged(): void {
+			backend._markDirty();
+		}
+
+		target: Hyprland.monitors
 	}
 	Timer {
 		id: debounce
