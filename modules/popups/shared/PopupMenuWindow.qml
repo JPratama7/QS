@@ -47,7 +47,6 @@ PopupWindow {
 	// When visible becomes false while activeComponent is set, notify ShellUI
 	// ShellUI will emit popupClosed signal, triggering our onPopupClosed handler
 	onVisibleChanged: {
-		console.log("PMW: visible -> " + visible + " active=" + (activeComponent !== null))
 		if (!visible && activeComponent !== null && !_internalClose) {
 			ShellUI.closePopup(context.name);
 		}
@@ -66,7 +65,6 @@ PopupWindow {
 	}
 	Connections {
 		function onPopupRequested(screenName: string, popupId: string, component: var, anchorX: int) {
-			console.log("PMW: request screen=" + screenName + " id=" + popupId + " match=" + (screenName === popupWindow.context.name))
 			if (screenName !== popupWindow.context.name)
 				return;
 			popupWindow.anchorX = anchorX;
