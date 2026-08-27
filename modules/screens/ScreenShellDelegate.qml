@@ -84,6 +84,7 @@ Item {
 
 		sourceComponent: CliphistOverlayWindow {
 			screenName: delegate.context.name
+			onClosed: cliphistLoader.active = false
 		}
 
 		onLoaded: {
@@ -94,13 +95,17 @@ Item {
 		Connections {
 			function onCliphistOpened(screenName: string): void {
 				if (screenName === delegate.context.name) {
-					cliphistLoader.active = true;
+					if (cliphistLoader.item && cliphistLoader.item.closing) {
+						// Re-opened mid-close: cancel the exit animation and settle back.
+						cliphistLoader.item.abortClose();
+					} else {
+						cliphistLoader.active = true;
+					}
 				}
 			}
 			function onCliphistClosed(): void {
-				if (cliphistLoader.active) {
-					cliphistLoader.active = false;
-				}
+				if (cliphistLoader.item)
+					cliphistLoader.item.closeAnimated();
 			}
 
 			target: ShellUI
@@ -146,6 +151,7 @@ Item {
 
 		sourceComponent: SettingsOverlayWindow {
 			screenName: delegate.context.name
+			onClosed: settingsLoader.active = false
 		}
 
 		onLoaded: {
@@ -156,13 +162,17 @@ Item {
 		Connections {
 			function onSettingsOpened(screenName: string): void {
 				if (screenName === delegate.context.name) {
-					settingsLoader.active = true;
+					if (settingsLoader.item && settingsLoader.item.closing) {
+						// Re-opened mid-close: cancel the exit animation and settle back.
+						settingsLoader.item.abortClose();
+					} else {
+						settingsLoader.active = true;
+					}
 				}
 			}
 			function onSettingsClosed(): void {
-				if (settingsLoader.active) {
-					settingsLoader.active = false;
-				}
+				if (settingsLoader.item)
+					settingsLoader.item.closeAnimated();
 			}
 
 			target: ShellUI
