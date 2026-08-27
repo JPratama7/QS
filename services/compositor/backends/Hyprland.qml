@@ -11,14 +11,13 @@ CompositorBackend {
 
 	property bool _dirty: true
 
-	// Per-screen workspaces cache: rebuilt once per change batch, not once per
-	// widget binding evaluation. Array identity is kept while the workspace id
-	// set is unchanged, so Repeaters don't churn delegates on window-only churn.
+	// Per-screen workspaces cache, rebuilt inside the debounced _rebuild() so
+	// widget bindings see one coalesced update per change batch. Array identity
+	// is kept while the workspace id set is unchanged, so Repeaters don't churn
+	// delegates on window-only churn.
 	property var _workspacesCache: ({})
-	property bool _workspacesDirty: true
 
 	function _markDirty(): void {
-		backend._workspacesDirty = true;
 		if (_dirty && debounce.running)
 			return;
 		_dirty = true;
@@ -50,6 +49,7 @@ CompositorBackend {
 			});
 			backend.toplevels = items;
 		}
+		backend._rebuildWorkspaces();
 		_dirty = false;
 	}
 	function activeWorkspaceIdForScreen(screenName: string): int {
@@ -88,11 +88,8 @@ CompositorBackend {
 			}
 		}
 		backend._workspacesCache = cache;
-		backend._workspacesDirty = false;
 	}
 	function workspacesForScreen(screenName: string): var {
-		if (backend._workspacesDirty)
-			backend._rebuildWorkspaces();
 		return backend._workspacesCache[screenName] || [];
 	}
 	function activeWindowForScreen(screenName: string): var {
