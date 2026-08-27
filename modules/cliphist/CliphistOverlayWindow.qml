@@ -13,17 +13,17 @@ PanelWindow {
 
     // `shown` is the visual state the transition binds to. The window's `visible`
     // stays true during the close animation so the exit can render; `shown` flips
-    // false to drive the exit, and the loader is torn down only after `closed`.
+    // false to drive the exit, and the loader is torn down only after `closeFinished`.
     property bool shown: false
     property bool closing: false
 
-    signal closed
+    signal closeFinished
 
     function reset(): void {
         cliphistView.reset();
     }
 
-    // Play the exit transition, then emit `closed` so the owner can drop the loader.
+    // Play the exit transition, then emit `closeFinished` so the owner can drop the loader.
     function closeAnimated(): void {
         if (overlay.closing)
             return;
@@ -72,7 +72,7 @@ PanelWindow {
         interval: 220
         repeat: false
 
-        onTriggered: overlay.closed()
+        onTriggered: overlay.closeFinished()
     }
 
     // Click-outside-to-close

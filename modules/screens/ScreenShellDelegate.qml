@@ -84,7 +84,7 @@ Item {
 
 		sourceComponent: CliphistOverlayWindow {
 			screenName: delegate.context.name
-			onClosed: cliphistLoader.active = false
+			onCloseFinished: cliphistLoader.active = false
 		}
 
 		onLoaded: {
@@ -151,7 +151,7 @@ Item {
 
 		sourceComponent: SettingsOverlayWindow {
 			screenName: delegate.context.name
-			onClosed: settingsLoader.active = false
+			onCloseFinished: settingsLoader.active = false
 		}
 
 		onLoaded: {
