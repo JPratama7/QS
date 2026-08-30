@@ -11,6 +11,11 @@ QtObject {
 	readonly property string barDisplayMode: PersistentConfig.adapter.barDisplayMode
 	readonly property var bar: PersistentConfig.adapter.bar
 
+	// Theme palette — name of the active palette from Defaults.palettes
+	readonly property string themePalette: PersistentConfig.adapter.themePalette
+	// Resolved active palette object (falls back to deepMocha if name is invalid)
+	readonly property var activePalette: Defaults.palettes[themePalette] || Defaults.palettes["deepMocha"]
+
 	// Time zone for clock display ("local" = system default)
 	readonly property string timeZone: PersistentConfig.adapter.timeZone
 
