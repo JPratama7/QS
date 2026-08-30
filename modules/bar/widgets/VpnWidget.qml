@@ -15,8 +15,8 @@ BaseWidget {
 	required property string screenName
 	required property PanelWindow barWindow
 
-	implicitWidth: label.implicitWidth
-	implicitHeight: label.implicitHeight
+	implicitWidth: label.implicitWidth + Theme.paddingSmall * 2
+	implicitHeight: label.implicitHeight + Theme.paddingSmall * 2
 
 	tooltipComponent: Component {
 		Text {
@@ -24,6 +24,12 @@ BaseWidget {
 			font.pixelSize: Theme.fontSizeSmall
 			color: Theme.foregroundColor
 		}
+	}
+
+	Rectangle {
+		anchors.fill: parent
+		radius: Theme.radiusSmall
+		color: mouseArea.containsMouse ? Theme.hoverColor : "transparent"
 	}
 
 	SvgIcon {
@@ -34,8 +40,12 @@ BaseWidget {
 		color: Vpn.connected ? Theme.accentColor : Theme.mutedColor
 		iconSize: ShellConfig.barIconSize
 	}
+
 	MouseArea {
+		id: mouseArea
+
 		anchors.fill: parent
+		hoverEnabled: true
 		cursorShape: Qt.PointingHandCursor
 
 		onClicked: {
@@ -43,6 +53,7 @@ BaseWidget {
 			ShellUI.openPopup(widget.screenName, "vpn", vpnMenuComponent, pos.x);
 		}
 	}
+
 	Component {
 		id: vpnMenuComponent
 
