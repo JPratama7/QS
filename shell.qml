@@ -1,5 +1,7 @@
 //@ pragma UseQApplication
 //@ pragma Env QS_NO_RELOAD_POPUP=1
+//@ pragma DropExpensiveFonts
+//@ pragma QS_DISABLE_CRASH_HANDLER
 
 import QtQuick
 import Quickshell
