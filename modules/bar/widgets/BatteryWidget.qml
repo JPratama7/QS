@@ -12,9 +12,9 @@ BaseWidget {
 	readonly property string _displayMode: ShellConfig.batteryDisplayMode()
 	readonly property color _textColor: {
 		if (Power.charging)
-			return "#3b82f6";
+			return Theme.accentColor;
 		if (Power.percent < 20)
-			return "#ef4444";
+			return Theme.errorColor;
 		return Theme.foregroundColor;
 	}
 
@@ -69,7 +69,7 @@ BaseWidget {
 	Row {
 		id: row
 
-		spacing: 5
+		spacing: Theme.spacingSmall
 		anchors.verticalCenter: parent.verticalCenter
 
 		Text {
@@ -79,7 +79,7 @@ BaseWidget {
 			text: Power.percent + "%"
 			color: widget._textColor
 			font.pixelSize: Theme.fontSizeSmall
-			font.family: Theme.fontFamily
+			font.family: Theme.fontFamilyMono
 			anchors.verticalCenter: parent.verticalCenter
 		}
 		SvgIcon {
