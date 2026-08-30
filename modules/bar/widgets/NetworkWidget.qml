@@ -9,47 +9,59 @@ import "../../../services/ui"
 import "../../popups/network"
 
 BaseWidget {
-    id: widget
+	id: widget
 
-    required property string screenName
-    required property PanelWindow barWindow
+	required property string screenName
+	required property PanelWindow barWindow
 
-    tooltipComponent: Component {
-        Text {
-            text: Network.connected ? "WiFi: " + Network.ssid : "WiFi: Off"
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.foregroundColor
-        }
-    }
+	tooltipComponent: Component {
+		Text {
+			text: Network.connected ? "WiFi: " + Network.ssid : "WiFi: Off"
+			font.pixelSize: Theme.fontSizeSmall
+			color: Theme.foregroundColor
+		}
+	}
 
-    implicitWidth: text.implicitWidth
-    implicitHeight: text.implicitHeight
+	implicitWidth: text.implicitWidth + Theme.paddingSmall * 2
+	implicitHeight: text.implicitHeight + Theme.paddingSmall * 2
 
-    Text {
-        id: text
-        text: Network.connected ? Network.ssid : "Off"
-        color: Network.connected ? Theme.foregroundColor : Theme.mutedColor
-        font.pixelSize: Theme.fontSizeSmall
-        font.family: Theme.fontFamily
-    }
+	Rectangle {
+		anchors.fill: parent
+		radius: Theme.radiusSmall
+		color: mouseArea.containsMouse ? Theme.hoverColor : "transparent"
+	}
 
-    MouseArea {
-        anchors.fill: parent
-        cursorShape: Qt.PointingHandCursor
+	Text {
+		id: text
 
-        onClicked: {
-            const pos = widget.mapToItem(null, 0, 0);
-            const menuWidth = 260;
-            // Right-zone widget: right-align the menu and clamp inside the bar window
-            const anchorX = Math.max(0, Math.min(pos.x, widget.barWindow.width - menuWidth - Theme.paddingNormal));
-            ShellUI.openPopup(widget.screenName, "network", networkMenuComponent, anchorX);
-        }
-    }
-    Component {
-        id: networkMenuComponent
+		anchors.centerIn: parent
+		text: Network.connected ? Network.ssid : "Off"
+		color: Network.connected ? Theme.foregroundColor : Theme.mutedColor
+		font.pixelSize: Theme.fontSizeSmall
+		font.family: Theme.fontFamily
+	}
 
-        NetworkMenu {
-            screenName: widget.screenName
-        }
-    }
+	MouseArea {
+		id: mouseArea
+
+		anchors.fill: parent
+		hoverEnabled: true
+		cursorShape: Qt.PointingHandCursor
+
+		onClicked: {
+			const pos = widget.mapToItem(null, 0, 0);
+			const menuWidth = 260;
+			// Right-zone widget: right-align the menu and clamp inside the bar window
+			const anchorX = Math.max(0, Math.min(pos.x, widget.barWindow.width - menuWidth - Theme.paddingNormal));
+			ShellUI.openPopup(widget.screenName, "network", networkMenuComponent, anchorX);
+		}
+	}
+
+	Component {
+		id: networkMenuComponent
+
+		NetworkMenu {
+			screenName: widget.screenName
+		}
+	}
 }
