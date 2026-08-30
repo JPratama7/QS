@@ -2,52 +2,98 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
+import ".."
 import "../../../config"
 
-RowLayout {
+SettingRow {
 	id: root
 
-	property string text: ""
 	property bool checked: false
 
 	signal toggled
 
-	Layout.fillWidth: true
-	spacing: 15
+	// Row accepts keyboard focus so Space/Enter can flip the toggle.
+	focus: true
 
-	Text {
-		text: root.text
-		color: Theme.foregroundColor
-		font.pixelSize: Theme.fontSizeNormal
-		Layout.fillWidth: true
+	Keys.onSpacePressed: event => {
+		root.toggled();
+		event.accepted = true;
 	}
+	Keys.onReturnPressed: event => {
+		root.toggled();
+		event.accepted = true;
+	}
+
+	// Modern switch track
 	Rectangle {
-		Layout.preferredWidth: PersistentConfig.adapterView.settings?.components?.toggle?.width || 40
-		Layout.preferredHeight: PersistentConfig.adapterView.settings?.components?.toggle?.height || 20
-		radius: 10
+		id: track
+
+		Layout.alignment: Qt.AlignRight
+		Layout.preferredWidth: 44
+		Layout.preferredHeight: 24
+		radius: 12
+		// Off: neutral surface. On: accent fill. Hover and focus lift the border.
 		color: root.checked ? Theme.accentColor : Theme.surfaceColor
-		border.color: Theme.surfaceColor
+		border.color: root.activeFocus ? Theme.accentColor : (trackMouse.containsMouse ? Qt.alpha(Theme.foregroundColor, 0.25) : Theme.borderColor)
 		border.width: 1
 
+		Behavior on color {
+			ColorAnimation {
+				duration: 150
+				easing.type: Easing.OutQuad
+			}
+		}
+		Behavior on border.color {
+			ColorAnimation {
+				duration: Theme.hoverDuration
+				easing.type: Easing.OutQuad
+			}
+		}
+
+		// Thumb
 		Rectangle {
+			id: thumb
+
 			width: 16
 			height: 16
 			radius: 8
-			color: Theme.foregroundColor
-			x: root.checked ? parent.width - width - 2 : 2
-			y: 2
+			// Off: muted knob. On: bright knob against the accent fill.
+			color: root.checked ? Theme.foregroundColor : Theme.mutedColor
+			y: (parent.height - height) / 2
+			x: root.checked ? parent.width - width - 4 : 4
+			scale: trackMouse.pressed ? 0.85 : 1.0
 
+			Behavior on color {
+				ColorAnimation {
+					duration: 150
+					easing.type: Easing.OutQuad
+				}
+			}
 			Behavior on x {
 				NumberAnimation {
 					duration: 150
 					easing.type: Easing.OutQuad
 				}
 			}
+			Behavior on scale {
+				NumberAnimation {
+					duration: 90
+					easing.type: Easing.OutQuad
+				}
+			}
 		}
-		MouseArea {
-			anchors.fill: parent
 
-			onClicked: root.toggled()
+		MouseArea {
+			id: trackMouse
+
+			anchors.fill: parent
+			hoverEnabled: true
+			cursorShape: Qt.PointingHandCursor
+
+			onClicked: {
+				root.forceActiveFocus();
+				root.toggled();
+			}
 		}
 	}
 }
