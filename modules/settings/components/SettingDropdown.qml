@@ -2,6 +2,8 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
+import ".."
+import "../../../components"
 import "../../../config"
 
 ColumnLayout {
@@ -17,36 +19,70 @@ ColumnLayout {
 	Layout.fillWidth: true
 	spacing: 4
 
-	// Label row + clickable value display
-	RowLayout {
+	// Trigger row — label left, value button right (same 2-section structure)
+	SettingRow {
 		Layout.fillWidth: true
-		spacing: 15
+		text: root.text
 
-		Text {
-			text: root.text
-			color: Theme.foregroundColor
-			font.pixelSize: Theme.fontSizeNormal
-			Layout.fillWidth: true
-		}
+		// Trigger button: value + rotating chevron
 		Rectangle {
-			Layout.preferredWidth: PersistentConfig.adapterView.settings?.components?.select?.width || 100
-			Layout.preferredHeight: PersistentConfig.adapterView.settings?.components?.select?.height || 30
+			id: trigger
+
+			Layout.alignment: Qt.AlignRight
+			Layout.preferredWidth: 140
+			Layout.preferredHeight: 28
 			radius: Theme.radiusSmall
-			color: Theme.surfaceColor
-			border.color: root._expanded ? Theme.accentColor : Theme.surfaceColor
+			color: triggerMouse.containsMouse ? Theme.hoverColor : Theme.surfaceColor
+			border.color: root._expanded ? Theme.accentColor : (triggerMouse.containsMouse ? Qt.alpha(Theme.foregroundColor, 0.25) : Theme.borderColor)
 			border.width: 1
 
-			Text {
-				anchors.centerIn: parent
-				text: root.currentValue
-				color: Theme.foregroundColor
-				font.pixelSize: Theme.fontSizeNormal
-				elide: Text.ElideRight
-				width: parent.width - 10
-				horizontalAlignment: Text.AlignHCenter
+			Behavior on color {
+				ColorAnimation {
+					duration: Theme.hoverDuration
+					easing.type: Easing.OutQuad
+				}
+			}
+			Behavior on border.color {
+				ColorAnimation {
+					duration: Theme.hoverDuration
+					easing.type: Easing.OutQuad
+				}
+			}
+
+			RowLayout {
+				anchors.fill: parent
+				anchors.leftMargin: 10
+				anchors.rightMargin: 8
+				spacing: 6
+
+				Text {
+					Layout.fillWidth: true
+					text: root.currentValue
+					color: Theme.foregroundColor
+					font.pixelSize: Theme.fontSizeNormal
+					font.family: Theme.fontFamilyMono
+					elide: Text.ElideRight
+					verticalAlignment: Text.AlignVCenter
+				}
+				SvgIcon {
+					source: "icons/outline/chevron-down.svg"
+					color: root._expanded ? Theme.accentColor : Theme.mutedColor
+					iconSize: Theme.fontSizeNormal
+					rotation: root._expanded ? 180 : 0
+
+					Behavior on rotation {
+						NumberAnimation {
+							duration: 150
+							easing.type: Easing.OutQuad
+						}
+					}
+				}
 			}
 			MouseArea {
+				id: triggerMouse
+
 				anchors.fill: parent
+				hoverEnabled: true
 				cursorShape: Qt.PointingHandCursor
 
 				onClicked: {
@@ -54,27 +90,33 @@ ColumnLayout {
 					if (root._expanded) {
 						searchField.text = "";
 						filteredModel.model = root.options;
+						searchField.forceActiveFocus();
 					}
 				}
 			}
 		}
 	}
 
-	// Expandable dropdown panel (inline, no Popup)
+	// Expandable dropdown panel (inline — Wayland overlays make popups painful)
 	Rectangle {
 		Layout.fillWidth: true
 		Layout.preferredHeight: root._expanded ? 200 : 0
 		clip: true
-		color: Theme.surfaceColor
+		color: Theme.backgroundColor
 		radius: Theme.radiusNormal
-		border.color: Qt.alpha(Theme.foregroundColor, 0.1)
+		border.color: root._expanded ? Qt.alpha(Theme.accentColor, 0.4) : Theme.borderColor
 		border.width: 1
 		visible: root._expanded
 
-		// Animate expand/collapse
 		Behavior on Layout.preferredHeight {
 			NumberAnimation {
-				duration: 120
+				duration: 150
+				easing.type: Easing.OutQuad
+			}
+		}
+		Behavior on border.color {
+			ColorAnimation {
+				duration: Theme.hoverDuration
 				easing.type: Easing.OutQuad
 			}
 		}
@@ -89,19 +131,29 @@ ColumnLayout {
 				Layout.fillWidth: true
 				Layout.preferredHeight: 28
 				radius: Theme.radiusSmall
-				color: Theme.backgroundColor
-				border.color: Theme.surfaceColor
+				color: Theme.surfaceColor
+				border.color: searchField.activeFocus ? Theme.accentColor : Theme.borderColor
 				border.width: 1
+
+				Behavior on border.color {
+					ColorAnimation {
+						duration: Theme.hoverDuration
+						easing.type: Easing.OutQuad
+					}
+				}
 
 				TextInput {
 					id: searchField
 
 					anchors.fill: parent
-					anchors.margins: 6
+					anchors.leftMargin: 8
+					anchors.rightMargin: 8
 					verticalAlignment: Text.AlignVCenter
 					color: Theme.foregroundColor
 					font.pixelSize: Theme.fontSizeNormal
+					font.family: Theme.fontFamilyMono
 					selectionColor: Qt.alpha(Theme.accentColor, 0.3)
+					selectByMouse: true
 
 					onTextChanged: {
 						const q = text.toLowerCase().trim();
@@ -121,6 +173,7 @@ ColumnLayout {
 						text: "Search..."
 						color: Theme.mutedColor
 						font.pixelSize: Theme.fontSizeNormal
+						font.family: Theme.fontFamilyMono
 						visible: !searchField.text && !searchField.activeFocus
 					}
 				}
@@ -137,33 +190,54 @@ ColumnLayout {
 				spacing: 1
 
 				delegate: Rectangle {
+					id: optionRow
+
 					required property string modelData
 
 					width: filteredModel.width
 					height: 26
 					radius: Theme.radiusSmall
-					color: mouseArea.containsMouse ? Qt.alpha(Theme.accentColor, 0.15) : "transparent"
+					color: rowMouse.containsMouse ? Theme.hoverAccentColor : (root.currentValue === optionRow.modelData ? Qt.alpha(Theme.accentColor, 0.08) : "transparent")
 
-					Text {
-						anchors.left: parent.left
-						anchors.verticalCenter: parent.verticalCenter
-						anchors.leftMargin: 8
-						text: parent.modelData
-						color: root.currentValue === parent.modelData ? Theme.accentColor : Theme.foregroundColor
-						font.pixelSize: Theme.fontSizeNormal
-						font.bold: root.currentValue === parent.modelData
-						elide: Text.ElideRight
-						width: parent.width - 16
+					Behavior on color {
+						ColorAnimation {
+							duration: Theme.hoverDuration
+							easing.type: Easing.OutQuad
+						}
+					}
+
+					RowLayout {
+						anchors.fill: parent
+						anchors.leftMargin: 10
+						anchors.rightMargin: 8
+						spacing: 6
+
+						Text {
+							Layout.fillWidth: true
+							text: optionRow.modelData
+							color: root.currentValue === optionRow.modelData ? Theme.accentColor : Theme.foregroundColor
+							font.pixelSize: Theme.fontSizeNormal
+							font.bold: root.currentValue === optionRow.modelData
+							elide: Text.ElideRight
+							verticalAlignment: Text.AlignVCenter
+						}
+						// Checkmark on the selected option
+						SvgIcon {
+							source: "icons/outline/check.svg"
+							color: Theme.accentColor
+							iconSize: Theme.fontSizeSmall
+							visible: root.currentValue === optionRow.modelData
+						}
 					}
 					MouseArea {
-						id: mouseArea
+						id: rowMouse
 
 						anchors.fill: parent
 						hoverEnabled: true
 						cursorShape: Qt.PointingHandCursor
 
 						onClicked: {
-							root.valueChanged(parent.modelData);
+							root.valueChanged(optionRow.modelData);
 							root._expanded = false;
 						}
 					}

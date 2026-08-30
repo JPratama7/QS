@@ -9,13 +9,15 @@ import "../../services/system"
 Item {
 	id: list
 
-	implicitHeight: resultsView.contentHeight
-	visible: Launcher.hasResults
+	// Reserve space for the empty hint when there are no results, so the
+	// message has room to render instead of collapsing to zero height.
+	implicitHeight: Launcher.hasResults ? resultsView.contentHeight : (emptyHint.implicitHeight + Theme.paddingNormal * 2)
 
 	ListView {
 		id: resultsView
 
 		anchors.fill: parent
+		visible: Launcher.hasResults
 		model: Launcher.results
 		delegate: resultDelegate
 		spacing: Theme.spacingSmall
@@ -42,7 +44,7 @@ Item {
 			width: resultsView.width
 			height: rowContent.implicitHeight + Theme.paddingSmall * 2
 			radius: Theme.radiusSmall
-			color: resultRow.index === Launcher.selectedIndex ? Qt.alpha(Theme.accentColor, 0.15) : "transparent"
+			color: "transparent"
 
 			Row {
 				id: rowContent
@@ -91,13 +93,15 @@ Item {
 		}
 	}
 
-	// Empty state
+	// Empty state — shown both on open (no query yet) and on a failed search.
+	// Parent is always visible now, so this actually renders.
 	Text {
+		id: emptyHint
 		anchors.centerIn: parent
-		text: "No results"
+		text: Launcher.query === "" ? "Start typing to search" : "No results"
 		color: Theme.mutedColor
 		font.pixelSize: Theme.fontSizeNormal
 		font.family: Theme.fontFamily
-		visible: !Launcher.hasResults && Launcher.query !== ""
+		visible: !Launcher.hasResults
 	}
 }

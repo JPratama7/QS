@@ -10,8 +10,14 @@ Singleton {
     id: root
 
     // Raw dataset: [{ "c": "😀", "n": "grinning face", "k": ["face", "grin"] }, ...]
+    // Released on close() so the ~1.9k objects only live while the picker is in use.
     property var allEmojis: ([])
     property bool _dataLoaded: false
+
+    // One-entry search cache: identical queries reuse the same result array
+    // instead of rebuilding 3-4 arrays per keystroke. Plain JS object — member
+    // writes aren't QML-observable, so no binding loops or extra re-evaluations.
+    property var _queryCache: ({"query": "", "results": null})
 
     // Search query — empty query = browse mode (full list)
     property string query: ""
@@ -21,6 +27,8 @@ Singleton {
         const q = root.query.trim().toLowerCase();
         if (q === "")
             return root.allEmojis;
+        if (root._queryCache.results !== null && root._queryCache.query === q)
+            return root._queryCache.results;
         const starts = [], contains = [], keyword = [];
         for (const e of root.allEmojis) {
             const n = e.n.toLowerCase();
@@ -32,7 +40,10 @@ Singleton {
                 keyword.push(e);
             }
         }
-        return starts.concat(contains, keyword);
+        const result = starts.concat(contains, keyword);
+        root._queryCache.results = result;
+        root._queryCache.query = q;
+        return result;
     }
 
     property int selectedIndex: -1
@@ -52,6 +63,8 @@ Singleton {
             try {
                 root.allEmojis = JSON.parse(emojiFile.text());
                 root._dataLoaded = true;
+                root._queryCache.results = null;
+                root._queryCache.query = "";
                 root.selectedIndex = root.allEmojis.length > 0 ? 0 : -1;
             } catch (e) {
                 console.error("Emoji: failed to parse data/emojis.json:", e);
@@ -81,10 +94,15 @@ Singleton {
         ShellUI.openEmoji(screenName);
     }
 
-    // Close the popup
+    // Close the popup — also release the dataset so idle picker costs nothing.
+    // open() reloads from disk because _dataLoaded is reset here.
     function close(): void {
         root.query = "";
         root.selectedIndex = -1;
+        root.allEmojis = [];
+        root._dataLoaded = false;
+        root._queryCache.results = null;
+        root._queryCache.query = "";
         ShellUI.closeEmoji();
     }
 

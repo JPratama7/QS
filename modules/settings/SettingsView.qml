@@ -57,7 +57,8 @@ Rectangle {
 					color: Theme.foregroundColor
 					font.pixelSize: Theme.fontSizeLarge
 					font.bold: true
-					Layout.alignment: Qt.AlignHCenter
+					Layout.alignment: Qt.AlignLeft
+					Layout.leftMargin: 10
 					Layout.bottomMargin: 15
 				}
 
@@ -71,6 +72,10 @@ Rectangle {
 						{
 							id: "bar",
 							label: "Bar"
+						},
+						{
+							id: "theme",
+							label: "Theme"
 						}
 					]
 
@@ -129,7 +134,15 @@ Rectangle {
 
 					// Section title
 					Text {
-						text: root.currentSection === "general" ? "General" : "Bar"
+						text: {
+						if (root.currentSection === "general")
+							return "General";
+						if (root.currentSection === "bar")
+							return "Bar";
+						if (root.currentSection === "theme")
+							return "Theme";
+						return "";
+					}
 						color: Theme.accentColor
 						font.pixelSize: Theme.fontSizeLarge
 						font.bold: true
@@ -340,6 +353,75 @@ Rectangle {
 									PersistentConfig.adapterView.bar = newBar;
 								}
 							}
+						}
+					}
+
+					// Theme section
+					ColumnLayout {
+						visible: root.currentSection === "theme"
+						Layout.fillWidth: true
+						spacing: 15
+
+						SettingSelect {
+							text: "Palette"
+							currentValue: PersistentConfig.adapterView.themePalette
+							options: ["deepMocha", "mochaMauve", "macchiatoTeal", "frappePeach"]
+
+							onValueChanged: val => {
+								PersistentConfig.adapterView.themePalette = val;
+							}
+						}
+
+						// Palette preview swatches
+						RowLayout {
+							Layout.fillWidth: true
+							spacing: 6
+
+							Repeater {
+								model: [
+									{ label: "Base", color: Theme.backgroundColor },
+									{ label: "Bar", color: Theme.barBackgroundColor },
+									{ label: "Surface", color: Theme.surfaceColor },
+									{ label: "Accent", color: Theme.accentColor },
+									{ label: "Text", color: Theme.foregroundColor },
+									{ label: "Muted", color: Theme.mutedColor },
+									{ label: "Error", color: Theme.errorColor }
+								]
+
+								delegate: ColumnLayout {
+									id: swatch
+
+									required property var modelData
+
+									Layout.preferredWidth: 40
+									spacing: 4
+
+									Rectangle {
+										Layout.preferredWidth: 40
+										Layout.preferredHeight: 40
+										radius: Theme.radiusSmall
+										color: swatch.modelData.color
+										border.color: Theme.borderColor
+										border.width: 1
+									}
+									Text {
+										Layout.alignment: Qt.AlignRight
+										Layout.leftMargin: 10
+										text: swatch.modelData.label
+										color: Theme.mutedColor
+										font.pixelSize: Theme.fontSizeSmall
+									}
+								}
+							}
+						}
+
+						Text {
+							Layout.fillWidth: true
+							Layout.topMargin: 10
+							text: "Palette changes apply instantly. Catppuccin flavors mixed across base depth and accent hue."
+							color: Theme.mutedColor
+							font.pixelSize: Theme.fontSizeSmall
+							wrapMode: Text.WordWrap
 						}
 					}
 				}

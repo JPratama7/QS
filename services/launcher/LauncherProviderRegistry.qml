@@ -18,8 +18,15 @@ Singleton {
 	property list<LauncherProvider> providers: []
 
 	function register(provider: LauncherProvider): void {
-		root.providers.push(provider);
-		root.providersChanged();
+		// Reassign rather than mutating in place: list property change
+		// notification fires automatically on assignment, and building a
+		// fresh JS array avoids the version-dependent push + manual
+		// providersChanged() dance on the list property itself.
+		const updated = [];
+		for (const p of root.providers)
+			updated.push(p);
+		updated.push(provider);
+		root.providers = updated;
 	}
 
 	// Run query across all providers, return merged results

@@ -29,6 +29,7 @@ FileView {
 		}
 		return {
 			primaryScreen: Defaults.primaryScreen,
+			themePalette: Defaults.themePalette,
 			timeZone: Defaults.timeZone,
 			barHeight: Defaults.barHeight,
 			barEdge: Defaults.barEdge,
@@ -84,6 +85,7 @@ FileView {
 	// Apply merged values to the adapter properties
 	function applyMergedValues(merged: var): void {
 		adapterView.primaryScreen = merged.primaryScreen;
+		adapterView.themePalette = merged.themePalette;
 		adapterView.timeZone = merged.timeZone;
 		adapterView.barHeight = merged.barHeight;
 		adapterView.barEdge = merged.barEdge;
@@ -148,6 +150,7 @@ FileView {
 		id: adapter
 
 		property string primaryScreen: Defaults.primaryScreen
+		property string themePalette: Defaults.themePalette
 		property string timeZone: Defaults.timeZone
 		property int barHeight: Defaults.barHeight
 		property string barEdge: Defaults.barEdge

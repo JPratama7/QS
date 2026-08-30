@@ -25,7 +25,7 @@ BaseWidget {
 	Rectangle {
 		anchors.fill: parent
 		radius: Theme.radiusSmall
-		color: mouseArea.containsMouse ? Qt.alpha(Theme.foregroundColor, 0.1) : "transparent"
+		color: mouseArea.containsMouse ? Theme.hoverColor : "transparent"
 	}
 	SvgIcon {
 		id: label

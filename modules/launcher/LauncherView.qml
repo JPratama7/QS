@@ -5,50 +5,51 @@ import "../../config"
 import "../../services/launcher"
 
 Item {
-    id: view
+	id: view
 
-    implicitWidth: column.implicitWidth
-    implicitHeight: column.implicitHeight + Theme.paddingNormal * 2
+	implicitWidth: column.implicitWidth
+	implicitHeight: column.implicitHeight + Theme.paddingNormal * 2
 
-    focus: true
+	focus: true
 
-    Keys.onUpPressed: Launcher.selectPrev()
-    Keys.onDownPressed: Launcher.selectNext()
-    Keys.onReturnPressed: Launcher.activateSelected()
-    Keys.onEscapePressed: Launcher.close()
+	Keys.onUpPressed: Launcher.selectPrev()
+	Keys.onDownPressed: Launcher.selectNext()
+	Keys.onReturnPressed: Launcher.activateSelected()
+	Keys.onEscapePressed: Launcher.close()
 
-    function reset(): void {
-        searchField.clear();
-        searchField.focusInput();
-    }
+	function reset(): void {
+		searchField.clear();
+		searchField.focusInput();
+	}
 
-    Rectangle {
-        z: -1
-        anchors.fill: parent
-        color: Theme.surfaceColor
-        radius: Theme.radiusNormal
-        border.width: 1
-        border.color: Qt.alpha(Theme.foregroundColor, 0.1)
-    }
+	Rectangle {
+		z: -1
+		anchors.fill: parent
+		color: Theme.surfaceColor
+		radius: Theme.radiusNormal
+		border.width: 1
+		border.color: Qt.alpha(Theme.foregroundColor, 0.1)
+	}
 
-    Column {
-        id: column
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-            margins: Theme.paddingNormal
-        }
-        spacing: Theme.spacingNormal
+	Column {
+		id: column
 
-        LauncherSearchField {
-            id: searchField
-            width: parent.width
-        }
+		anchors {
+			top: parent.top
+			left: parent.left
+			right: parent.right
+			margins: Theme.paddingNormal
+		}
+		spacing: Theme.spacingNormal
 
-        LauncherResultsList {
-            width: parent.width
-            height: Math.min(implicitHeight, 400)
-        }
-    }
+		LauncherSearchField {
+			id: searchField
+			width: parent.width
+		}
+
+		LauncherResultsList {
+			width: parent.width
+			height: Math.min(implicitHeight, Defaults.launcherResultsHeight)
+		}
+	}
 }

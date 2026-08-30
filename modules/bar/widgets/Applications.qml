@@ -41,7 +41,13 @@ BaseWidget {
 				Rectangle {
 					anchors.fill: parent
 					radius: Theme.radiusSmall
-					color: appItem.modelData?.activated ? Qt.alpha(Theme.accentColor, 0.3) : "transparent"
+					color: {
+						if (appItem.modelData?.activated)
+							return Qt.alpha(Theme.accentColor, 0.3);
+						if (appMouseArea.containsMouse)
+							return Theme.hoverColor;
+						return "transparent";
+					}
 
 					Image {
 						anchors.centerIn: parent
@@ -54,7 +60,9 @@ BaseWidget {
 					}
 				}
 				MouseArea {
+					id: appMouseArea
 					anchors.fill: parent
+					hoverEnabled: true
 					cursorShape: Qt.PointingHandCursor
 					acceptedButtons: Qt.LeftButton | Qt.RightButton
 

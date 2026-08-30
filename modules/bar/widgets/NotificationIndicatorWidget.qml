@@ -17,8 +17,8 @@ BaseWidget {
 	readonly property bool hasUnread: Notification.unreadCount > 0
 	readonly property bool isDnd: Notification.dndEnabled
 
-	implicitWidth: labelRow.implicitWidth
-	implicitHeight: labelRow.implicitHeight
+	implicitWidth: labelRow.implicitWidth + Theme.paddingSmall * 2
+	implicitHeight: labelRow.implicitHeight + Theme.paddingSmall * 2
 
 	tooltipComponent: Component {
 		Text {
@@ -26,6 +26,12 @@ BaseWidget {
 			font.pixelSize: Theme.fontSizeSmall
 			color: Theme.foregroundColor
 		}
+	}
+
+	Rectangle {
+		anchors.fill: parent
+		radius: Theme.radiusSmall
+		color: mouseArea.containsMouse ? Theme.hoverColor : "transparent"
 	}
 
 	Row {
@@ -48,7 +54,9 @@ BaseWidget {
 		}
 	}
 	MouseArea {
+		id: mouseArea
 		anchors.fill: parent
+		hoverEnabled: true
 		cursorShape: Qt.PointingHandCursor
 		acceptedButtons: Qt.LeftButton | Qt.RightButton
 

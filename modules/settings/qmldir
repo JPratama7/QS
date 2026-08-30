@@ -4,5 +4,6 @@ SettingsView SettingsView.qml
 SettingToggle components/SettingToggle.qml
 SettingSelect components/SettingSelect.qml
 SettingSection components/SettingSection.qml
+SettingRow components/SettingRow.qml
 SettingNumber components/SettingNumber.qml
 SettingDropdown components/SettingDropdown.qml

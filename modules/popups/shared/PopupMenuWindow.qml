@@ -43,7 +43,6 @@ PopupWindow {
 					popupContent.sourceComponent = null;
 			});
 	}
-
 	// Detect external dismissal (click outside, Escape, focus loss)
 	// When visible becomes false while activeComponent is set, notify ShellUI
 	// ShellUI will emit popupClosed signal, triggering our onPopupClosed handler

@@ -1,0 +1,6 @@
+module popups.vpn
+VpnMenu VpnMenu.qml
+VpnMenuHost VpnMenuHost.qml
+VpnMainPage VpnMainPage.qml
+VpnActionPage VpnActionPage.qml
+VpnPasswordPage VpnPasswordPage.qml

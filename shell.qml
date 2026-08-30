@@ -1,9 +1,12 @@
 //@ pragma UseQApplication
 //@ pragma Env QS_NO_RELOAD_POPUP=1
+//@ pragma DropExpensiveFonts
+//@ pragma QS_DISABLE_CRASH_HANDLER
 
 import QtQuick
 import Quickshell
 import "modules/ipc"
+import "modules/popups/shared"
 import "modules/screens"
 
 ShellRoot {
@@ -13,6 +16,9 @@ ShellRoot {
     }
 
     Ipc {
+    }
+
+    PopupHosts {
     }
 
 }

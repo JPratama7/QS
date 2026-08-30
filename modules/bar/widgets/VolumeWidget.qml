@@ -10,8 +10,8 @@ BaseWidget {
 
 	readonly property real _volumePercent: Math.round(Audio.volume * 100)
 
-	implicitWidth: text.implicitWidth
-	implicitHeight: text.implicitHeight
+	implicitWidth: text.implicitWidth + Theme.paddingSmall * 2
+	implicitHeight: text.implicitHeight + Theme.paddingSmall * 2
 
 	tooltipComponent: Component {
 		Column {
@@ -37,16 +37,28 @@ BaseWidget {
 		}
 	}
 
+	Rectangle {
+		anchors.fill: parent
+		radius: Theme.radiusSmall
+		color: mouseArea.containsMouse ? Theme.hoverColor : "transparent"
+	}
+
 	Text {
 		id: text
 
+		anchors.centerIn: parent
 		text: Audio.muted ? "Mute" : widget._volumePercent + "%"
 		color: Audio.muted ? Theme.mutedColor : Theme.foregroundColor
 		font.pixelSize: Theme.fontSizeSmall
-		font.family: Theme.fontFamily
+		font.family: Theme.fontFamilyMono
 	}
+
 	MouseArea {
+		id: mouseArea
+
 		anchors.fill: parent
+		hoverEnabled: true
+		cursorShape: Qt.PointingHandCursor
 
 		onClicked: Audio.toggleMute()
 	}

@@ -1,3 +1,4 @@
 module popups.shared
 ConfirmActionDialog ConfirmActionDialog.qml
 PopupMenuWindow PopupMenuWindow.qml
+PopupHosts PopupHosts.qml

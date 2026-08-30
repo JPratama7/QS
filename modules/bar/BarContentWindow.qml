@@ -22,12 +22,21 @@ ShellWindow {
 	WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 	implicitHeight: context.barHeight
 	exclusiveZone: barWindow._barActive && context.barDisplayMode !== "non_exclusive" ? context.barHeight : 0
-	color: Theme.backgroundColor
+	color: Theme.barBackgroundColor
 	visible: context.barDisplayMode !== "hidden" && BarVisibility.effectiveVisible(context.name) || context.barDisplayMode === "auto_hide"
 	anchors.top: context.barEdge === "top"
 	anchors.bottom: context.barEdge === "bottom"
 	anchors.left: true
 	anchors.right: true
+
+	// Hairline border at the window-facing edge — depth without weight
+	Rectangle {
+		z: 1
+		width: parent.width
+		height: 1
+		color: Theme.borderColor
+		y: barWindow.context.barEdge === "top" ? parent.height - 1 : 0
+	}
 
 	HoverHandler {
 		id: barHover

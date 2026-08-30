@@ -14,8 +14,8 @@ BaseWidget {
 	required property string screenName
 	required property PanelWindow barWindow
 
-	implicitWidth: textItem.implicitWidth
-	implicitHeight: textItem.implicitHeight
+	implicitWidth: textItem.implicitWidth + Theme.paddingSmall * 2
+	implicitHeight: textItem.implicitHeight + Theme.paddingSmall * 2
 
 	tooltipComponent: Component {
 		Text {
@@ -30,19 +30,29 @@ BaseWidget {
 
 		precision: SystemClock.Minutes
 	}
+
+	Rectangle {
+		anchors.fill: parent
+		radius: Theme.radiusSmall
+		color: mouseArea.containsMouse ? Theme.hoverColor : "transparent"
+	}
+
 	Text {
 		id: textItem
 
-		text: {
-			return TimeZone.formatTime(systemClock.date, "hh:mm ddd", ShellConfig.timeZone);
-		}
+		anchors.centerIn: parent
+		text: TimeZone.formatTime(systemClock.date, "hh:mm ddd", ShellConfig.timeZone)
 		color: Theme.foregroundColor
 		font.pixelSize: Theme.fontSizeNormal
-		font.family: Theme.fontFamily
+		font.family: Theme.fontFamilyMono
 		verticalAlignment: Text.AlignVCenter
 	}
+
 	MouseArea {
+		id: mouseArea
+
 		anchors.fill: parent
+		hoverEnabled: true
 		cursorShape: Qt.PointingHandCursor
 
 		onClicked: {
@@ -52,6 +62,7 @@ BaseWidget {
 			ShellUI.openPopup(widget.screenName, "calendar", calendarComponent, Math.max(0, anchorX));
 		}
 	}
+
 	Component {
 		id: calendarComponent
 

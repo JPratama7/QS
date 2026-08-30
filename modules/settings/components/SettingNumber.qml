@@ -1,14 +1,14 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
-import "../../../components"
+import ".."
 import "../../../config"
 
-RowLayout {
+SettingRow {
 	id: root
 
-	property string text: ""
 	property int currentValue: 0
 	property int minValue: 0
 	property int maxValue: 1000
@@ -16,48 +16,93 @@ RowLayout {
 
 	signal valueChanged(int newValue)
 
-	Layout.fillWidth: true
-	spacing: 15
-
-	Text {
-		text: root.text
-		color: Theme.foregroundColor
-		font.pixelSize: Theme.fontSizeNormal
-		Layout.fillWidth: true
-	}
+	// Slider + value chip sit side by side in the right section
 	RowLayout {
-		spacing: 5
+		Layout.alignment: Qt.AlignRight
+		spacing: Theme.spacingNormal
 
-		Rectangle {
-			Layout.preferredWidth: PersistentConfig.adapterView.settings?.components?.numberButton?.width || 30
-			Layout.preferredHeight: PersistentConfig.adapterView.settings?.components?.numberButton?.height || 30
-			radius: Theme.radiusSmall
-			color: Theme.surfaceColor
-			border.color: Theme.surfaceColor
-			border.width: 1
+		// Slider is the honest control for a bounded numeric range.
+		Slider {
+			id: slider
 
-			SvgIcon {
-				anchors.centerIn: parent
-				source: "icons/outline/minus.svg"
-				color: Theme.foregroundColor
-				iconSize: Theme.fontSizeLarge
+			Layout.preferredWidth: 150
+			Layout.preferredHeight: 28
+			from: root.minValue
+			to: root.maxValue
+			stepSize: root.step
+			// `value` is set imperatively (a binding would fight the drag).
+			Component.onCompleted: value = root.currentValue
+			onMoved: root.valueChanged(Math.round(value))
+
+			// Re-sync from external config writes (e.g. defaults reset).
+			Connections {
+				target: root
+
+				function onCurrentValueChanged(): void {
+					slider.value = root.currentValue;
+				}
 			}
-			MouseArea {
-				anchors.fill: parent
 
-				onClicked: {
-					if (root.currentValue - root.step >= root.minValue) {
-						root.valueChanged(root.currentValue - root.step);
+			background: Rectangle {
+				x: slider.leftPadding
+				y: slider.topPadding + slider.availableHeight / 2 - height / 2
+				width: slider.availableWidth
+				height: 4
+				radius: 2
+				color: Theme.surfaceColor
+
+				// Filled portion up to the handle center.
+				// Handle travel is inset by its own width so it stays inside the
+				// track at both extremes; fill must track the handle center, not
+				// the raw visualPosition * track width.
+				Rectangle {
+					width: slider.visualPosition * (slider.availableWidth - 14) + 7
+					height: parent.height
+					radius: 2
+					color: Theme.accentColor
+
+					Behavior on width {
+						NumberAnimation {
+							duration: 60
+							easing.type: Easing.OutQuad
+						}
+					}
+				}
+			}
+
+			handle: Rectangle {
+				x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
+				y: slider.topPadding + slider.availableHeight / 2 - height / 2
+				width: 14
+				height: 14
+				radius: 7
+				color: slider.pressed ? Theme.accentColor : Theme.foregroundColor
+				border.color: Theme.accentColor
+				border.width: 2
+				scale: slider.pressed ? 1.15 : (slider.hovered ? 1.08 : 1.0)
+
+				Behavior on scale {
+					NumberAnimation {
+						duration: 90
+						easing.type: Easing.OutQuad
+					}
+				}
+				Behavior on color {
+					ColorAnimation {
+						duration: 90
+						easing.type: Easing.OutQuad
 					}
 				}
 			}
 		}
+
+		// Mono value chip — numbers read as data on a control surface.
 		Rectangle {
-			Layout.preferredWidth: PersistentConfig.adapterView.settings?.components?.numberDisplay?.width || 60
-			Layout.preferredHeight: PersistentConfig.adapterView.settings?.components?.numberDisplay?.height || 30
+			Layout.preferredWidth: 52
+			Layout.preferredHeight: 28
 			radius: Theme.radiusSmall
 			color: Theme.backgroundColor
-			border.color: Theme.surfaceColor
+			border.color: Theme.borderColor
 			border.width: 1
 
 			Text {
@@ -65,30 +110,7 @@ RowLayout {
 				text: root.currentValue.toString()
 				color: Theme.foregroundColor
 				font.pixelSize: Theme.fontSizeNormal
-			}
-		}
-		Rectangle {
-			Layout.preferredWidth: PersistentConfig.adapterView.settings?.components?.numberButton?.width || 30
-			Layout.preferredHeight: PersistentConfig.adapterView.settings?.components?.numberButton?.height || 30
-			radius: Theme.radiusSmall
-			color: Theme.surfaceColor
-			border.color: Theme.surfaceColor
-			border.width: 1
-
-			SvgIcon {
-				anchors.centerIn: parent
-				source: "icons/outline/plus.svg"
-				color: Theme.foregroundColor
-				iconSize: Theme.fontSizeLarge
-			}
-			MouseArea {
-				anchors.fill: parent
-
-				onClicked: {
-					if (root.currentValue + root.step <= root.maxValue) {
-						root.valueChanged(root.currentValue + root.step);
-					}
-				}
+				font.family: Theme.fontFamilyMono
 			}
 		}
 	}
