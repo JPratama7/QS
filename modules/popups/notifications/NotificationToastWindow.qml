@@ -19,11 +19,11 @@ PopupWindow {
 
     readonly property int toastWidth: 280
     readonly property int toastSpacing: Theme.spacingNormal
-    readonly property int edgeMargin: ShellConfig.popupEdgeMargin
+    readonly property int edgeMargin: PersistentConfig.adapter.popupEdgeMargin
 
     // Compute anchor position based on toastPosition config
     function computeAnchorX(): int {
-        const position = ShellConfig.toastPosition;
+        const position = PersistentConfig.adapter.toastPosition;
         const screenWidth = toastWindow.context.screen.width;
         
         switch (position) {
@@ -42,7 +42,7 @@ PopupWindow {
     }
 
     function computeAnchorY(): int {
-        const position = ShellConfig.toastPosition;
+        const position = PersistentConfig.adapter.toastPosition;
         const barAtBottom = toastWindow.context.barEdge === "bottom";
 
         switch (position) {

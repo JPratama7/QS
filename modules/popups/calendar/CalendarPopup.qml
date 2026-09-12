@@ -23,6 +23,8 @@ Item {
 		return new Date(year, month, 1).getDay();
 	}
 	function monthName(month: int): string {
+		// Note: the QML JS engine on this platform has no Intl (ReferenceError),
+		// so month names are hardcoded rather than derived from Intl.DateTimeFormat.
 		const names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 		return names[month];
 	}
@@ -31,7 +33,7 @@ Item {
 	implicitHeight: contentColumn.implicitHeight + Theme.paddingNormal * 2
 
 	Component.onCompleted: {
-		const today = TimeZone.getToday(ShellConfig.timeZone);
+		const today = TimeZone.getToday(PersistentConfig.adapter.timeZone);
 		root._todayYear = today.year;
 		root._todayMonth = today.month;
 		root._todayDate = today.day;
@@ -99,7 +101,7 @@ Item {
 					anchors.horizontalCenter: parent.horizontalCenter
 				}
 				Text {
-					text: ShellConfig.timeZone || "System"
+					text: PersistentConfig.adapter.timeZone || "System"
 					color: Theme.mutedColor
 					font.pixelSize: Theme.fontSizeSmall
 					font.family: Theme.fontFamily
