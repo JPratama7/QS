@@ -18,19 +18,18 @@ Singleton {
 		const all = SystemTray.items.values;
 		if (!all)
 			return [];
-		const hidden = ShellConfig.trayHiddenIds;
+		const hidden = PersistentConfig.adapter.trayHiddenIds;
 		return all.filter(item => item != null && !hidden.includes(item.id));
 	}
 
-	function setActiveRequest(item: SystemTrayItem, anchorX: int, anchorY: int): void {
+	function setActiveRequest(item: SystemTrayItem, anchorX: int): void {
 		if (root.activeRequest) {
 			root.activeRequest.destroy();
 			root.activeRequest = null;
 		}
 		root.activeRequest = requestFactory.createObject(root, {
 			item: item,
-			anchorX: anchorX,
-			anchorY: anchorY
+			anchorX: anchorX
 		});
 	}
 

@@ -62,8 +62,4 @@ Singleton {
         powerProcess.command = ["systemctl", "suspend"];
         powerProcess.startDetached();
     }
-
-    function logout(): void {
-        // Stub - requires compositor/hyprctl call
-    }
 }

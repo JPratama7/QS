@@ -68,21 +68,11 @@ Singleton {
         inhibited = false
     }
 
-    // Public: Create idle inhibitor
-    function inhibit(): void {
-        applyInhibit()
-    }
-
-    // Public: Release idle inhibitor
-    function uninhibit(): void {
-        applyUninhibit()
-    }
-
     // Toggle helper
     function toggle(): void {
         if (inhibited)
-            uninhibit()
+            applyUninhibit()
         else
-            inhibit()
+            applyInhibit()
     }
 }

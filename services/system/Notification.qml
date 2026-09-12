@@ -15,9 +15,8 @@ Singleton {
 	}
 
 	readonly property int unreadCount: trackedList.length
-	readonly property list<Notification> trackedNotifications: trackedList
 	property list<Notification> trackedList: ([])
-	readonly property bool dndEnabled: ShellConfig.dndEnabled
+	readonly property bool dndEnabled: PersistentConfig.adapter.dndEnabled
 
 	// Toast queue — each entry: { notification: Notification, createdAt: int }
 	// Persisted via PersistentProperties for reload survival
@@ -52,7 +51,7 @@ Singleton {
 		toastSweepTimer.scheduleNext();
 	}
 	function addToast(notification: Notification): void {
-		const maxStack = ShellConfig.toastMaxStack;
+		const maxStack = PersistentConfig.adapter.toastMaxStack;
 		if (maxStack <= 0)
 			return;
 		let queue = (root.toastQueue || []).slice();
@@ -60,7 +59,7 @@ Singleton {
 			queue.shift();
 		}
 		const now = Date.now();
-		const expiresAt = now + ShellConfig.toastDurationMs;
+		const expiresAt = now + PersistentConfig.adapter.toastDurationMs;
 		queue.push({
 			notification: notification,
 			createdAt: now
@@ -82,7 +81,7 @@ Singleton {
 
 	// Enforce notification history cap — dismiss oldest overflow entries
 	function _enforceHistoryCap(): void {
-		const maxHistory = ShellConfig.notificationMaxHistory;
+		const maxHistory = PersistentConfig.adapter.notificationMaxHistory;
 		if (maxHistory <= 0)
 			return;
 		let list = root.trackedList;
@@ -107,7 +106,7 @@ Singleton {
 			root._earliestExpiry = 0;
 			return;
 		}
-		const duration = ShellConfig.toastDurationMs;
+		const duration = PersistentConfig.adapter.toastDurationMs;
 		let earliest = Infinity;
 		for (const item of queue) {
 			const expiresAt = item.createdAt + duration;
@@ -148,7 +147,7 @@ Singleton {
 			root.trackedListChanged();
 			root._enforceHistoryCap();
 			root.newNotificationReceived(notification);
-			if (!ShellConfig.dndEnabled) {
+			if (!PersistentConfig.adapter.dndEnabled) {
 				root.addToast(notification);
 			}
 		}
@@ -176,7 +175,7 @@ Singleton {
 
 		onTriggered: {
 			const now = Date.now();
-			const duration = ShellConfig.toastDurationMs;
+			const duration = PersistentConfig.adapter.toastDurationMs;
 			const filtered = root.toastQueue.filter(item => (now - item.createdAt) < duration);
 			if (filtered.length !== root.toastQueue.length) {
 				root.toastQueue = filtered;
