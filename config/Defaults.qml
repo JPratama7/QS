@@ -50,6 +50,8 @@ QtObject {
 	})
 	// Time zone for clock display (empty string = system default)
 	readonly property string timeZone: ""
+	// Clock format — preset whitelisted in ShellConfig.timeFormat
+	readonly property string timeFormat: "hh:mm ddd"
 	// Bar defaults
 	readonly property int barHeight: 32
 	readonly property string barEdge: "top"
@@ -80,7 +82,6 @@ QtObject {
 	readonly property int triggerZoneHeight: 4
 	// Launcher defaults
 	readonly property int launcherWidth: 560
-	readonly property int launcherMaxResults: 8
 	// Vertical margin kept between the launcher and the screen edges
 	readonly property int launcherVerticalMargin: 100
 	// Max height of the results list before it scrolls
@@ -98,27 +99,6 @@ QtObject {
 	// Tray defaults
 	readonly property var trayHiddenIds: ([])
 	readonly property int trayMenuMaxHeight: 400
-	// Settings panel component dimensions
-	readonly property var settings: {
-		"components": {
-			"numberButton": {
-				"width": 30,
-				"height": 30
-			},
-			"numberDisplay": {
-				"width": 60,
-				"height": 30
-			},
-			"select": {
-				"width": 100,
-				"height": 30
-			},
-			"toggle": {
-				"width": 40,
-				"height": 20
-			}
-		}
-	}
 	// Bar widget layout defaults
 	readonly property var barWidgetLayout: {
 		"left": ["launcher", "workspaces", "activeWindow"],
