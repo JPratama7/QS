@@ -24,7 +24,7 @@ IpcHandler {
 
     // Toggle cliphist on primary screen
     function toggleCliphist(): void {
-        const screen = ShellConfig.primaryScreen
+        const screen = PersistentConfig.adapter.primaryScreen
             || (ScreenRegistry.enabledScreens.length > 0 ? ScreenRegistry.enabledScreens[0].name : "");
         Cliphist.toggle(screen);
     }
@@ -32,7 +32,7 @@ IpcHandler {
     // Open cliphist on specified screen (or primary if omitted)
     function openCliphist(screen: string): void {
         const targetScreen = screen
-            || ShellConfig.primaryScreen
+            || PersistentConfig.adapter.primaryScreen
             || (ScreenRegistry.enabledScreens.length > 0 ? ScreenRegistry.enabledScreens[0].name : "");
         Cliphist.open(targetScreen);
     }
