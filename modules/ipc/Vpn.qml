@@ -34,7 +34,7 @@ IpcHandler {
     // Resolve a screen name: explicit arg → primary → first enabled screen → "".
     function _resolveScreen(screen: string): string {
         return screen
-            || ShellConfig.primaryScreen
+            || PersistentConfig.adapter.primaryScreen
             || (ScreenRegistry.enabledScreens.length > 0 ? ScreenRegistry.enabledScreens[0].name : "");
     }
 

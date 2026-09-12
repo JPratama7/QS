@@ -15,7 +15,7 @@ Item {
 
     signal importRequested()
 
-    readonly property int maxMenuHeight: ShellConfig.trayMenuMaxHeight
+    readonly property int maxMenuHeight: PersistentConfig.adapter.trayMenuMaxHeight
     readonly property int contentHeight: pageColumn.implicitHeight + Theme.paddingNormal * 2
 
     implicitWidth: width
