@@ -62,13 +62,13 @@ Edit `config.json` in the shell directory:
 ```json
 {
   "primaryScreen": "",
+  "timeFormat": "hh:mm ddd",
   "barHeight": 32,
   "barDisplayMode": "visible",
   "barEdge": "top",
   "excludedScreens": [],
   "triggerZoneHeight": 4,
   "launcherWidth": 560,
-  "launcherMaxResults": 8,
   "popupEdgeMargin": 8,
   "toastPosition": "top-right",
   "toastMaxStack": 3,
@@ -108,8 +108,6 @@ Edit `config.json` in the shell directory:
 | --------------- | ---------------------------------------- |
 | `visible`       | Always visible, reserves screen space    |
 | `auto_hide`     | Hidden by default, appears on edge hover |
-| `hidden`        | Never visible                            |
-| `non_exclusive` | Visible but doesn't reserve space        |
 
 ### Excluding Screens
 

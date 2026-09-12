@@ -166,7 +166,7 @@ services/                    # Business logic services
 - Detects compositor type (Hyprland/Generic)
 - Loads appropriate backend dynamically
 - Normalized API:
-  - `focusedScreenName()`
+  - `focusedScreen` (property)
   - `workspacesForScreen(screenName)`
   - `activeWindowForScreen(screenName)`
   - `screenHasFullscreen(screenName)`
@@ -178,7 +178,7 @@ services/                    # Business logic services
 QtObject {
     readonly property string name: "hyprland" | "generic"
 
-    function focusedScreenName(): string
+    property string focusedScreen
     function workspacesForScreen(screenName: string): var
     function activeWindowForScreen(screenName: string): var
     function screenHasFullscreen(screenName: string): bool
@@ -206,8 +206,7 @@ QtObject {
 ```qml
 QtObject {
     id: provider
-    property string name: "applications"
-    property int priority: 100  // lower = higher priority
+    property string providerId: "applications"
 
     function search(query: string): var  // returns LauncherResult[]
     function activate(data: var): void
@@ -239,7 +238,6 @@ Widget.onClick
 IPC call / LauncherButton.onClick
   -> Launcher.open(screenName)
     -> ShellUI.openLauncher(screenName)
-      -> closeAllPopups()
       -> launcherOpened signal
         -> ScreenShellDelegate.Loader.active = true
           -> LauncherOverlayWindow instantiated
@@ -293,7 +291,6 @@ bind = SUPER, R, exec, qs ipc call shell toggleLauncher
   "excludedScreens": [],
   "triggerZoneHeight": 4,
   "launcherWidth": 560,
-  "launcherMaxResults": 8,
   "popupEdgeMargin": 8,
   "toastPosition": "top-right",
   "toastMaxStack": 3,
@@ -331,8 +328,6 @@ bind = SUPER, R, exec, qs ipc call shell toggleLauncher
 
 - `visible` - Always visible, reserves space
 - `auto_hide` - Hidden by default, appears on hover/edge trigger
-- `hidden` - Never visible
-- `non_exclusive` - Visible but doesn't reserve space
 
 ---
 
