@@ -14,7 +14,7 @@ Singleton {
 	property string activeScreenName: ""
 	property int delayMs: 500
 	property PopupWindow tooltipWindow: null
-	readonly property string _barEdge: ShellConfig.barEdge
+	readonly property string _barEdge: PersistentConfig.adapter.barEdge
 
 	function show(target: Item, tooltipComponent: Component, screenName: string, window: PanelWindow): void {
 		if (!target || !tooltipComponent)
@@ -156,6 +156,6 @@ Singleton {
 			root.hide();
 		}
 
-		target: ShellConfig
+		target: PersistentConfig.adapter
 	}
 }
