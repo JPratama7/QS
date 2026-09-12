@@ -5,59 +5,18 @@ import QtQuick
 QtObject {
 	id: config
 
-	// Bar configuration
-	readonly property int barHeight: PersistentConfig.adapter.barHeight
-	readonly property string barEdge: PersistentConfig.adapter.barEdge
-	readonly property string barDisplayMode: PersistentConfig.adapter.barDisplayMode
-	readonly property var bar: PersistentConfig.adapter.bar
-
-	// Theme palette — name of the active palette from Defaults.palettes
-	readonly property string themePalette: PersistentConfig.adapter.themePalette
 	// Resolved active palette object (falls back to deepMocha if name is invalid)
-	readonly property var activePalette: Defaults.palettes[themePalette] || Defaults.palettes["deepMocha"]
+	readonly property var activePalette: Defaults.palettes[PersistentConfig.adapter.themePalette] || Defaults.palettes["deepMocha"]
 
-	// Time zone for clock display ("local" = system default)
-	readonly property string timeZone: PersistentConfig.adapter.timeZone
-
-	// Auto-hide trigger configuration
-	readonly property int triggerZoneHeight: PersistentConfig.adapter.triggerZoneHeight
-
-	// Launcher configuration
-	readonly property int launcherWidth: PersistentConfig.adapter.launcherWidth
-	readonly property int launcherMaxResults: PersistentConfig.adapter.launcherMaxResults
-
-	// Popup configuration
-	readonly property int popupEdgeMargin: PersistentConfig.adapter.popupEdgeMargin
-
-	// Toast configuration
-	readonly property string toastPosition: PersistentConfig.adapter.toastPosition
-	readonly property int toastMaxStack: PersistentConfig.adapter.toastMaxStack
-	readonly property int toastDurationMs: PersistentConfig.adapter.toastDurationMs
-
-	// Notification history cap — 0 means unlimited
-	readonly property int notificationMaxHistory: PersistentConfig.adapter.notificationMaxHistory
-
-	// DnD configuration
-	readonly property bool dndEnabled: PersistentConfig.adapter.dndEnabled
-
-	// Primary screen name — used by ScreenContext.isPrimary
-	readonly property string primaryScreen: PersistentConfig.adapter.primaryScreen
-
-	// Screen exclusion list (regex patterns)
-	readonly property var excludedScreens: PersistentConfig.adapter.excludedScreens
-
-	// Tray configuration
-	readonly property var trayHiddenIds: PersistentConfig.adapter.trayHiddenIds
-	readonly property int trayMenuMaxHeight: PersistentConfig.adapter.trayMenuMaxHeight
-
-	// Bar widget layout configuration
-	readonly property var barWidgetLayout: PersistentConfig.adapter.barWidgetLayout
-	readonly property var barWidgetLayoutPerScreen: PersistentConfig.adapter.barWidgetLayoutPerScreen
+	// Clock format — whitelisted presets only, so TimeZone.formatTime can rely on them
+	readonly property string timeFormat: {
+		const fmt = PersistentConfig.adapter.timeFormat;
+		const presets = ["hh:mm", "hh:mm ddd", "hh:mm:ss", "hh:mm AP", "MMM d, hh:mm"];
+		return presets.indexOf(fmt) >= 0 ? fmt : "hh:mm ddd";
+	}
 
 	// Bar widget scale configuration
 	readonly property real barWidgetScale: (PersistentConfig.adapter.bar || {}).widgets?.scale || 1.0
-	readonly property var barWidgetScalePerScreen: PersistentConfig.adapter.barWidgetScalePerScreen
-
 	readonly property int barIconSize: (PersistentConfig.adapter.bar || {}).widgets?.iconSize || Defaults.bar.widgets.iconSize
 
 	function widgetScaleForScreen(screenName: string): real {

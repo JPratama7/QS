@@ -31,13 +31,13 @@ FileView {
 			primaryScreen: Defaults.primaryScreen,
 			themePalette: Defaults.themePalette,
 			timeZone: Defaults.timeZone,
+			timeFormat: Defaults.timeFormat,
 			barHeight: Defaults.barHeight,
 			barEdge: Defaults.barEdge,
 			barDisplayMode: Defaults.barDisplayMode,
 			bar: deepCopy(Defaults.bar),
 			triggerZoneHeight: Defaults.triggerZoneHeight,
 			launcherWidth: Defaults.launcherWidth,
-			launcherMaxResults: Defaults.launcherMaxResults,
 			popupEdgeMargin: Defaults.popupEdgeMargin,
 			toastPosition: Defaults.toastPosition,
 			toastMaxStack: Defaults.toastMaxStack,
@@ -50,8 +50,7 @@ FileView {
 			barWidgetLayoutPerScreen: deepCopy(Defaults.barWidgetLayoutPerScreen),
 			barWidgetScalePerScreen: {},
 			idleInhibitor: false,
-			dndEnabled: Defaults.dndEnabled,
-			settings: deepCopy(Defaults.settings)
+			dndEnabled: Defaults.dndEnabled
 		};
 	}
 
@@ -87,13 +86,13 @@ FileView {
 		adapterView.primaryScreen = merged.primaryScreen;
 		adapterView.themePalette = merged.themePalette;
 		adapterView.timeZone = merged.timeZone;
+		adapterView.timeFormat = merged.timeFormat;
 		adapterView.barHeight = merged.barHeight;
 		adapterView.barEdge = merged.barEdge;
 		adapterView.barDisplayMode = merged.barDisplayMode;
 		adapterView.bar = merged.bar;
 		adapterView.triggerZoneHeight = merged.triggerZoneHeight;
 		adapterView.launcherWidth = merged.launcherWidth;
-		adapterView.launcherMaxResults = merged.launcherMaxResults;
 		adapterView.popupEdgeMargin = merged.popupEdgeMargin;
 		adapterView.toastPosition = merged.toastPosition;
 		adapterView.toastMaxStack = merged.toastMaxStack;
@@ -107,7 +106,6 @@ FileView {
 		adapterView.barWidgetScalePerScreen = merged.barWidgetScalePerScreen;
 		adapterView.idleInhibitor = merged.idleInhibitor;
 		adapterView.dndEnabled = merged.dndEnabled;
-		adapterView.settings = merged.settings;
 	}
 
 	path: Quickshell.shellDir + "/config.json"
@@ -152,13 +150,13 @@ FileView {
 		property string primaryScreen: Defaults.primaryScreen
 		property string themePalette: Defaults.themePalette
 		property string timeZone: Defaults.timeZone
+		property string timeFormat: Defaults.timeFormat
 		property int barHeight: Defaults.barHeight
 		property string barEdge: Defaults.barEdge
 		property string barDisplayMode: Defaults.barDisplayMode
 		property var bar: Defaults.bar
 		property int triggerZoneHeight: Defaults.triggerZoneHeight
 		property int launcherWidth: Defaults.launcherWidth
-		property int launcherMaxResults: Defaults.launcherMaxResults
 		property int popupEdgeMargin: Defaults.popupEdgeMargin
 		property string toastPosition: Defaults.toastPosition
 		property int toastMaxStack: Defaults.toastMaxStack
@@ -172,6 +170,5 @@ FileView {
 		property var barWidgetScalePerScreen: ({})
 		property bool idleInhibitor: false
 		property bool dndEnabled: Defaults.dndEnabled
-		property var settings: Defaults.settings
 	}
 }
