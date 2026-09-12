@@ -7,8 +7,8 @@ QtObject {
 
     required property ShellScreen screen
     readonly property string name: screen.name
-    readonly property bool isPrimary: ShellConfig.primaryScreen === "" || ShellConfig.primaryScreen === screen.name
-    readonly property string barEdge: ShellConfig.barEdge
-    readonly property int barHeight: ShellConfig.barHeight
-    readonly property string barDisplayMode: ShellConfig.barDisplayMode
+    readonly property bool isPrimary: PersistentConfig.adapter.primaryScreen === "" || PersistentConfig.adapter.primaryScreen === screen.name
+    readonly property string barEdge: PersistentConfig.adapter.barEdge
+    readonly property int barHeight: PersistentConfig.adapter.barHeight
+    readonly property string barDisplayMode: PersistentConfig.adapter.barDisplayMode
 }
