@@ -14,21 +14,10 @@ CompositorBackend {
 		debounce.restart();
 	}
 	function _rebuild(): void {
-		const mode = backend.sortMode;
 		const items = ToplevelManager.toplevels.values.slice();
-
-		if (mode === CompositorBackend.ToplevelSort.None) {
-			// No sorting
-		} else if (mode === CompositorBackend.ToplevelSort.WorkspaceId) {
-			// Generic backend doesn't have workspace info, fall back to name sort
-			items.sort(function (a, b) {
-				return (a.title || "").localeCompare(b.title || "");
-			});
-		} else if (mode === CompositorBackend.ToplevelSort.Name) {
-			items.sort(function (a, b) {
-				return (a.title || "").localeCompare(b.title || "");
-			});
-		}
+		items.sort(function (a, b) {
+			return (a.title || "").localeCompare(b.title || "");
+		});
 		backend.toplevels = items;
 		_dirty = false;
 	}
@@ -47,6 +36,9 @@ CompositorBackend {
 	function switchWorkspace(screenName: string, workspaceId: int): void {
 		console.warn("GenericBackend: switchWorkspace not supported");
 	}
+	function logout(): void {
+		console.warn("GenericBackend: logout not supported");
+	}
 
 	backendId: "generic"
 	available: true
@@ -56,13 +48,6 @@ CompositorBackend {
 		backend._rebuild();
 	}
 
-	Connections {
-		function onSortModeChanged(): void {
-			backend._markDirty();
-		}
-
-		target: backend
-	}
 	Connections {
 		function onValuesChanged(): void {
 			backend._markDirty();

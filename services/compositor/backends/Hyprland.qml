@@ -24,31 +24,23 @@ CompositorBackend {
 		debounce.restart();
 	}
 	function _rebuild(): void {
-		const mode = backend.sortMode;
 		const items = ToplevelManager.toplevels.values.slice();
 
-		if (mode === CompositorBackend.ToplevelSort.None) {
-			backend.toplevels = items;
-		} else if (mode === CompositorBackend.ToplevelSort.WorkspaceId) {
-			const wsMap = new Map();
-			for (const ht of Hyprland.toplevels.values) {
-				wsMap.set(ht.title, ht);
-			}
-			items.sort(function (a, b) {
-				const wsA = wsMap.get(a.title);
-				const wsB = wsMap.get(b.title);
-				if (wsA && wsB && wsA.workspace && wsB.workspace) {
-					return wsA.workspace.id - wsB.workspace.id;
-				}
-				return (a.title || "").localeCompare(b.title || "");
-			});
-			backend.toplevels = items;
-		} else if (mode === CompositorBackend.ToplevelSort.Name) {
-			items.sort(function (a, b) {
-				return (a.title || "").localeCompare(b.title || "");
-			});
-			backend.toplevels = items;
+		// Workspace-grouped sort: windows ordered by their Hyprland workspace id,
+		// with title fallback for windows without workspace info.
+		const wsMap = new Map();
+		for (const ht of Hyprland.toplevels.values) {
+			wsMap.set(ht.title, ht);
 		}
+		items.sort(function (a, b) {
+			const wsA = wsMap.get(a.title);
+			const wsB = wsMap.get(b.title);
+			if (wsA && wsB && wsA.workspace && wsB.workspace) {
+				return wsA.workspace.id - wsB.workspace.id;
+			}
+			return (a.title || "").localeCompare(b.title || "");
+		});
+		backend.toplevels = items;
 		backend._rebuildWorkspaces();
 		_dirty = false;
 	}
@@ -126,6 +118,9 @@ CompositorBackend {
 		Hyprland.dispatch("focusmonitor " + screenName);
 		Hyprland.dispatch("workspace " + String(workspaceId));
 	}
+	function logout(): void {
+		Hyprland.dispatch("exit");
+	}
 
 	backendId: "hyprland"
 	focusedScreen: Hyprland.focusedMonitor?.name ?? ""
@@ -134,13 +129,6 @@ CompositorBackend {
 		backend._rebuild();
 	}
 
-	Connections {
-		function onSortModeChanged(): void {
-			backend._markDirty();
-		}
-
-		target: backend
-	}
 	Connections {
 		function onValuesChanged(): void {
 			backend._markDirty();
