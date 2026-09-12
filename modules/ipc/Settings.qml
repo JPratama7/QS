@@ -24,7 +24,7 @@ IpcHandler {
         if (ShellUI.isSettingsOpen()) {
             ShellUI.closeSettings();
         } else {
-            const screen = ShellConfig.primaryScreen
+            const screen = PersistentConfig.adapter.primaryScreen
                 || (ScreenRegistry.enabledScreens.length > 0 ? ScreenRegistry.enabledScreens[0].name : "");
             ShellUI.openSettings(screen);
         }
@@ -33,7 +33,7 @@ IpcHandler {
     // Open settings on specified screen (or primary if omitted)
     function openSettings(screen: string): void {
         const targetScreen = screen
-            || ShellConfig.primaryScreen
+            || PersistentConfig.adapter.primaryScreen
             || (ScreenRegistry.enabledScreens.length > 0 ? ScreenRegistry.enabledScreens[0].name : "");
         ShellUI.openSettings(targetScreen);
     }

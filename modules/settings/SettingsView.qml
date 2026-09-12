@@ -336,6 +336,15 @@ Rectangle {
 									PersistentConfig.adapterView.bar = newBar;
 								}
 							}
+							SettingDropdown {
+								text: "Time Format"
+								currentValue: PersistentConfig.adapterView.timeFormat
+								options: ["hh:mm ddd", "hh:mm", "hh:mm:ss", "hh:mm AP", "MMM d, hh:mm"]
+
+								onValueChanged: val => {
+									PersistentConfig.adapterView.timeFormat = val;
+								}
+							}
 							SettingNumber {
 								text: "Active Window Max Text Width"
 								currentValue: (PersistentConfig.adapterView.bar && PersistentConfig.adapterView.bar.widgets && PersistentConfig.adapterView.bar.widgets.activeWindow && PersistentConfig.adapterView.bar.widgets.activeWindow.maxTextWidth) !== undefined ? PersistentConfig.adapterView.bar.widgets.activeWindow.maxTextWidth : 200
