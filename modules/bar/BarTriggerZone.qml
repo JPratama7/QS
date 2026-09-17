@@ -22,7 +22,7 @@ ShellWindow {
 	anchors.bottom: context.barEdge === "bottom"
 	anchors.left: true
 	anchors.right: true
-	implicitHeight: ShellConfig.triggerZoneHeight
+	implicitHeight: PersistentConfig.adapter.triggerZoneHeight
 	color: "transparent"
 
 	// Only active when auto-hide is enabled and bar is hidden

@@ -18,12 +18,9 @@ Singleton {
 	// Temperature in Celsius
 	property real temperature: 0
 
-	// Raw values
-	property int ramUsedMB: 0
-	property int ramTotalMB: 0
+	// Raw values (GB — the auto-detect threshold for MB was true on every machine since ~2000)
 	property real ramUsedGB: 0
 	property real ramTotalGB: 0
-	property bool useGB: false  // Auto-detected based on total RAM
 
 	// Private state for CPU calculation
 	property var _prevCpuStats: null
@@ -45,13 +42,9 @@ Singleton {
 
 		if (memTotal > 0) {
 			const used = memTotal - memAvailable;
-			service.ramTotalMB = Math.round(memTotal / 1024);
-			service.ramUsedMB = Math.round(used / 1024);
 			service.ramTotalGB = Math.round((memTotal / 1024 / 1024) * 10) / 10;
 			service.ramUsedGB = Math.round((used / 1024 / 1024) * 10) / 10;
 			service.ramUsage = used / memTotal;
-			// Use GB if total RAM >= 1GB (1024 MB)
-			service.useGB = service.ramTotalMB >= 1024;
 		}
 	}
 	function parseCpuStat(text: string): void {

@@ -5,6 +5,8 @@ import Quickshell
 import Quickshell.Wayland
 import "../../config"
 import "../../services/launcher"
+import "../../services/system"
+import "../search"
 
 PanelWindow {
 	id: overlay
@@ -46,10 +48,77 @@ PanelWindow {
 	}
 
 	// Centered launcher view
-	LauncherView {
+	SearchView {
 		id: launcherView
 		anchors.centerIn: parent
 		width: Defaults.launcherWidth
 		height: Math.min(implicitHeight, parent.height - Defaults.launcherVerticalMargin)
+		searchService: Launcher
+		resultDelegate: launcherResultDelegate
+		placeholderText: "Search applications..."
+		resultsHeight: Defaults.launcherResultsHeight
+		emptyQueryHint: "Start typing to search"
+		reserveEmptySpace: true
+	}
+
+	Component {
+		id: launcherResultDelegate
+
+		Rectangle {
+			id: resultRow
+
+			required property var modelData
+			required property int index
+
+			width: parent.width
+			height: rowContent.implicitHeight + Theme.paddingSmall * 2
+			radius: Theme.radiusSmall
+			color: "transparent"
+
+			Row {
+				id: rowContent
+
+				spacing: Theme.spacingSmall
+
+				anchors {
+					verticalCenter: parent.verticalCenter
+					left: parent.left
+					leftMargin: Theme.paddingSmall
+				}
+				Image {
+					width: Theme.iconSizeSmall
+					height: Theme.iconSizeSmall
+					fillMode: Image.PreserveAspectFit
+					sourceSize.width: Theme.iconSizeSmall
+					sourceSize.height: Theme.iconSizeSmall
+					source: AppIcons.iconFromName(resultRow.modelData.icon)
+				}
+				Column {
+					anchors.verticalCenter: parent.verticalCenter
+					spacing: 2
+
+					Text {
+						text: resultRow.modelData.title
+						color: Theme.foregroundColor
+						font.pixelSize: Theme.fontSizeSmall
+						font.family: Theme.fontFamily
+					}
+					Text {
+						text: resultRow.modelData.subtitle
+						color: Theme.mutedColor
+						font.pixelSize: Theme.fontSizeSmall - 1
+						font.family: Theme.fontFamily
+						visible: text !== ""
+					}
+				}
+			}
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+
+				onEntered: Launcher.selectedIndex = resultRow.index
+				onClicked: Launcher.activateSelected()
+			}
+		}
 	}
 }

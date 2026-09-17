@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 
-import Quickshell.Widgets
 import "../../../components/bar"
 import "../../../config"
 import "../../../services/compositor"
@@ -49,7 +48,7 @@ BaseWidget {
 			widget.applyActiveWindowConfig();
 		}
 
-		target: ShellConfig
+		target: PersistentConfig.adapter
 	}
 	Row {
 		id: row

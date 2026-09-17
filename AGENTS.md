@@ -197,7 +197,6 @@ Available properties: `name`, `model`, `serialNumber`, `x`, `y`, `width`, `heigh
 2. Implement `search(query: string): var` returning `LauncherResult[]`
 3. Implement `activate(data: var): void`
 4. Self-register in `Component.onCompleted`: `LauncherProviderRegistry.register(provider)`
-5. Set `priority` property (lower = higher priority in results)
 
 ---
 
@@ -415,7 +414,7 @@ delegate: Text {
 1. **Add Debug Output**: Insert temporary Text elements to show data counts and states
 2. **Simplify First**: Replace complex delegates with simple Text items to verify data flow
 3. **Check Property Initialization**: Ensure `var` properties with array literals use the disambiguated form `property var foo: ([])`, or initialize in `Component.onCompleted` if the platform requires it.
-4. **Verify Data Sources**: Confirm the data source (e.g., `trackedList` vs `trackedNotifications`) works correctly
+4. **Verify Data Sources**: Confirm the data source (e.g., `trackedList`) works correctly
 5. **Test Incrementally**: Start with basic functionality, then add complexity
 
 ### Key QML Timing Insights

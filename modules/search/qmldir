@@ -1,0 +1,4 @@
+module search
+SearchField SearchField.qml
+SearchResultsList SearchResultsList.qml
+SearchView SearchView.qml

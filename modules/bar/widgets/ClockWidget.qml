@@ -28,7 +28,7 @@ BaseWidget {
 	SystemClock {
 		id: systemClock
 
-		precision: SystemClock.Minutes
+		precision: SystemClock.Seconds
 	}
 
 	Rectangle {
@@ -41,7 +41,7 @@ BaseWidget {
 		id: textItem
 
 		anchors.centerIn: parent
-		text: TimeZone.formatTime(systemClock.date, "hh:mm ddd", ShellConfig.timeZone)
+		text: TimeZone.formatTime(systemClock.date, ShellConfig.timeFormat, PersistentConfig.adapter.timeZone)
 		color: Theme.foregroundColor
 		font.pixelSize: Theme.fontSizeNormal
 		font.family: Theme.fontFamilyMono

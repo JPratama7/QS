@@ -10,7 +10,6 @@ Singleton {
 	id: root
 
 	property var allTimezones: ([])
-	property bool _loaded: false
 	property string _buffer: ""
 	property string systemTimezone: ""
 	property string _lastSetTimezone: ""
@@ -29,32 +28,69 @@ Singleton {
 		setTzProcess.running = true;
 	}
 	function formatTime(dateTime, formatHint, timeZone) {
+		// Without a configured timezone the system zone applies — Qt's formatter handles it.
+		// Note: this QML engine has no Intl, so the timezone-aware path below is guarded.
 		if (!timeZone || typeof Intl === 'undefined') {
 			return Qt.formatDateTime(dateTime, formatHint);
 		}
+		const jsDate = new Date(dateTime.valueOf());
 		try {
-			const jsDate = new Date(dateTime.valueOf());
-			if (formatHint === "hh:mm ddd") {
-				const time = jsDate.toLocaleString('sv-SE', {
+			// sv-SE gives zero-padded 24h "HH:mm"; weekday/AM-PM markers come from
+			// en-US so the output reads consistently regardless of the system locale.
+			switch (formatHint) {
+			case "hh:mm":
+				return jsDate.toLocaleString('sv-SE', {
 					timeZone: timeZone,
 					hour: '2-digit',
 					minute: '2-digit',
 					hour12: false
 				});
-				const weekday = jsDate.toLocaleString('en-US', {
+			case "hh:mm ddd":
+				return jsDate.toLocaleString('sv-SE', {
+					timeZone: timeZone,
+					hour: '2-digit',
+					minute: '2-digit',
+					hour12: false
+				}) + " " + jsDate.toLocaleString('en-US', {
 					timeZone: timeZone,
 					weekday: 'short'
 				});
-				return time + " " + weekday;
+			case "hh:mm:ss":
+				return jsDate.toLocaleString('sv-SE', {
+					timeZone: timeZone,
+					hour: '2-digit',
+					minute: '2-digit',
+					second: '2-digit',
+					hour12: false
+				});
+			case "hh:mm AP":
+				return jsDate.toLocaleString('en-US', {
+					timeZone: timeZone,
+					hour: '2-digit',
+					minute: '2-digit',
+					hour12: true
+				});
+			case "MMM d, hh:mm":
+				return jsDate.toLocaleString('en-US', {
+					timeZone: timeZone,
+					month: 'short',
+					day: 'numeric'
+				}) + ", " + jsDate.toLocaleString('sv-SE', {
+					timeZone: timeZone,
+					hour: '2-digit',
+					minute: '2-digit',
+					hour12: false
+				});
+			default:
+				return Qt.formatDateTime(dateTime, formatHint);
 			}
-			return Qt.formatDateTime(dateTime, formatHint);
 		} catch (e) {
 			return Qt.formatDateTime(dateTime, formatHint);
 		}
 	}
 	function getToday(timeZone) {
+		const now = new Date();
 		if (!timeZone || typeof Intl === 'undefined') {
-			const now = new Date();
 			return {
 				year: now.getFullYear(),
 				month: now.getMonth(),
@@ -62,50 +98,22 @@ Singleton {
 			};
 		}
 		try {
-			const now = new Date();
-			const formatter = new Intl.DateTimeFormat('en-US', {
+			const parts = new Intl.DateTimeFormat('en-US', {
 				timeZone: timeZone,
 				year: 'numeric',
 				month: 'numeric',
 				day: 'numeric'
-			});
-			if (formatter.formatToParts) {
-				const parts = formatter.formatToParts(now);
-				const year = parseInt(parts.find(p => p.type === 'year').value);
-				const month = parseInt(parts.find(p => p.type === 'month').value) - 1;
-				const day = parseInt(parts.find(p => p.type === 'day').value);
-				return {
-					year: year,
-					month: month,
-					day: day
-				};
-			}
-			const str = now.toLocaleString('sv-SE', {
-				timeZone: timeZone,
-				year: 'numeric',
-				month: 'numeric',
-				day: 'numeric'
-			});
-			const parts = str.split(/[-/]/);
-			if (parts.length === 3) {
-				return {
-					year: parseInt(parts[0]),
-					month: parseInt(parts[1]) - 1,
-					day: parseInt(parts[2])
-				};
-			}
-			const fallback = new Date();
+			}).formatToParts(now);
 			return {
-				year: fallback.getFullYear(),
-				month: fallback.getMonth(),
-				day: fallback.getDate()
+				year: parseInt(parts.find(p => p.type === 'year').value),
+				month: parseInt(parts.find(p => p.type === 'month').value) - 1,
+				day: parseInt(parts.find(p => p.type === 'day').value)
 			};
 		} catch (e) {
-			const fallback = new Date();
 			return {
-				year: fallback.getFullYear(),
-				month: fallback.getMonth(),
-				day: fallback.getDate()
+				year: now.getFullYear(),
+				month: now.getMonth(),
+				day: now.getDate()
 			};
 		}
 	}
@@ -142,7 +150,6 @@ Singleton {
 					console.error("TimeZone: timedatectl list-timezones returned no data");
 				}
 				root._buffer = "";
-				root._loaded = true;
 			}
 		}
 	}

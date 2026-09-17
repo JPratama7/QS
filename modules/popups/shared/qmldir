@@ -1,4 +1,6 @@
 module popups.shared
+BackHeader BackHeader.qml
 ConfirmActionDialog ConfirmActionDialog.qml
+MenuHost MenuHost.qml
 PopupMenuWindow PopupMenuWindow.qml
 PopupHosts PopupHosts.qml

@@ -69,11 +69,6 @@ Item {
         Repeater {
             model: [
                 {
-                    action: "lock",
-                    label: "\uD83D\uDD12  Lock",
-                    destructive: false
-                },
-                {
                     action: "suspend",
                     label: "\uD83D\uDCA4  Suspend",
                     destructive: false

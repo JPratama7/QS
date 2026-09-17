@@ -27,7 +27,7 @@ IpcHandler {
         if (ShellUI.isEmojiOpen()) {
             Emoji.close();
         } else {
-            const screen = ShellConfig.primaryScreen
+            const screen = PersistentConfig.adapter.primaryScreen
                 || (ScreenRegistry.enabledScreens.length > 0 ? ScreenRegistry.enabledScreens[0].name : "");
             Emoji.open(screen);
         }
@@ -36,7 +36,7 @@ IpcHandler {
     // Open emoji picker on specified screen (or primary if omitted)
     function openEmoji(screen: string): void {
         const targetScreen = screen
-            || ShellConfig.primaryScreen
+            || PersistentConfig.adapter.primaryScreen
             || (ScreenRegistry.enabledScreens.length > 0 ? ScreenRegistry.enabledScreens[0].name : "");
         Emoji.open(targetScreen);
     }

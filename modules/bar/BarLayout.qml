@@ -189,6 +189,39 @@ Item {
 		}
 	}
 
+	// One widget slot inside a zone — async Loader plus tooltip hover handling.
+	// Shared by all three zone Repeaters; ids are per-instantiation so the
+	// left/center/right id-prefix hazard disappears.
+	Component {
+		id: zoneWidgetComponent
+
+		Item {
+			required property string modelData
+
+			width: zoneLoader.implicitWidth
+			height: parent.height
+			anchors.verticalCenter: parent.verticalCenter
+
+			Loader {
+				id: zoneLoader
+
+				asynchronous: true
+				sourceComponent: barLayout.widgetComponentForId(parent.modelData)
+				anchors.verticalCenter: parent.verticalCenter
+			}
+			HoverHandler {
+				id: zoneHoverHandler
+
+				onHoveredChanged: {
+					if (hovered && zoneLoader.item)
+						barLayout.showTooltip(zoneLoader.item);
+					else
+						barLayout.hideTooltip();
+				}
+			}
+		}
+	}
+
 	// Left zone
 	Row {
 		id: leftZone
@@ -201,31 +234,7 @@ Item {
 		Repeater {
 			model: barLayout.widgetLayoutForZone("left")
 
-			Item {
-				required property string modelData
-
-				width: leftWidgetLoader.implicitWidth
-				height: parent.height
-				anchors.verticalCenter: parent.verticalCenter
-
-				Loader {
-					id: leftWidgetLoader
-
-					asynchronous: true
-					sourceComponent: barLayout.widgetComponentForId(parent.modelData)
-					anchors.verticalCenter: parent.verticalCenter
-				}
-				HoverHandler {
-					id: leftHoverHandler
-
-					onHoveredChanged: {
-						if (hovered && leftWidgetLoader.item)
-							barLayout.showTooltip(leftWidgetLoader.item);
-						else
-							barLayout.hideTooltip();
-					}
-				}
-			}
+			delegate: zoneWidgetComponent
 		}
 	}
 
@@ -241,31 +250,7 @@ Item {
 		Repeater {
 			model: barLayout.widgetLayoutForZone("center")
 
-			Item {
-				required property string modelData
-
-				width: centerWidgetLoader.implicitWidth
-				height: parent.height
-				anchors.verticalCenter: parent.verticalCenter
-
-				Loader {
-					id: centerWidgetLoader
-
-					asynchronous: true
-					sourceComponent: barLayout.widgetComponentForId(parent.modelData)
-					anchors.verticalCenter: parent.verticalCenter
-				}
-				HoverHandler {
-					id: centerHoverHandler
-
-					onHoveredChanged: {
-						if (hovered && centerWidgetLoader.item)
-							barLayout.showTooltip(centerWidgetLoader.item);
-						else
-							barLayout.hideTooltip();
-					}
-				}
-			}
+			delegate: zoneWidgetComponent
 		}
 	}
 
@@ -281,31 +266,7 @@ Item {
 		Repeater {
 			model: barLayout.widgetLayoutForZone("right")
 
-			Item {
-				required property string modelData
-
-				width: rightWidgetLoader.implicitWidth
-				height: parent.height
-				anchors.verticalCenter: parent.verticalCenter
-
-				Loader {
-					id: rightWidgetLoader
-
-					asynchronous: true
-					sourceComponent: barLayout.widgetComponentForId(parent.modelData)
-					anchors.verticalCenter: parent.verticalCenter
-				}
-				HoverHandler {
-					id: rightHoverHandler
-
-					onHoveredChanged: {
-						if (hovered && rightWidgetLoader.item)
-							barLayout.showTooltip(rightWidgetLoader.item);
-						else
-							barLayout.hideTooltip();
-					}
-				}
-			}
+			delegate: zoneWidgetComponent
 		}
 	}
 }

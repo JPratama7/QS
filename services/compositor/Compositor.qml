@@ -5,7 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
-import "../../types/compositor"
+import "../../types"
 
 Singleton {
 	id: service
@@ -40,9 +40,9 @@ Singleton {
 		if (backend)
 			backend.switchWorkspace(screenName, workspaceId);
 	}
-	function setToplevelSortMode(mode: int): void {
+	function logout(): void {
 		if (backend)
-			backend.sortMode = mode;
+			backend.logout();
 	}
 
 	Component.onCompleted: {

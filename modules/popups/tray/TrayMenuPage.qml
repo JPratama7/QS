@@ -3,9 +3,9 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import Quickshell
-import "../../../components"
 import "../../../config"
 import "../../../services/ui"
+import "../shared"
 import "."
 
 Item {
@@ -14,9 +14,8 @@ Item {
 	required property string screenName
 	required property var menuHandle
 	required property StackView stackView
-	readonly property bool isSubmenu: page.stackView.depth > 1
-	readonly property int maxMenuHeight: ShellConfig.trayMenuMaxHeight
-	readonly property int headerHeight: isSubmenu ? backButton.height + Theme.spacingSmall : 0
+	readonly property int maxMenuHeight: PersistentConfig.adapter.trayMenuMaxHeight
+	readonly property int headerHeight: backHeader.headerHeight
 	readonly property int contentHeight: pageColumn.implicitHeight + Theme.paddingNormal * 2
 	readonly property int totalHeight: headerHeight + contentHeight
 
@@ -29,55 +28,11 @@ Item {
 		menu: page.menuHandle
 	}
 
-	// Back button — only shown for submenu pages
-	Rectangle {
-		id: backButton
+	BackHeader {
+		id: backHeader
 
-		visible: page.isSubmenu
-		height: visible ? backRow.implicitHeight + Theme.paddingSmall * 2 : 0
-		radius: Theme.radiusSmall
-		color: backArea.containsMouse ? Qt.alpha(Theme.accentColor, 0.15) : "transparent"
-
-		anchors {
-			top: parent.top
-			left: parent.left
-			right: parent.right
-			topMargin: Theme.paddingNormal
-			leftMargin: Theme.paddingNormal
-			rightMargin: Theme.paddingNormal
-		}
-		Row {
-			id: backRow
-
-			spacing: Theme.spacingSmall
-
-			anchors {
-				verticalCenter: parent.verticalCenter
-				left: parent.left
-				leftMargin: Theme.paddingSmall
-			}
-			SvgIcon {
-				source: "icons/outline/chevron-left.svg"
-				color: Theme.accentColor
-				iconSize: Theme.fontSizeSmall
-				anchors.verticalCenter: parent.verticalCenter
-			}
-			Text {
-				text: "Back"
-				color: Theme.accentColor
-				font.pixelSize: Theme.fontSizeSmall
-				font.family: Theme.fontFamily
-				anchors.verticalCenter: parent.verticalCenter
-			}
-		}
-		MouseArea {
-			id: backArea
-
-			anchors.fill: parent
-			hoverEnabled: true
-
-			onClicked: page.stackView.pop()
-		}
+		stackView: page.stackView
+		showWhenSubmenu: true
 	}
 	ScrollView {
 		contentHeight: pageColumn.implicitHeight + Theme.paddingNormal
@@ -86,11 +41,11 @@ Item {
 		ScrollBar.vertical.policy: ScrollBar.AsNeeded
 
 		anchors {
-			top: page.isSubmenu ? backButton.bottom : parent.top
+			top: backHeader.bottom
 			left: parent.left
 			right: parent.right
 			bottom: parent.bottom
-			topMargin: page.isSubmenu ? Theme.spacingSmall : Theme.paddingNormal
+			topMargin: backHeader.visible ? Theme.spacingSmall : Theme.paddingNormal
 		}
 		Column {
 			id: pageColumn

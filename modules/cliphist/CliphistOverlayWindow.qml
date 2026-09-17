@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Wayland
 import "../../config"
 import "../../services/system"
+import "../search"
 
 PanelWindow {
     id: overlay
@@ -93,11 +94,14 @@ PanelWindow {
     }
 
     // Centered cliphist view
-    CliphistView {
+    SearchView {
         id: cliphistView
         anchors.centerIn: parent
         width: 500
         height: Math.min(implicitHeight, parent.height - 100)
+        searchService: Cliphist
+        resultDelegate: cliphistResultDelegate
+        placeholderText: "Search clipboard..."
 
         // Open: opacity 0->1, scale 0.96->1.0. Close reverses via `shown`.
         opacity: overlay.shown ? 1 : 0
@@ -114,6 +118,53 @@ PanelWindow {
             NumberAnimation {
                 duration: 220
                 easing.type: Easing.OutCubic
+            }
+        }
+    }
+
+    Component {
+        id: cliphistResultDelegate
+
+        Rectangle {
+            id: resultRow
+            required property string modelData
+            required property int index
+
+            width: parent.width
+            height: entryText.implicitHeight + Theme.paddingSmall * 2
+            radius: Theme.radiusSmall
+            color: resultRow.index === Cliphist.selectedIndex
+                ? Qt.alpha(Theme.accentColor, 0.15)
+                : "transparent"
+
+            Text {
+                id: entryText
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    right: parent.right
+                    margins: Theme.paddingSmall
+                }
+                // Strip the cliphist ID prefix (e.g. "1234\tActual content") for display
+                text: {
+                    const tab = resultRow.modelData.indexOf("\t");
+                    return tab >= 0 ? resultRow.modelData.substring(tab + 1) : resultRow.modelData;
+                }
+                color: Theme.foregroundColor
+                font.pixelSize: Theme.fontSizeSmall
+                font.family: Theme.fontFamily
+                elide: Text.ElideRight
+                maximumLineCount: 1
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                onEntered: Cliphist.selectedIndex = resultRow.index
+                onClicked: {
+                    Cliphist.selectedIndex = resultRow.index;
+                    Cliphist.activateSelected();
+                }
             }
         }
     }

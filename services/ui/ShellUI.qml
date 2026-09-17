@@ -7,7 +7,7 @@ import Quickshell
 Singleton {
 	id: root
 
-	// Tracks which screens have an open popup — used only by closeAllPopups()
+	// Tracks which screens have an open popup — read by openPopup/closePopup/isPopupOpen/onScreensChanged
 	property var _openScreens: ({})
 
 	// Launcher open state (screen name of the screen showing the launcher, or "")
@@ -24,10 +24,6 @@ Singleton {
 
 	// Track known screens for removal detection
 	property var _knownScreenNames: ([])
-	readonly property string launcherScreen: _launcherScreen
-	readonly property string cliphistScreen: _cliphistScreen
-	readonly property string settingsScreen: _settingsScreen
-	readonly property string emojiScreen: _emojiScreen
 
 	// Emitted when a widget requests a popup — carries the component to render and anchor X
 	signal popupRequested(screenName: string, popupId: string, component: var, anchorX: int)
@@ -83,37 +79,43 @@ Singleton {
 		return root._openScreens[screenName] === popupId;
 	}
 
-	// Close all open popups across all screens
-	function closeAllPopups(): void {
-		const keys = Object.keys(root._openScreens);
-		if (keys.length === 0)
+	// Shared opener for the four overlays. Overlays are mutually exclusive:
+	// opening one closes the other three, plus this kind if it was open on
+	// another screen. Preserves the original close-guard asymmetry —
+	// launcher/cliphist close unconditionally, settings/emoji only when open.
+	function _openOverlay(kind: string, screenName: string): void {
+		if (root["_" + kind + "Screen"] === screenName) {
 			return;
-		for (const key of keys) {
-			delete root._openScreens[key];
-			root.popupClosed(key);
 		}
+		if (kind !== "launcher" && root._launcherScreen !== "") {
+			root.closeLauncher();
+		}
+		if (kind !== "cliphist" && root._cliphistScreen !== "") {
+			root.closeCliphist();
+		}
+		if (kind !== "settings" && root._settingsScreen !== "") {
+			root.closeSettings();
+		}
+		if (kind !== "emoji" && root._emojiScreen !== "") {
+			root.closeEmoji();
+		}
+		const closeSelf = kind === "launcher" ? root.closeLauncher
+			: kind === "cliphist" ? root.closeCliphist
+			: kind === "settings" ? root.closeSettings
+			: root.closeEmoji;
+		if (root["_" + kind + "Screen"] !== "") {
+			closeSelf();
+		}
+		root["_" + kind + "Screen"] = screenName;
+		(kind === "launcher" ? root.launcherOpened
+			: kind === "cliphist" ? root.cliphistOpened
+			: kind === "settings" ? root.settingsOpened
+			: root.emojiOpened)(screenName);
 	}
 
 	// Launcher open/close
 	function openLauncher(screenName: string): void {
-		if (root._launcherScreen === screenName) {
-			return;
-		}
-		if (root._settingsScreen !== "") {
-			root.closeSettings();
-		}
-		if (root._launcherScreen !== "") {
-			root.closeLauncher();
-		}
-		if (root._cliphistScreen !== "") {
-			root.closeCliphist();
-		}
-		if (root._emojiScreen !== "") {
-			root.closeEmoji();
-		}
-
-		root._launcherScreen = screenName;
-		root.launcherOpened(screenName);
+		root._openOverlay("launcher", screenName);
 	}
 	function closeLauncher(): void {
 		root._launcherScreen = "";
@@ -125,24 +127,7 @@ Singleton {
 
 	// Cliphist open/close
 	function openCliphist(screenName: string): void {
-		if (root._cliphistScreen === screenName) {
-			return;
-		}
-		if (root._settingsScreen !== "") {
-			root.closeSettings();
-		}
-		if (root._cliphistScreen !== "") {
-			root.closeCliphist();
-		}
-		if (root._launcherScreen !== "") {
-			root.closeLauncher();
-		}
-		if (root._emojiScreen !== "") {
-			root.closeEmoji();
-		}
-
-		root._cliphistScreen = screenName;
-		root.cliphistOpened(screenName);
+		root._openOverlay("cliphist", screenName);
 	}
 	function closeCliphist(): void {
 		root._cliphistScreen = "";
@@ -154,24 +139,7 @@ Singleton {
 
 	// Settings open/close
 	function openSettings(screenName: string): void {
-		if (root._settingsScreen === screenName) {
-			return;
-		}
-		if (root._settingsScreen !== "") {
-			root.closeSettings();
-		}
-		if (root._launcherScreen !== "") {
-			root.closeLauncher();
-		}
-		if (root._cliphistScreen !== "") {
-			root.closeCliphist();
-		}
-		if (root._emojiScreen !== "") {
-			root.closeEmoji();
-		}
-
-		root._settingsScreen = screenName;
-		root.settingsOpened(screenName);
+		root._openOverlay("settings", screenName);
 	}
 	function closeSettings(): void {
 		if (root._settingsScreen !== "") {
@@ -185,24 +153,7 @@ Singleton {
 
 	// Emoji picker open/close
 	function openEmoji(screenName: string): void {
-		if (root._emojiScreen === screenName) {
-			return;
-		}
-		if (root._settingsScreen !== "") {
-			root.closeSettings();
-		}
-		if (root._emojiScreen !== "") {
-			root.closeEmoji();
-		}
-		if (root._launcherScreen !== "") {
-			root.closeLauncher();
-		}
-		if (root._cliphistScreen !== "") {
-			root.closeCliphist();
-		}
-
-		root._emojiScreen = screenName;
-		root.emojiOpened(screenName);
+		root._openOverlay("emoji", screenName);
 	}
 	function closeEmoji(): void {
 		if (root._emojiScreen !== "") {

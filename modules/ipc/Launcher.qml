@@ -27,7 +27,7 @@ IpcHandler {
         if (ShellUI.isLauncherOpen()) {
             Launcher.close();
         } else {
-            const screen = ShellConfig.primaryScreen
+            const screen = PersistentConfig.adapter.primaryScreen
                 || (ScreenRegistry.enabledScreens.length > 0 ? ScreenRegistry.enabledScreens[0].name : "");
             Launcher.open(screen);
         }
@@ -36,7 +36,7 @@ IpcHandler {
     // Open launcher on specified screen (or primary if omitted)
     function openLauncher(screen: string): void {
         const targetScreen = screen
-            || ShellConfig.primaryScreen
+            || PersistentConfig.adapter.primaryScreen
             || (ScreenRegistry.enabledScreens.length > 0 ? ScreenRegistry.enabledScreens[0].name : "");
         Launcher.open(targetScreen);
     }

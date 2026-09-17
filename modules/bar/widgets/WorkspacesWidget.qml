@@ -20,7 +20,6 @@ BaseWidget {
 
 	readonly property var workspaces: Compositor.workspacesForScreen(screenName)
 	readonly property int activeWorkspaceId: Compositor.activeWorkspaceIdForScreen(screenName)
-	property var workspacesConfig: ({})
 	property bool showText: Defaults.bar.widgets.workspaces.showText
 
 	// Dot-mode geometry — inactive dots are small, active expands to a pill
@@ -31,7 +30,6 @@ BaseWidget {
 	function applyWorkspacesConfig(): void {
 		const widgetsConfig = ShellConfig.barWidgetsConfig()
 		const nextWorkspacesConfig = widgetsConfig.workspaces || {}
-		workspacesConfig = nextWorkspacesConfig
 		showText = typeof nextWorkspacesConfig.showText === "boolean"
 			? nextWorkspacesConfig.showText
 			: Defaults.bar.widgets.workspaces.showText
@@ -40,7 +38,7 @@ BaseWidget {
 	Component.onCompleted: applyWorkspacesConfig()
 
 	Connections {
-		target: ShellConfig
+		target: PersistentConfig.adapter
 		function onBarChanged(): void {
 			widget.applyWorkspacesConfig()
 		}

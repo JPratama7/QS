@@ -41,7 +41,7 @@ Singleton {
 		const states = {};
 		for (const screen of Quickshell.screens) {
 			states[screen.name] = screenStateComponent.createObject(service, {
-				displayMode: ShellConfig.barDisplayMode
+				displayMode: PersistentConfig.adapter.barDisplayMode
 			});
 		}
 		screenStates = states;
@@ -88,13 +88,6 @@ Singleton {
 			return;
 		}
 		state.forceVisible = value;
-	}
-	function setFullscreen(screenName: string, value: bool): void {
-		const state = screenStates[screenName];
-		if (!state) {
-			return;
-		}
-		state.fullscreen = value;
 	}
 	function scheduleHide(screenName: string): void {
 		destroyTimer(screenName);
@@ -152,7 +145,7 @@ Singleton {
 			const states = {};
 			for (const screen of Quickshell.screens) {
 				states[screen.name] = service.screenStates[screen.name] || screenStateComponent.createObject(service, {
-					displayMode: ShellConfig.barDisplayMode
+					displayMode: PersistentConfig.adapter.barDisplayMode
 				});
 			}
 			service.screenStates = states;
@@ -175,10 +168,10 @@ Singleton {
 	Connections {
 		function onBarDisplayModeChanged(): void {
 			for (const screenName in service.screenStates) {
-				service.screenStates[screenName].displayMode = ShellConfig.barDisplayMode;
+				service.screenStates[screenName].displayMode = PersistentConfig.adapter.barDisplayMode;
 			}
 		}
 
-		target: ShellConfig
+		target: PersistentConfig.adapter
 	}
 }

@@ -2,10 +2,15 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import "../../config"
-import "../../services/launcher"
 
+// Shared search input for the picker overlays. Binds two-way to the picker
+// service's query property; placeholder text is per-picker.
 Rectangle {
-	id: field
+	id: root
+
+	// Picker service — must expose a `query` string property
+	required property var searchService
+	property string placeholderText: ""
 
 	implicitHeight: searchInput.implicitHeight + Theme.paddingSmall * 2
 	radius: Theme.radiusSmall
@@ -16,7 +21,6 @@ Rectangle {
 	function clear(): void {
 		searchInput.text = "";
 	}
-
 	function focusInput(): void {
 		searchInput.forceActiveFocus();
 	}
@@ -29,13 +33,13 @@ Rectangle {
 			right: parent.right
 			margins: Theme.paddingSmall
 		}
-		text: Launcher.query
+		text: root.searchService.query
 		color: Theme.foregroundColor
 		font.pixelSize: Theme.fontSizeNormal
 		font.family: Theme.fontFamily
 
 		onTextChanged: {
-			Launcher.query = text;
+			root.searchService.query = text;
 		}
 	}
 
@@ -46,7 +50,7 @@ Rectangle {
 			left: parent.left
 			leftMargin: Theme.paddingSmall
 		}
-		text: "Search applications..."
+		text: root.placeholderText
 		color: Theme.mutedColor
 		font.pixelSize: Theme.fontSizeNormal
 		font.family: Theme.fontFamily

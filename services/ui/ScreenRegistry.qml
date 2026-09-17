@@ -10,7 +10,7 @@ Singleton {
 	id: registry
 
 	readonly property list<ShellScreen> enabledScreens: {
-		const excluded = ShellConfig.excludedScreens;
+		const excluded = PersistentConfig.adapter.excludedScreens;
 		if (excluded.length === 0)
 			return Quickshell.screens;
 		return Quickshell.screens.filter(s => !isExcluded(s.name));
@@ -38,7 +38,7 @@ Singleton {
 		}
 	}
 	function isExcluded(screenName: string): bool {
-		const patterns = ShellConfig.excludedScreens;
+		const patterns = PersistentConfig.adapter.excludedScreens;
 		for (const pattern of patterns) {
 			if (screenName.match(pattern))
 				return true;

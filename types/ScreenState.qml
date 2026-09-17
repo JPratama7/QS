@@ -13,9 +13,7 @@ QtObject {
 
     readonly property bool effectiveVisible: {
         if (fullscreen && !popupOpen) return false;
-        if (displayMode === "visible") return true;
         if (displayMode === "auto_hide") return hovered || popupOpen || forceVisible;
-        if (displayMode === "hidden") return false;
-        return false;
+        return true;
     }
 }

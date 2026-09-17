@@ -9,8 +9,8 @@ BaseWidget {
 	id: widget
 
 	readonly property string _ramFormat: ShellConfig.systemMonitorRamFormat()
-	readonly property string _ramAbsolute: SystemMonitor.useGB ? SystemMonitor.ramUsedGB.toFixed(1) + "/" + SystemMonitor.ramTotalGB.toFixed(1) + " GB" : SystemMonitor.ramUsedMB + "/" + SystemMonitor.ramTotalMB + " MB"
-	readonly property string _ramUsed: SystemMonitor.useGB ? SystemMonitor.ramUsedGB.toFixed(1) + " GB" : SystemMonitor.ramUsedMB + " MB"
+	readonly property string _ramAbsolute: SystemMonitor.ramUsedGB.toFixed(1) + "/" + SystemMonitor.ramTotalGB.toFixed(1) + " GB"
+	readonly property string _ramUsed: SystemMonitor.ramUsedGB.toFixed(1) + " GB"
 	readonly property string _ramText: {
 		if (_ramFormat === "used/total")
 			return _ramAbsolute;
