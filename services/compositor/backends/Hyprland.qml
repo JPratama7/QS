@@ -4,7 +4,7 @@ import QtQml
 import QtQuick
 import Quickshell.Hyprland
 import Quickshell.Wayland
-import "../../../types/compositor"
+import "../../../types"
 
 CompositorBackend {
 	id: backend

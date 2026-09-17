@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Wayland
 import "../../config"
 import "../../services/launcher"
+import "../../services/system"
 import "../search"
 
 PanelWindow {

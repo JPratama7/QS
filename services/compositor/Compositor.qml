@@ -5,7 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
-import "../../types/compositor"
+import "../../types"
 
 Singleton {
 	id: service

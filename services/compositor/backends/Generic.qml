@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell.Wayland
-import "../../../types/compositor"
+import "../../../types"
 
 CompositorBackend {
 	id: backend
