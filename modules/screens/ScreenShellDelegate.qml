@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import "../../components"
 import "../../services/ui"
 import "../../types"
 import "../bar"
@@ -8,6 +9,7 @@ import "../cliphist"
 import "../emoji"
 import "../launcher"
 import "../popups/notifications"
+import "../popups/session"
 import "../popups/shared"
 import "../settings"
 
@@ -46,136 +48,71 @@ Item {
 			barWindow: barWindow
 		}
 	}
-	Loader {
-		id: launcherLoader
-
-		active: false
-		asynchronous: true
-
-		sourceComponent: LauncherOverlayWindow {
-			screenName: delegate.context.name
-		}
-
-		onLoaded: {
-			item.visible = true;
-			item.reset();
-		}
-
-		Connections {
-			function onLauncherOpened(screenName: string): void {
-				if (screenName === delegate.context.name) {
-					launcherLoader.active = true;
-				}
-			}
-			function onLauncherClosed(): void {
-				if (launcherLoader.active) {
-					launcherLoader.active = false;
-				}
-			}
-
-			target: ShellUI
-		}
+	OverlayHost {
+		kind: "launcher"
+		screenName: delegate.context.name
+		sourceComponent: launcherWindow
+		resetOnOpen: true
 	}
-	Loader {
-		id: cliphistLoader
-
-		active: false
-		asynchronous: true
-
-		sourceComponent: CliphistOverlayWindow {
-			screenName: delegate.context.name
-			onCloseFinished: cliphistLoader.active = false
-		}
-
-		onLoaded: {
-			item.visible = true;
-			item.reset();
-		}
-
-		Connections {
-			function onCliphistOpened(screenName: string): void {
-				if (screenName === delegate.context.name) {
-					if (cliphistLoader.item && cliphistLoader.item.closing) {
-						// Re-opened mid-close: cancel the exit animation and settle back.
-						cliphistLoader.item.abortClose();
-					} else {
-						cliphistLoader.active = true;
-					}
-				}
-			}
-			function onCliphistClosed(): void {
-				if (cliphistLoader.item)
-					cliphistLoader.item.closeAnimated();
-			}
-
-			target: ShellUI
-		}
+	OverlayHost {
+		kind: "session"
+		screenName: delegate.context.name
+		sourceComponent: sessionWindow
+	}
+	OverlayHost {
+		kind: "cliphist"
+		screenName: delegate.context.name
+		sourceComponent: cliphistWindow
+		resetOnOpen: true
+		animateClose: true
+	}
+	OverlayHost {
+		kind: "emoji"
+		screenName: delegate.context.name
+		sourceComponent: emojiWindow
+		resetOnOpen: true
+	}
+	OverlayHost {
+		kind: "settings"
+		screenName: delegate.context.name
+		sourceComponent: settingsWindow
+		resetOnOpen: true
+		animateClose: true
 	}
 
-	Loader {
-		id: emojiLoader
+	Component {
+		id: launcherWindow
 
-		active: false
-		asynchronous: true
-
-		sourceComponent: EmojiOverlayWindow {
+		LauncherOverlayWindow {
 			screenName: delegate.context.name
-		}
-
-		onLoaded: {
-			item.visible = true;
-			item.reset();
-		}
-
-		Connections {
-			function onEmojiOpened(screenName: string): void {
-				if (screenName === delegate.context.name) {
-					emojiLoader.active = true;
-				}
-			}
-			function onEmojiClosed(): void {
-				if (emojiLoader.active) {
-					emojiLoader.active = false;
-				}
-			}
-
-			target: ShellUI
 		}
 	}
+	Component {
+		id: sessionWindow
 
-	Loader {
-		id: settingsLoader
-
-		active: false
-		asynchronous: true
-
-		sourceComponent: SettingsOverlayWindow {
+		SessionOverlayWindow {
 			screenName: delegate.context.name
-			onCloseFinished: settingsLoader.active = false
 		}
+	}
+	Component {
+		id: cliphistWindow
 
-		onLoaded: {
-			item.visible = true;
-			item.reset();
+		CliphistOverlayWindow {
+			screenName: delegate.context.name
 		}
+	}
+	Component {
+		id: emojiWindow
 
-		Connections {
-			function onSettingsOpened(screenName: string): void {
-				if (screenName === delegate.context.name) {
-					if (settingsLoader.item && settingsLoader.item.closing) {
-						// Re-opened mid-close: cancel the exit animation and settle back.
-						settingsLoader.item.abortClose();
-					} else {
-						settingsLoader.active = true;
-					}
-				}
-			}
-			function onSettingsClosed(): void {
-				if (settingsLoader.item)
-					settingsLoader.item.closeAnimated();
-			}
+		EmojiOverlayWindow {
+			screenName: delegate.context.name
+		}
+	}
+	Component {
+		id: settingsWindow
 
-			target: ShellUI
+		SettingsOverlayWindow {
+			screenName: delegate.context.name
 		}
 	}
 }

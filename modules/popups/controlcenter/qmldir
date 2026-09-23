@@ -1,0 +1,5 @@
+module popups.controlcenter
+ControlCenter ControlCenter.qml
+ControlCenterHost ControlCenterHost.qml
+ControlSlider ControlSlider.qml
+ControlToggle ControlToggle.qml

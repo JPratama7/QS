@@ -23,7 +23,7 @@ PanelWindow {
         bottom: true
     }
 
-    color: Qt.alpha(Theme.backgroundColor, 0.85)
+    color: Qt.alpha(Theme.backgroundColor, ShellConfig.overlayOpacity)
 
     visible: false
 

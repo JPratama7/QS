@@ -42,8 +42,8 @@ Item {
 		currentIndex: root.searchService.selectedIndex
 
 		highlight: Rectangle {
-			color: Qt.alpha(Theme.accentColor, 0.2)
-			radius: Theme.radiusSmall
+			color: Theme.accentSoft
+			radius: Theme.radiusInner
 		}
 	}
 

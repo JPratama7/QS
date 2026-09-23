@@ -43,6 +43,7 @@ FileView {
 			toastMaxStack: Defaults.toastMaxStack,
 			toastDurationMs: Defaults.toastDurationMs,
 			notificationMaxHistory: Defaults.notificationMaxHistory,
+			transparency: deepCopy(Defaults.transparency),
 			excludedScreens: [],
 			trayHiddenIds: deepCopy(Defaults.trayHiddenIds),
 			trayMenuMaxHeight: Defaults.trayMenuMaxHeight,
@@ -98,6 +99,7 @@ FileView {
 		adapterView.toastMaxStack = merged.toastMaxStack;
 		adapterView.toastDurationMs = merged.toastDurationMs;
 		adapterView.notificationMaxHistory = merged.notificationMaxHistory;
+		adapterView.transparency = merged.transparency;
 		adapterView.excludedScreens = merged.excludedScreens;
 		adapterView.trayHiddenIds = merged.trayHiddenIds;
 		adapterView.trayMenuMaxHeight = merged.trayMenuMaxHeight;
@@ -162,6 +164,7 @@ FileView {
 		property int toastMaxStack: Defaults.toastMaxStack
 		property int toastDurationMs: Defaults.toastDurationMs
 		property int notificationMaxHistory: Defaults.notificationMaxHistory
+		property var transparency: Defaults.transparency
 		property var excludedScreens: ([])
 		property var trayHiddenIds: Defaults.trayHiddenIds
 		property int trayMenuMaxHeight: Defaults.trayMenuMaxHeight

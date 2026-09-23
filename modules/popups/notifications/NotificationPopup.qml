@@ -12,7 +12,7 @@ Item {
 	id: root
 
 	required property string screenName
-	readonly property int popupWidth: 280
+	readonly property int popupWidth: 300
 	readonly property int maxPopupHeight: 400
 
 	// Expanded state keyed by notification.id — survives delegate reuse
@@ -55,12 +55,20 @@ Item {
 
 		target: Notification
 	}
+	// Glass card + glow layer behind (DESIGN_GUIDE.md §4)
+	Rectangle {
+		anchors.centerIn: parent
+		width: parent.width - 6
+		height: parent.height - 6
+		radius: Theme.radiusGlassy
+		color: Qt.alpha(Theme.accentColor, 0.05)
+	}
 	Rectangle {
 		anchors.fill: parent
-		color: Theme.surfaceColor
-		radius: Theme.radiusNormal
+		color: Theme.glassSurface
+		radius: Theme.radiusGlassy
 		border.width: 1
-		border.color: Qt.alpha(Theme.foregroundColor, 0.1)
+		border.color: Theme.glassBorder
 	}
 	Column {
 		id: column
@@ -74,110 +82,111 @@ Item {
 			margins: Theme.paddingNormal
 		}
 
-		// Header
-		Text {
+		// Header — title + Clear all text button
+		Row {
+			id: headerRow
+
 			width: parent.width
-			text: "Notifications"
-			color: Theme.foregroundColor
-			font.pixelSize: Theme.fontSizeNormal
-			font.family: Theme.fontFamily
-			font.weight: Font.Medium
+			spacing: Theme.spacingNormal
+
+			Text {
+				width: parent.width - clearAllButton.width - parent.spacing
+				text: "Notifications"
+				color: Theme.foregroundColor
+				font.pixelSize: Theme.fontSizeNormal
+				font.family: Theme.fontFamily
+				font.weight: Font.Medium
+				elide: Text.ElideRight
+			}
+			Item {
+				id: clearAllButton
+
+				width: clearAllText.implicitWidth + Theme.paddingSmall * 2
+				height: clearAllText.implicitHeight + Theme.paddingSmall
+				visible: Notification.trackedList.length > 0
+
+				Text {
+					id: clearAllText
+
+					anchors.centerIn: parent
+					text: "Clear all"
+					color: clearAllArea.containsMouse ? Theme.errorColor : Theme.mutedColor
+					font.pixelSize: Theme.fontSizeSmall
+					font.family: Theme.fontFamily
+				}
+				MouseArea {
+					id: clearAllArea
+
+					anchors.fill: parent
+					hoverEnabled: true
+
+					onClicked: Notification.dismissAll()
+				}
+			}
 		}
 
-		// DnD toggle
-		Button {
-			id: dndButton
+		// DnD switch pinned under the header
+		Row {
+			id: dndRow
 
 			width: parent.width
-			height: dndText.implicitHeight + Theme.paddingSmall * 2
+			spacing: Theme.spacingSmall
 
-			Rectangle {
-				anchors.fill: parent
-				radius: Theme.radiusSmall
-				color: dndArea.containsMouse ? Qt.alpha(Theme.accentColor, 0.15) : "transparent"
-			}
 			Text {
-				id: dndText
+				id: dndLabel
 
-				anchors.centerIn: parent
-				text: Notification.dndEnabled ? "Do Not Disturb: ON" : "Do Not Disturb: OFF"
-				color: Notification.dndEnabled ? Theme.accentColor : Theme.mutedColor
+				text: "Do Not Disturb"
+				color: Notification.dndEnabled ? Theme.foregroundColor : Theme.mutedColor
 				font.pixelSize: Theme.fontSizeSmall
 				font.family: Theme.fontFamily
+				anchors.verticalCenter: parent.verticalCenter
 			}
-			MouseArea {
-				id: dndArea
-
-				anchors.fill: parent
-				hoverEnabled: true
-
-				onClicked: Notification.toggleDnd()
+			Item {
+				width: parent.width - dndLabel.width - dndSwitch.width - parent.spacing
+				height: 1
 			}
-		}
+			ToggleSwitch {
+				id: dndSwitch
 
-		// Clear all button (only show if there are notifications)
-		Button {
-			id: clearAllButton
+				checked: Notification.dndEnabled
+				anchors.verticalCenter: parent.verticalCenter
 
-			width: parent.width
-			height: clearAllText.implicitHeight + Theme.paddingSmall * 2
-			visible: Notification.trackedList.length > 0
-
-			Rectangle {
-				anchors.fill: parent
-				radius: Theme.radiusSmall
-				color: clearAllArea.containsMouse ? Qt.alpha(Theme.errorColor, 0.15) : "transparent"
-			}
-			Text {
-				id: clearAllText
-
-				anchors.centerIn: parent
-				text: "Clear All"
-				color: clearAllArea.containsMouse ? Theme.errorColor : Theme.mutedColor
-				font.pixelSize: Theme.fontSizeSmall
-				font.family: Theme.fontFamily
-			}
-			MouseArea {
-				id: clearAllArea
-
-				anchors.fill: parent
-				hoverEnabled: true
-
-				onClicked: Notification.dismissAll()
+				onToggled: Notification.toggleDnd()
 			}
 		}
 
-		// Notifications list — ListView for delegate reuse (virtualization)
+		// Notifications list — stacked cards, ListView for delegate reuse
 		ListView {
 			id: notificationList
 
 			width: parent.width
-			height: Math.min(contentHeight, Math.max(0, root.maxPopupHeight - dndButton.height - clearAllButton.height - 30 - Theme.paddingNormal * 4))
+			height: Math.min(contentHeight, Math.max(0, root.maxPopupHeight - dndRow.height - headerRow.height - 48))
 			visible: Notification.trackedList.length > 0
 			clip: true
 			spacing: Theme.spacingSmall
-			reuseItems: true
-			cacheBuffer: 100
 			model: Notification.trackedList
 
-			delegate: Item {
+			delegate: Rectangle {
 				id: notificationItem
 
 				required property QuickshellNotifications.Notification modelData
 				readonly property int itemPadding: Theme.paddingSmall
 				readonly property int iconSize: Theme.iconSizeSmall * 1.5
 				readonly property bool bodyExpanded: root._isExpanded(modelData.id)
+				readonly property bool isCritical: modelData.urgency === QuickshellNotifications.NotificationUrgency.Critical
 
 				width: ListView.view.width
-				implicitHeight: contentColumn.implicitHeight + itemPadding * 2
+				height: contentColumn.implicitHeight + itemPadding * 2
+				radius: Theme.radiusInner
+				// Critical: dangerSoft fill + dangerBorder ring; normal: hover accentSoft
+				color: isCritical ? Theme.dangerSoft : (itemArea.containsMouse ? Theme.accentSoft : Qt.alpha(Theme.foregroundColor, 0.03))
+				border.width: isCritical ? 1 : 0
+				border.color: Theme.dangerBorder
 
-				Rectangle {
-					anchors.fill: parent
-					radius: Theme.radiusSmall
-					color: itemArea.containsMouse ? Qt.alpha(Theme.foregroundColor, 0.05) : "transparent"
-					border.width: notificationItem.modelData.urgency === QuickshellNotifications.NotificationUrgency.Critical ? 1 : 0
-					border.color: Qt.alpha(Theme.errorColor, 0.3)
+				Behavior on color {
+					ColorAnimation { duration: Theme.hoverDuration }
 				}
+
 				Row {
 					id: contentColumn
 
@@ -198,10 +207,10 @@ Item {
 						anchors.verticalCenter: parent.verticalCenter
 						color: {
 							if (notificationItem.modelData.urgency === QuickshellNotifications.NotificationUrgency.Critical)
-								return Qt.alpha(Theme.errorColor, 0.2);
+								return Theme.dangerSoft;
 							if (notificationItem.modelData.urgency === QuickshellNotifications.NotificationUrgency.Low)
 								return Qt.alpha(Theme.mutedColor, 0.15);
-							return Qt.alpha(Theme.accentColor, 0.2);
+							return Theme.accentSoft;
 						}
 
 						// Resolved icon (image > appIcon > desktopEntry)

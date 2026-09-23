@@ -35,6 +35,8 @@ Item {
 			return clockComp;
 		case "network":
 			return networkComp;
+		case "controlcenter":
+			return controlCenterComp;
 		case "volume":
 			return volumeComp;
 		case "battery":
@@ -117,9 +119,20 @@ Item {
 		}
 	}
 	Component {
+		id: controlCenterComp
+
+		ControlCenterWidget {
+			screenName: barLayout.screenName
+			barWindow: barLayout.barWindow
+			widgetScale: barLayout.widgetScale
+		}
+	}
+	Component {
 		id: volumeComp
 
 		VolumeWidget {
+			screenName: barLayout.screenName
+			barWindow: barLayout.barWindow
 			widgetScale: barLayout.widgetScale
 		}
 	}
@@ -127,6 +140,8 @@ Item {
 		id: batteryComp
 
 		BatteryWidget {
+			screenName: barLayout.screenName
+			barWindow: barLayout.barWindow
 			widgetScale: barLayout.widgetScale
 		}
 	}

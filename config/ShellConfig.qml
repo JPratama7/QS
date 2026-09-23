@@ -19,6 +19,17 @@ QtObject {
 	readonly property real barWidgetScale: (PersistentConfig.adapter.bar || {}).widgets?.scale || 1.0
 	readonly property int barIconSize: (PersistentConfig.adapter.bar || {}).widgets?.iconSize || Defaults.bar.widgets.iconSize
 
+	// Transparency — percent opacities resolved to 0..1, clamped
+	readonly property real barOpacity: _clampOpacity((PersistentConfig.adapter.transparency || {}).bar, Defaults.transparency.bar)
+	readonly property real popupOpacity: _clampOpacity((PersistentConfig.adapter.transparency || {}).popup, Defaults.transparency.popup)
+	readonly property real overlayOpacity: _clampOpacity((PersistentConfig.adapter.transparency || {}).overlay, Defaults.transparency.overlay)
+
+	function _clampOpacity(percent: var, fallbackPercent: int): real {
+		if (typeof percent !== "number" || !isFinite(percent))
+			return fallbackPercent / 100;
+		return Math.max(0, Math.min(100, percent)) / 100;
+	}
+
 	function widgetScaleForScreen(screenName: string): real {
 		const perScreen = PersistentConfig.adapter.barWidgetScalePerScreen;
 		const scale = perScreen && perScreen[screenName];

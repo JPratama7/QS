@@ -1,2 +1,3 @@
 module containers
 ShellWindow ShellWindow.qml
+OverlayHost OverlayHost.qml

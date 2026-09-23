@@ -13,10 +13,10 @@ Rectangle {
 	property string placeholderText: ""
 
 	implicitHeight: searchInput.implicitHeight + Theme.paddingSmall * 2
-	radius: Theme.radiusSmall
-	color: Theme.backgroundColor
+	radius: Theme.radiusInner
+	color: Qt.alpha(Theme.foregroundColor, 0.05)
 	border.width: 1
-	border.color: Qt.alpha(Theme.foregroundColor, 0.15)
+	border.color: Theme.glassBorder
 
 	function clear(): void {
 		searchInput.text = "";

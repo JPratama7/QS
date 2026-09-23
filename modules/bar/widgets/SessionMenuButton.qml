@@ -6,7 +6,6 @@ import "../../../components/bar"
 import "../../../components"
 import "../../../config"
 import "../../../services/ui"
-import "../../popups/session"
 
 BaseWidget {
 	id: widget
@@ -48,16 +47,7 @@ BaseWidget {
 		cursorShape: Qt.PointingHandCursor
 
 		onClicked: {
-			const pos = widget.mapToItem(null, 0, 0);
-			ShellUI.openPopup(widget.screenName, "session", sessionMenuComponent, pos.x);
-		}
-	}
-
-	Component {
-		id: sessionMenuComponent
-
-		SessionMenu {
-			screenName: widget.screenName
+			ShellUI.openSession(widget.screenName);
 		}
 	}
 }

@@ -27,10 +27,10 @@ Item {
 		id: card
 
 		anchors.fill: parent
-		color: Theme.surfaceColor
-		radius: Theme.radiusNormal
+		color: Theme.glassSurface
+		radius: Theme.radiusGlassy
 		border.width: 1
-		border.color: toast.notification.urgency === QuickshellNotification.NotificationUrgency.Critical ? Qt.alpha(Theme.errorColor, 0.3) : Qt.alpha(Theme.foregroundColor, 0.1)
+		border.color: toast.notification.urgency === QuickshellNotification.NotificationUrgency.Critical ? Theme.dangerBorder : Theme.glassBorder
 	}
 	Row {
 		id: cardContent
@@ -52,10 +52,10 @@ Item {
 			anchors.verticalCenter: parent.verticalCenter
 			color: {
 				if (toast.notification.urgency === QuickshellNotification.NotificationUrgency.Critical)
-					return Qt.alpha(Theme.errorColor, 0.2);
+					return Theme.dangerSoft;
 				if (toast.notification.urgency === QuickshellNotification.NotificationUrgency.Low)
 					return Qt.alpha(Theme.mutedColor, 0.15);
-				return Qt.alpha(Theme.accentColor, 0.2);
+				return Theme.accentSoft;
 			}
 
 			// Resolved icon (image > appIcon > desktopEntry)

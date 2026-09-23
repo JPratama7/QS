@@ -65,7 +65,7 @@ QtObject {
 			"scale": 1,
 			"iconSize": 16,
 			"workspaces": {
-				"showText": true
+				"showText": false
 			},
 			"activeWindow": {
 				"maxTextWidth": 200
@@ -81,7 +81,7 @@ QtObject {
 	// Auto-hide trigger defaults
 	readonly property int triggerZoneHeight: 4
 	// Launcher defaults
-	readonly property int launcherWidth: 560
+	readonly property int launcherWidth: 640
 	// Vertical margin kept between the launcher and the screen edges
 	readonly property int launcherVerticalMargin: 100
 	// Max height of the results list before it scrolls
@@ -96,6 +96,17 @@ QtObject {
 	readonly property int toastDurationMs: 5000
 	// Notification history cap — 0 means unlimited
 	readonly property int notificationMaxHistory: 100
+	// Transparency — percent opacities for the glass surfaces (bar, popups, overlay scrims)
+	readonly property var transparency: {
+		"bar": 85,
+		"popup": 85,
+		"overlay": 85
+	}
+	// Control center feature flags — stub toggles hidden until real backends exist
+	readonly property var controlCenter: {
+		"showBluetoothStub": false,
+		"showNightLightStub": false
+	}
 	// Tray defaults
 	readonly property var trayHiddenIds: ([])
 	readonly property int trayMenuMaxHeight: 400
@@ -103,7 +114,7 @@ QtObject {
 	readonly property var barWidgetLayout: {
 		"left": ["launcher", "workspaces", "activeWindow"],
 		"center": ["clock"],
-		"right": ["network", "vpn", "volume", "battery", "idleInhibitor", "notifications", "tray", "settings", "session"]
+		"right": ["vpn", "idleInhibitor", "controlcenter", "settings", "session"]
 	}
 	readonly property var barWidgetLayoutPerScreen: ({})
 }

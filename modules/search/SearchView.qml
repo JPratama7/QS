@@ -37,10 +37,10 @@ Item {
 	Rectangle {
 		z: -1
 		anchors.fill: parent
-		color: Theme.surfaceColor
-		radius: Theme.radiusNormal
+		color: Theme.glassSurface
+		radius: Theme.radiusGlassy
 		border.width: 1
-		border.color: Qt.alpha(Theme.foregroundColor, 0.1)
+		border.color: Theme.glassBorder
 	}
 
 	Column {

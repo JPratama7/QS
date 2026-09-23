@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Quickshell
 import "../../../components"
 import "../../../config"
 import "../../../services/system"
@@ -28,9 +29,19 @@ Item {
 		const names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 		return names[month];
 	}
+	function weekdayName(day: int): string {
+		const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+		return names[day];
+	}
 
 	implicitWidth: popupWidth
 	implicitHeight: contentColumn.implicitHeight + Theme.paddingNormal * 2
+
+	SystemClock {
+		id: systemClock
+
+		precision: SystemClock.Minutes
+	}
 
 	Component.onCompleted: {
 		const today = TimeZone.getToday(PersistentConfig.adapter.timeZone);
@@ -41,12 +52,20 @@ Item {
 		root._displayMonth = root._todayMonth;
 	}
 
+	// Glass card + glow layer behind (DESIGN_GUIDE.md §5)
+	Rectangle {
+		anchors.centerIn: parent
+		width: parent.width - 6
+		height: parent.height - 6
+		radius: Theme.radiusGlassy
+		color: Qt.alpha(Theme.accentColor, 0.05)
+	}
 	Rectangle {
 		anchors.fill: parent
-		color: Theme.surfaceColor
-		radius: Theme.radiusNormal
+		color: Theme.glassSurface
+		radius: Theme.radiusGlassy
 		border.width: 1
-		border.color: Qt.alpha(Theme.foregroundColor, 0.1)
+		border.color: Theme.glassBorder
 	}
 	Column {
 		id: contentColumn
@@ -58,6 +77,26 @@ Item {
 			left: parent.left
 			right: parent.right
 			margins: Theme.paddingNormal
+		}
+		// Big clock moment — large hh:mm, date line below (end4-style header)
+		Column {
+			width: parent.width
+			spacing: 2
+
+			Text {
+				text: TimeZone.formatTime(systemClock.date, "hh:mm", PersistentConfig.adapter.timeZone)
+				color: Theme.foregroundColor
+				font.pixelSize: 26
+				font.weight: Font.Medium
+				font.family: Theme.fontFamilyMono
+			}
+			Text {
+				text: root.weekdayName(new Date(root._todayYear, root._todayMonth, root._todayDate).getDay())
+					+ ", " + root.monthName(root._todayMonth) + " " + root._todayDate
+				color: Theme.mutedColor
+				font.pixelSize: Theme.fontSizeNormal
+				font.family: Theme.fontFamily
+			}
 		}
 		Item {
 			id: headerRow
@@ -180,16 +219,18 @@ Item {
 
 					width: root.cellSize
 					height: root.cellSize
-					color: isToday ? Qt.alpha(Theme.accentColor, 0.2) : "transparent"
-					radius: Theme.radiusSmall
+					// Today = accent circle (mockup); other days transparent
+					color: isToday ? Theme.accentColor : "transparent"
+					radius: width / 2
 
 					Text {
 						anchors.centerIn: parent
 						visible: parent.dayNumber > 0
 						text: parent.dayNumber
-						color: parent.isToday ? Theme.accentColor : Theme.foregroundColor
+						color: parent.isToday ? Theme.barBackgroundColor : Theme.foregroundColor
 						font.pixelSize: Theme.fontSizeSmall
 						font.family: Theme.fontFamily
+						font.weight: parent.isToday ? Font.Medium : Font.Normal
 					}
 				}
 			}

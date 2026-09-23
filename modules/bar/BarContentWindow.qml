@@ -22,7 +22,8 @@ ShellWindow {
 	WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 	implicitHeight: context.barHeight
 	exclusiveZone: barWindow._barActive ? context.barHeight : 0
-	color: Theme.barBackgroundColor
+	// Glass bar — translucent over the compositor, hairline edge (DESIGN_GUIDE.md §1)
+	color: Theme.glassBackground
 	anchors.top: context.barEdge === "top"
 	anchors.bottom: context.barEdge === "bottom"
 	anchors.left: true
@@ -33,7 +34,7 @@ ShellWindow {
 		z: 1
 		width: parent.width
 		height: 1
-		color: Theme.borderColor
+		color: Theme.glassBorder
 		y: barWindow.context.barEdge === "top" ? parent.height - 1 : 0
 	}
 

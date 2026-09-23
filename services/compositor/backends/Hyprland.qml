@@ -48,11 +48,11 @@ CompositorBackend {
 		const monitor = Hyprland.monitors.values.find(m => m.name === screenName);
 		return monitor ? monitor.activeWorkspace?.id ?? 0 : 0;
 	}
-	function _sameWorkspaceIds(a: var, b: var): bool {
+	function _sameWorkspaceState(a: var, b: var): bool {
 		if (!a || !b || a.length !== b.length)
 			return false;
 		for (let i = 0; i < a.length; i++) {
-			if (a[i] !== b[i])
+			if (a[i].id !== b[i].id || a[i].occupied !== b[i].occupied || a[i].urgent !== b[i].urgent)
 				return false;
 		}
 		return true;
@@ -67,13 +67,14 @@ CompositorBackend {
 							"id": ws.id,
 							"name": ws.name,
 							"monitor": ws.monitor,
-							"windows": ws.windows
+							"occupied": ws.toplevels.count > 0,
+							"urgent": ws.urgent
 						}));
 				const previous = backend._workspacesCache[monitor.name];
-				// Keep the previous array when only windows/name changed — the
-				// widgets render id + active state, so a stable identity avoids
-				// Repeater teardown/recreate churn.
-				if (_sameWorkspaceIds(previous, list))
+				// Keep the previous array when only id/occupied/urgent match —
+				// the widgets render those, so a stable identity avoids
+				// Repeater teardown/recreate churn while state stays live.
+				if (_sameWorkspaceState(previous, list))
 					cache[monitor.name] = previous;
 				else
 					cache[monitor.name] = list;
