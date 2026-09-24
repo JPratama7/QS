@@ -57,7 +57,7 @@ BaseWidget {
 
 		onClicked: {
 			const pos = widget.mapToItem(null, 0, 0);
-			const popupWidth = 280;
+			const popupWidth = 300;
 			const anchorX = pos.x + widget.width / 2 - popupWidth / 2;
 			ShellUI.openPopup(widget.screenName, "calendar", calendarComponent, Math.max(0, anchorX));
 		}

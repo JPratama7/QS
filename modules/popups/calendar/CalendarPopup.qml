@@ -9,19 +9,25 @@ import "../../../services/system"
 Item {
 	id: root
 
-	readonly property int popupWidth: 280
-	readonly property int cellSize: 36
+	readonly property int popupWidth: 300
+	readonly property int cardPad: 16
+	readonly property int railWidth: 18
+	readonly property real cellSize: (popupWidth - cardPad * 2 - railWidth) / 7
 	property int _todayYear: 0
 	property int _todayMonth: 0
 	property int _todayDate: 0
 	property int _displayYear: 0
 	property int _displayMonth: 0
+	readonly property bool _drifted: _displayYear !== _todayYear || _displayMonth !== _todayMonth
 
 	function daysInMonth(year: int, month: int): int {
 		return new Date(year, month + 1, 0).getDate();
 	}
 	function firstDayOfMonth(year: int, month: int): int {
 		return new Date(year, month, 1).getDay();
+	}
+	function weekRowCount(year: int, month: int): int {
+		return Math.ceil((firstDayOfMonth(year, month) + daysInMonth(year, month)) / 7);
 	}
 	function monthName(month: int): string {
 		// Note: the QML JS engine on this platform has no Intl (ReferenceError),
@@ -33,9 +39,25 @@ Item {
 		const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 		return names[day];
 	}
+	// ISO-8601 week number — the Thursday of a week decides its week/year
+	function isoWeek(d: var): int {
+		const t = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+		const day = (t.getDay() + 6) % 7;
+		t.setDate(t.getDate() - day + 3);
+		const firstThu = new Date(t.getFullYear(), 0, 4);
+		const fd = (firstThu.getDay() + 6) % 7;
+		firstThu.setDate(firstThu.getDate() - fd + 3);
+		return 1 + Math.round((t.getTime() - firstThu.getTime()) / 604800000);
+	}
+	function dayOfYear(d: var): int {
+		return Math.round((d.getTime() - new Date(d.getFullYear(), 0, 1).getTime()) / 86400000) + 1;
+	}
+	function daysInYear(year: int): int {
+		return ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) ? 366 : 365;
+	}
 
 	implicitWidth: popupWidth
-	implicitHeight: contentColumn.implicitHeight + Theme.paddingNormal * 2
+	implicitHeight: contentColumn.implicitHeight
 
 	SystemClock {
 		id: systemClock
@@ -70,53 +92,160 @@ Item {
 	Column {
 		id: contentColumn
 
-		spacing: Theme.spacingSmall
+		width: root.popupWidth
+		spacing: 0
 
 		anchors {
 			top: parent.top
 			left: parent.left
-			right: parent.right
-			margins: Theme.paddingNormal
 		}
-		// Big clock moment — large hh:mm, date line below (end4-style header)
-		Column {
-			width: parent.width
-			spacing: 2
-
-			Text {
-				text: TimeZone.formatTime(systemClock.date, "hh:mm", PersistentConfig.adapter.timeZone)
-				color: Theme.foregroundColor
-				font.pixelSize: 26
-				font.weight: Font.Medium
-				font.family: Theme.fontFamilyMono
-			}
-			Text {
-				text: root.weekdayName(new Date(root._todayYear, root._todayMonth, root._todayDate).getDay())
-					+ ", " + root.monthName(root._todayMonth) + " " + root._todayDate
-				color: Theme.mutedColor
-				font.pixelSize: Theme.fontSizeNormal
-				font.family: Theme.fontFamily
-			}
-		}
+		// Anchor header — today as a tear-off date; the clock is a status line
 		Item {
-			id: headerRow
-
 			width: parent.width
-			height: navPrev.implicitHeight + Theme.paddingSmall * 2
+			height: headLeft.implicitHeight + root.cardPad + 12
 
-			SvgIcon {
-				id: navPrev
+			Column {
+				id: headLeft
 
-				source: "icons/outline/chevron-left.svg"
-				color: Theme.accentColor
-				iconSize: Theme.fontSizeLarge
+				x: root.cardPad
+				y: root.cardPad
+				spacing: 6
 
-				anchors {
-					left: parent.left
-					verticalCenter: parent.verticalCenter
+				Text {
+					text: root._todayDate
+					color: Theme.foregroundColor
+					font.pixelSize: 46
+					font.weight: Font.Medium
+					font.family: Theme.fontFamilyMono
+					font.letterSpacing: -1.5
+				}
+				Text {
+					text: root.weekdayName(new Date(root._todayYear, root._todayMonth, root._todayDate).getDay())
+					color: Theme.mutedColor
+					font.pixelSize: 9
+					font.family: Theme.fontFamilyMono
+					font.letterSpacing: 2.2
+					font.capitalization: Font.AllUppercase
+				}
+			}
+			Column {
+				x: parent.width - width - root.cardPad
+				y: root.cardPad + 7
+				spacing: 5
+
+				Text {
+					text: TimeZone.formatTime(systemClock.date, "hh:mm", PersistentConfig.adapter.timeZone)
+					color: Theme.foregroundColor
+					font.pixelSize: 17
+					font.weight: Font.Medium
+					font.family: Theme.fontFamilyMono
+					anchors.right: parent.right
+				}
+				Text {
+					text: PersistentConfig.adapter.timeZone || "System"
+					color: Qt.alpha(Theme.mutedColor, 0.72)
+					font.pixelSize: 8
+					font.family: Theme.fontFamilyMono
+					font.letterSpacing: 1.3
+					font.capitalization: Font.AllUppercase
+					anchors.right: parent.right
+				}
+			}
+		}
+		Rectangle {
+			width: parent.width
+			height: 1
+			color: Theme.glassBorder
+		}
+		// Viewport nav — month belongs to the grid, not to the header
+		Item {
+			width: parent.width
+			height: 24 + 22
+
+			Row {
+				id: monthRow
+
+				x: root.cardPad
+				spacing: 4
+
+				anchors.verticalCenter: parent.verticalCenter
+
+				Text {
+					text: root.monthName(root._displayMonth)
+					color: Theme.foregroundColor
+					font.pixelSize: 14
+					font.weight: Font.DemiBold
+					font.family: Theme.fontFamily
+				}
+				Text {
+					text: root._displayYear
+					color: Theme.mutedColor
+					font.pixelSize: 14
+					font.family: Theme.fontFamily
+				}
+			}
+			// Return path — only exists while the viewport has drifted from today
+			Rectangle {
+				id: todayChip
+
+				visible: root._drifted
+				x: root.cardPad + monthRow.implicitWidth + 14
+				width: chipText.implicitWidth + 16
+				height: 18
+				radius: 9
+				color: Theme.accentSoft
+				border.width: 1
+				border.color: Theme.accentBorder
+
+				anchors.verticalCenter: parent.verticalCenter
+
+				Text {
+					id: chipText
+
+					anchors.centerIn: parent
+					text: "Today"
+					color: Theme.accentColor
+					font.pixelSize: 8
+					font.family: Theme.fontFamilyMono
+					font.letterSpacing: 1.2
+					font.capitalization: Font.AllUppercase
 				}
 				MouseArea {
 					anchors.fill: parent
+					cursorShape: Qt.PointingHandCursor
+
+					onClicked: {
+						root._displayYear = root._todayYear;
+						root._displayMonth = root._todayMonth;
+					}
+				}
+			}
+			Item {
+				id: navPrev
+
+				width: 24
+				height: 24
+				x: parent.width - root.cardPad - 50
+
+				anchors.verticalCenter: parent.verticalCenter
+
+				Rectangle {
+					anchors.fill: parent
+					radius: width / 2
+					color: Theme.accentSoft
+					visible: prevArea.containsMouse
+				}
+				SvgIcon {
+					anchors.centerIn: parent
+					source: "icons/outline/chevron-left.svg"
+					color: prevArea.containsMouse ? Theme.accentColor : Theme.mutedColor
+					iconSize: 11
+				}
+				MouseArea {
+					id: prevArea
+
+					anchors.fill: parent
+					hoverEnabled: true
 					cursorShape: Qt.PointingHandCursor
 
 					onClicked: {
@@ -128,38 +257,34 @@ Item {
 					}
 				}
 			}
-			Column {
-				anchors.centerIn: parent
-				spacing: 2
-
-				Text {
-					text: root.monthName(root._displayMonth) + " " + root._displayYear
-					color: Theme.foregroundColor
-					font.pixelSize: Theme.fontSizeNormal
-					font.family: Theme.fontFamily
-					anchors.horizontalCenter: parent.horizontalCenter
-				}
-				Text {
-					text: PersistentConfig.adapter.timeZone || "System"
-					color: Theme.mutedColor
-					font.pixelSize: Theme.fontSizeSmall
-					font.family: Theme.fontFamily
-					anchors.horizontalCenter: parent.horizontalCenter
-				}
-			}
-			SvgIcon {
+			Item {
 				id: navNext
 
-				source: "icons/outline/chevron-right.svg"
-				color: Theme.accentColor
-				iconSize: Theme.fontSizeLarge
+				width: 24
+				height: 24
 
 				anchors {
 					right: parent.right
+					rightMargin: root.cardPad
 					verticalCenter: parent.verticalCenter
 				}
-				MouseArea {
+				Rectangle {
 					anchors.fill: parent
+					radius: width / 2
+					color: Theme.accentSoft
+					visible: nextArea.containsMouse
+				}
+				SvgIcon {
+					anchors.centerIn: parent
+					source: "icons/outline/chevron-right.svg"
+					color: nextArea.containsMouse ? Theme.accentColor : Theme.mutedColor
+					iconSize: 11
+				}
+				MouseArea {
+					id: nextArea
+
+					anchors.fill: parent
+					hoverEnabled: true
 					cursorShape: Qt.PointingHandCursor
 
 					onClicked: {
@@ -172,66 +297,198 @@ Item {
 				}
 			}
 		}
-		Row {
-			id: dayNamesRow
-
+		// Ledger grid — week-number rail on the left, band across the current week
+		Item {
 			width: parent.width
-			spacing: 0
+			height: gridCol.implicitHeight + 2
 
-			Repeater {
-				model: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+			Column {
+				id: gridCol
 
-				delegate: Item {
-					required property string modelData
+				x: root.cardPad
+				width: parent.width - root.cardPad * 2
+				spacing: 0
 
-					width: root.cellSize
-					height: root.cellSize * 0.6
+				Row {
+					height: 20
+					spacing: 0
 
-					Text {
-						anchors.centerIn: parent
-						text: modelData
-						color: Theme.mutedColor
-						font.pixelSize: Theme.fontSizeSmall
-						font.family: Theme.fontFamily
+					Item {
+						width: root.railWidth
+						height: 20
+					}
+					Repeater {
+						model: ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]
+
+						delegate: Text {
+							required property string modelData
+							required property int index
+
+							width: root.cellSize
+							height: 20
+							horizontalAlignment: Text.AlignHCenter
+							verticalAlignment: Text.AlignVCenter
+							text: modelData
+							color: (index === 0 || index === 6) ? Qt.alpha(Theme.mutedColor, 0.5) : Qt.alpha(Theme.mutedColor, 0.72)
+							font.pixelSize: 8
+							font.family: Theme.fontFamilyMono
+							font.letterSpacing: 0.8
+						}
+					}
+				}
+				Repeater {
+					model: root.weekRowCount(root._displayYear, root._displayMonth)
+
+					delegate: Rectangle {
+						id: weekRow
+
+						required property int index
+						readonly property var rowStart: new Date(root._displayYear, root._displayMonth, 1 - root.firstDayOfMonth(root._displayYear, root._displayMonth) + index * 7)
+						readonly property var rowThursday: new Date(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 4)
+						readonly property bool isCurrentWeek: {
+							const end = new Date(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 7);
+							const t = new Date(root._todayYear, root._todayMonth, root._todayDate);
+							return !root._drifted && t >= rowStart && t < end;
+						}
+
+						width: gridCol.width
+						height: root.cellSize
+						radius: 7
+						color: isCurrentWeek ? Theme.accentSoft : "transparent"
+
+						Text {
+							width: root.railWidth
+							height: parent.height
+							horizontalAlignment: Text.AlignHCenter
+							verticalAlignment: Text.AlignVCenter
+							text: root.isoWeek(weekRow.rowThursday)
+							color: weekRow.isCurrentWeek ? Theme.accentColor : Qt.alpha(Theme.mutedColor, 0.72)
+							font.pixelSize: 8
+							font.family: Theme.fontFamilyMono
+							font.weight: weekRow.isCurrentWeek ? Font.Medium : Font.Normal
+						}
+						Row {
+							x: root.railWidth
+							height: parent.height
+							spacing: 0
+
+							Repeater {
+								model: 7
+
+								delegate: Item {
+									required property int index
+									readonly property var cellDate: new Date(weekRow.rowStart.getFullYear(), weekRow.rowStart.getMonth(), weekRow.rowStart.getDate() + index)
+									readonly property bool isWeekend: index === 0 || index === 6
+									readonly property bool isOut: cellDate.getMonth() !== root._displayMonth
+									readonly property bool isToday: cellDate.getFullYear() === root._todayYear && cellDate.getMonth() === root._todayMonth && cellDate.getDate() === root._todayDate
+
+									width: root.cellSize
+									height: root.cellSize
+
+									Rectangle {
+										visible: parent.isToday
+										anchors.centerIn: parent
+										width: parent.width - 2
+										height: width
+										radius: width / 2
+										color: Theme.accentSoft
+									}
+									Rectangle {
+										visible: parent.isToday
+										anchors.centerIn: parent
+										width: parent.width - 10
+										height: width
+										radius: width / 2
+										color: Theme.accentColor
+									}
+									Rectangle {
+										visible: cellArea.containsMouse && !parent.isToday
+										anchors.centerIn: parent
+										width: parent.width - 8
+										height: width
+										radius: width / 2
+										color: weekRow.isCurrentWeek ? Qt.alpha(Theme.accentColor, 0.22) : Theme.hoverColor
+									}
+									Text {
+										anchors.centerIn: parent
+										text: parent.cellDate.getDate()
+										font.pixelSize: 12
+										font.family: Theme.fontFamily
+										font.weight: parent.isToday ? Font.DemiBold : Font.Normal
+										color: parent.isToday ? Theme.barBackgroundColor
+											: parent.isOut ? (parent.isWeekend ? Qt.alpha(Theme.mutedColor, 0.45) : Qt.alpha(Theme.foregroundColor, 0.28))
+											: parent.isWeekend ? Theme.mutedColor
+											: Theme.foregroundColor
+									}
+									MouseArea {
+										id: cellArea
+
+										anchors.fill: parent
+										hoverEnabled: true
+									}
+								}
+							}
+						}
 					}
 				}
 			}
 		}
-		Grid {
-			id: dayGrid
-
+		Rectangle {
 			width: parent.width
-			columns: 7
-			spacing: 0
+			height: 1
+			color: Theme.glassBorder
+		}
+		// Almanac footer — day-of-year and ISO week for the anchor date
+		Item {
+			width: parent.width
+			height: footText.implicitHeight + 24
 
-			Repeater {
-				model: 42
+			Row {
+				id: footText
 
-				delegate: Rectangle {
-					required property int index
-					readonly property int firstDay: root.firstDayOfMonth(root._displayYear, root._displayMonth)
-					readonly property int daysInMonth: root.daysInMonth(root._displayYear, root._displayMonth)
-					readonly property int dayNumber: {
-						const day = index - firstDay + 1;
-						return (day > 0 && day <= daysInMonth) ? day : 0;
-					}
-					readonly property bool isToday: dayNumber > 0 && root._displayYear === root._todayYear && root._displayMonth === root._todayMonth && dayNumber === root._todayDate
+				x: root.cardPad
+				spacing: 5
 
-					width: root.cellSize
-					height: root.cellSize
-					// Today = accent circle (mockup); other days transparent
-					color: isToday ? Theme.accentColor : "transparent"
-					radius: width / 2
+				anchors.verticalCenter: parent.verticalCenter
 
-					Text {
-						anchors.centerIn: parent
-						visible: parent.dayNumber > 0
-						text: parent.dayNumber
-						color: parent.isToday ? Theme.barBackgroundColor : Theme.foregroundColor
-						font.pixelSize: Theme.fontSizeSmall
-						font.family: Theme.fontFamily
-						font.weight: parent.isToday ? Font.Medium : Font.Normal
-					}
+				Text {
+					text: "Day"
+					color: Qt.alpha(Theme.mutedColor, 0.72)
+					font.pixelSize: 8
+					font.family: Theme.fontFamilyMono
+					font.letterSpacing: 1.2
+					font.capitalization: Font.AllUppercase
+				}
+				Text {
+					text: root.dayOfYear(new Date(root._todayYear, root._todayMonth, root._todayDate)) + " / " + root.daysInYear(root._todayYear)
+					color: Theme.mutedColor
+					font.pixelSize: 8
+					font.family: Theme.fontFamilyMono
+					font.letterSpacing: 1.2
+				}
+			}
+			Row {
+				spacing: 5
+
+				anchors {
+					right: parent.right
+					rightMargin: root.cardPad
+					verticalCenter: parent.verticalCenter
+				}
+				Text {
+					text: "Week"
+					color: Qt.alpha(Theme.mutedColor, 0.72)
+					font.pixelSize: 8
+					font.family: Theme.fontFamilyMono
+					font.letterSpacing: 1.2
+					font.capitalization: Font.AllUppercase
+				}
+				Text {
+					text: root.isoWeek(new Date(root._todayYear, root._todayMonth, root._todayDate))
+					color: Theme.mutedColor
+					font.pixelSize: 8
+					font.family: Theme.fontFamilyMono
+					font.letterSpacing: 1.2
 				}
 			}
 		}
