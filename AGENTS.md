@@ -213,6 +213,7 @@ Available properties: `name`, `model`, `serialNumber`, `x`, `y`, `width`, `heigh
 - Signal handlers below properties
 - Child components last
 - Use `id:` for internal references, `property alias` for external API
+- Indent with 4 spaces (the tree is normalized to spaces — no tabs)
 
 ---
 

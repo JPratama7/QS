@@ -8,46 +8,46 @@ import "../../../config"
 import "../../../services/ui"
 
 BaseWidget {
-	id: widget
+    id: widget
 
-	required property string screenName
-	required property PanelWindow barWindow
+    required property string screenName
+    required property PanelWindow barWindow
 
-	implicitWidth: label.implicitWidth + Theme.paddingSmall * 2
-	implicitHeight: label.implicitHeight + Theme.paddingSmall * 2
+    implicitWidth: label.implicitWidth + Theme.paddingSmall * 2
+    implicitHeight: label.implicitHeight + Theme.paddingSmall * 2
 
-	tooltipComponent: Component {
-		Text {
-			text: "Session"
-			font.pixelSize: Theme.fontSizeSmall
-			color: Theme.foregroundColor
-		}
-	}
+    tooltipComponent: Component {
+        Text {
+            text: "Session"
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+        }
+    }
 
-	Rectangle {
-		anchors.fill: parent
-		radius: Theme.radiusSmall
-		color: mouseArea.containsMouse ? Theme.hoverColor : "transparent"
-	}
+    Rectangle {
+        anchors.fill: parent
+        radius: Theme.radiusSmall
+        color: mouseArea.containsMouse ? Theme.hoverColor : "transparent"
+    }
 
-	SvgIcon {
-		id: label
+    SvgIcon {
+        id: label
 
-		anchors.centerIn: parent
-		source: "icons/outline/power.svg"
-		color: Theme.foregroundColor
-		iconSize: ShellConfig.barIconSize
-	}
+        anchors.centerIn: parent
+        source: "icons/outline/power.svg"
+        color: Theme.foregroundColor
+        iconSize: ShellConfig.barIconSize
+    }
 
-	MouseArea {
-		id: mouseArea
+    MouseArea {
+        id: mouseArea
 
-		anchors.fill: parent
-		hoverEnabled: true
-		cursorShape: Qt.PointingHandCursor
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
 
-		onClicked: {
-			ShellUI.openSession(widget.screenName);
-		}
-	}
+        onClicked: {
+            ShellUI.openSession(widget.screenName);
+        }
+    }
 }
