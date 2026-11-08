@@ -48,7 +48,7 @@ PanelWindow {
     }
 
     visible: false
-    color: overlay.shown ? Qt.alpha(Theme.backgroundColor, 0.85) : Qt.rgba(0, 0, 0, 0)
+    color: overlay.shown ? Qt.alpha(Theme.backgroundColor, ShellConfig.overlayOpacity) : Qt.rgba(0, 0, 0, 0)
     Behavior on color {
         ColorAnimation {
             duration: 220

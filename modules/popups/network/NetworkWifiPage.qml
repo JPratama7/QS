@@ -1,7 +1,9 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell.Networking
+// Aliased so the module's `Network` type doesn't shadow the services/system
+// Network singleton (see ControlCenter.qml).
+import Quickshell.Networking as NetApi
 import "../../../config"
 import "../../../services/system"
 import "."
@@ -58,7 +60,7 @@ NetworkMenuPage {
             label: modelData.name
             trailingIcon: modelData.connected
                 ? "icons/outline/check.svg"
-                : (modelData.security !== WifiSecurityType.Open ? "icons/outline/lock.svg" : "")
+                : (modelData.security !== NetApi.WifiSecurityType.Open ? "icons/outline/lock.svg" : "")
             trailingColor: modelData.connected ? Theme.accentColor : Theme.mutedColor
             onClicked: page.stackView.push(Qt.resolvedUrl("NetworkActionPage.qml"), {
                 network: modelData,

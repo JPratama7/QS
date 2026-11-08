@@ -6,7 +6,7 @@ import "../../../components/bar"
 import "../../../config"
 import "../../../services/system"
 import "../../../services/ui"
-import "../../popups/network"
+import "../../popups/controlcenter"
 
 BaseWidget {
 	id: widget
@@ -50,17 +50,17 @@ BaseWidget {
 
 		onClicked: {
 			const pos = widget.mapToItem(null, 0, 0);
-			const menuWidth = 260;
-			// Right-zone widget: right-align the menu and clamp inside the bar window
-			const anchorX = Math.max(0, Math.min(pos.x, widget.barWindow.width - menuWidth - Theme.paddingNormal));
-			ShellUI.openPopup(widget.screenName, "network", networkMenuComponent, anchorX);
+			const ccWidth = 360;
+			// Right-zone widget: right-align the card and clamp inside the bar window
+			const anchorX = Math.max(0, Math.min(pos.x, widget.barWindow.width - ccWidth - Theme.paddingNormal));
+			ShellUI.openPopup(widget.screenName, "controlcenter", controlCenterComponent, anchorX);
 		}
 	}
 
 	Component {
-		id: networkMenuComponent
+		id: controlCenterComponent
 
-		NetworkMenu {
+		ControlCenter {
 			screenName: widget.screenName
 		}
 	}

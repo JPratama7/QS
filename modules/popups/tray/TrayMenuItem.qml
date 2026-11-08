@@ -40,12 +40,11 @@ Item {
 
 		visible: !root.isSeparator
 		anchors.fill: parent
-		radius: Theme.radiusSmall
-		color: Theme.accentColor
-		opacity: hoverArea.containsMouse && root.entry?.enabled ? 0.15 : 0
+		radius: Theme.radiusInner
+		color: hoverArea.containsMouse && root.entry?.enabled ? Theme.accentSoft : "transparent"
 
-		Behavior on opacity {
-			NumberAnimation {
+		Behavior on color {
+			ColorAnimation {
 				duration: 100
 			}
 		}

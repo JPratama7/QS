@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import "../../components"
 import "../../services/ui"
 import "../../types"
 import "../bar"
@@ -8,174 +9,110 @@ import "../cliphist"
 import "../emoji"
 import "../launcher"
 import "../popups/notifications"
+import "../popups/session"
 import "../popups/shared"
 import "../settings"
 
 Item {
-	id: delegate
+    id: delegate
 
-	required property ScreenContext context
+    required property ScreenContext context
 
-	BarContentWindow {
-		id: barWindow
+    BarContentWindow {
+        id: barWindow
 
-		context: delegate.context
-	}
-	Loader {
-		id: triggerZoneLoader
+        context: delegate.context
+    }
+    Loader {
+        id: triggerZoneLoader
 
-		active: delegate.context.barDisplayMode === "auto_hide"
-		asynchronous: true
+        active: delegate.context.barDisplayMode === "auto_hide"
+        asynchronous: true
 
-		sourceComponent: BarTriggerZone {
-			context: delegate.context
-		}
-	}
-	PopupMenuWindow {
-		context: delegate.context
-		barWindow: barWindow
-	}
-	Loader {
-		id: toastWindowLoader
+        sourceComponent: BarTriggerZone {
+            context: delegate.context
+        }
+    }
+    PopupMenuWindow {
+        context: delegate.context
+        barWindow: barWindow
+    }
+    Loader {
+        id: toastWindowLoader
 
-		active: delegate.context.isPrimary
-		asynchronous: true
+        active: delegate.context.isPrimary
+        asynchronous: true
 
-		sourceComponent: NotificationToastWindow {
-			context: delegate.context
-			barWindow: barWindow
-		}
-	}
-	Loader {
-		id: launcherLoader
+        sourceComponent: NotificationToastWindow {
+            context: delegate.context
+            barWindow: barWindow
+        }
+    }
+    OverlayHost {
+        kind: "launcher"
+        screenName: delegate.context.name
+        sourceComponent: launcherWindow
+        resetOnOpen: true
+    }
+    OverlayHost {
+        kind: "session"
+        screenName: delegate.context.name
+        sourceComponent: sessionWindow
+    }
+    OverlayHost {
+        kind: "cliphist"
+        screenName: delegate.context.name
+        sourceComponent: cliphistWindow
+        resetOnOpen: true
+        animateClose: true
+    }
+    OverlayHost {
+        kind: "emoji"
+        screenName: delegate.context.name
+        sourceComponent: emojiWindow
+        resetOnOpen: true
+    }
+    OverlayHost {
+        kind: "settings"
+        screenName: delegate.context.name
+        sourceComponent: settingsWindow
+        resetOnOpen: true
+        animateClose: true
+    }
 
-		active: false
-		asynchronous: true
+    Component {
+        id: launcherWindow
 
-		sourceComponent: LauncherOverlayWindow {
-			screenName: delegate.context.name
-		}
+        LauncherOverlayWindow {
+            screenName: delegate.context.name
+        }
+    }
+    Component {
+        id: sessionWindow
 
-		onLoaded: {
-			item.visible = true;
-			item.reset();
-		}
+        SessionOverlayWindow {
+            screenName: delegate.context.name
+        }
+    }
+    Component {
+        id: cliphistWindow
 
-		Connections {
-			function onLauncherOpened(screenName: string): void {
-				if (screenName === delegate.context.name) {
-					launcherLoader.active = true;
-				}
-			}
-			function onLauncherClosed(): void {
-				if (launcherLoader.active) {
-					launcherLoader.active = false;
-				}
-			}
+        CliphistOverlayWindow {
+            screenName: delegate.context.name
+        }
+    }
+    Component {
+        id: emojiWindow
 
-			target: ShellUI
-		}
-	}
-	Loader {
-		id: cliphistLoader
+        EmojiOverlayWindow {
+            screenName: delegate.context.name
+        }
+    }
+    Component {
+        id: settingsWindow
 
-		active: false
-		asynchronous: true
-
-		sourceComponent: CliphistOverlayWindow {
-			screenName: delegate.context.name
-			onCloseFinished: cliphistLoader.active = false
-		}
-
-		onLoaded: {
-			item.visible = true;
-			item.reset();
-		}
-
-		Connections {
-			function onCliphistOpened(screenName: string): void {
-				if (screenName === delegate.context.name) {
-					if (cliphistLoader.item && cliphistLoader.item.closing) {
-						// Re-opened mid-close: cancel the exit animation and settle back.
-						cliphistLoader.item.abortClose();
-					} else {
-						cliphistLoader.active = true;
-					}
-				}
-			}
-			function onCliphistClosed(): void {
-				if (cliphistLoader.item)
-					cliphistLoader.item.closeAnimated();
-			}
-
-			target: ShellUI
-		}
-	}
-
-	Loader {
-		id: emojiLoader
-
-		active: false
-		asynchronous: true
-
-		sourceComponent: EmojiOverlayWindow {
-			screenName: delegate.context.name
-		}
-
-		onLoaded: {
-			item.visible = true;
-			item.reset();
-		}
-
-		Connections {
-			function onEmojiOpened(screenName: string): void {
-				if (screenName === delegate.context.name) {
-					emojiLoader.active = true;
-				}
-			}
-			function onEmojiClosed(): void {
-				if (emojiLoader.active) {
-					emojiLoader.active = false;
-				}
-			}
-
-			target: ShellUI
-		}
-	}
-
-	Loader {
-		id: settingsLoader
-
-		active: false
-		asynchronous: true
-
-		sourceComponent: SettingsOverlayWindow {
-			screenName: delegate.context.name
-			onCloseFinished: settingsLoader.active = false
-		}
-
-		onLoaded: {
-			item.visible = true;
-			item.reset();
-		}
-
-		Connections {
-			function onSettingsOpened(screenName: string): void {
-				if (screenName === delegate.context.name) {
-					if (settingsLoader.item && settingsLoader.item.closing) {
-						// Re-opened mid-close: cancel the exit animation and settle back.
-						settingsLoader.item.abortClose();
-					} else {
-						settingsLoader.active = true;
-					}
-				}
-			}
-			function onSettingsClosed(): void {
-				if (settingsLoader.item)
-					settingsLoader.item.closeAnimated();
-			}
-
-			target: ShellUI
-		}
-	}
+        SettingsOverlayWindow {
+            screenName: delegate.context.name
+        }
+    }
 }

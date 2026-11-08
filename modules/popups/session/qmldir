@@ -1,2 +1,3 @@
 module popups.session
 SessionMenu SessionMenu.qml
+SessionOverlayWindow SessionOverlayWindow.qml

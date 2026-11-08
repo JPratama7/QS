@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Controls
+import Quickshell.Widgets
 import "../../../config"
 
 // Shared host for the popup menus: entrance animation (opacity + slide),
@@ -69,14 +70,22 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.surfaceColor
-        radius: Theme.radiusNormal
+        color: Theme.glassSurface
+        radius: Theme.radiusGlassy
+        border.width: 1
+        border.color: Theme.glassBorder
     }
 
-    StackView {
-        id: stack
+    ClippingRectangle {
+        id: stackClip
         anchors.fill: parent
-        clip: true
+        radius: Theme.radiusGlassy
+        color: "transparent"
+
+        StackView {
+            id: stack
+            anchors.fill: parent
+            clip: true
 
         initialItem: root.initialPage
 
@@ -103,6 +112,7 @@ Item {
                 NumberAnimation { property: "x"; from: 0; to: root.menuWidth; duration: 200; easing.type: Easing.OutCubic }
                 NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 200; easing.type: Easing.OutCubic }
             }
+        }
         }
     }
 }

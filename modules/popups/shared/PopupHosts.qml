@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import "../controlcenter"
 import "../network"
 import "../vpn"
 
@@ -9,4 +10,5 @@ QtObject {
 
     property VpnMenuHost vpnHost: VpnMenuHost {}
     property NetworkMenuHost networkHost: NetworkMenuHost {}
+    property ControlCenterHost controlCenterHost: ControlCenterHost {}
 }

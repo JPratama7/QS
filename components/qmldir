@@ -1,5 +1,8 @@
 module components
 
 ShellWindow containers/ShellWindow.qml
+OverlayHost containers/OverlayHost.qml
 BaseWidget bar/BaseWidget.qml
+SubIcon bar/SubIcon.qml
 SvgIcon SvgIcon.qml
+ToggleSwitch ToggleSwitch.qml

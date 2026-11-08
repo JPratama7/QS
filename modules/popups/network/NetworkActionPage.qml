@@ -2,7 +2,9 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Controls
-import Quickshell.Networking
+// Aliased so the module's `Network` type doesn't shadow the services/system
+// Network singleton (see ControlCenter.qml).
+import Quickshell.Networking as NetApi
 import "../../../components"
 import "../../../config"
 import "../../../services/system"
@@ -46,9 +48,9 @@ Item {
         const net = page.current
         if (net && !net.connected && !net.known) {
             const sec = net.security
-            if (sec === WifiSecurityType.WpaPsk
-                || sec === WifiSecurityType.Wpa2Psk
-                || sec === WifiSecurityType.Sae)
+            if (sec === NetApi.WifiSecurityType.WpaPsk
+                || sec === NetApi.WifiSecurityType.Wpa2Psk
+                || sec === NetApi.WifiSecurityType.Sae)
                 page.passwordMode = true
         }
         if (page.passwordMode)

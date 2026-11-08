@@ -9,53 +9,54 @@ import "../../services/ui"
 import "../../types"
 
 ShellWindow {
-	id: barWindow
+    id: barWindow
 
-	required property ScreenContext context
-	readonly property bool _barActive: BarVisibility.effectiveVisible(context.name)
+    required property ScreenContext context
+    readonly property bool _barActive: BarVisibility.effectiveVisible(context.name)
 
-	name: "bar-content"
-	screen: context.screen
-	aboveWindows: true
-	WlrLayershell.layer: WlrLayer.Top
-	WlrLayershell.exclusionMode: ExclusionMode.Auto
-	WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-	implicitHeight: context.barHeight
-	exclusiveZone: barWindow._barActive ? context.barHeight : 0
-	color: Theme.barBackgroundColor
-	anchors.top: context.barEdge === "top"
-	anchors.bottom: context.barEdge === "bottom"
-	anchors.left: true
-	anchors.right: true
+    name: "bar-content"
+    screen: context.screen
+    aboveWindows: true
+    WlrLayershell.layer: WlrLayer.Top
+    WlrLayershell.exclusionMode: ExclusionMode.Auto
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+    implicitHeight: context.barHeight
+    exclusiveZone: barWindow._barActive ? context.barHeight : 0
+    // Glass bar — translucent over the compositor, hairline edge (DESIGN_GUIDE.md §1)
+    color: Theme.glassBackground
+    anchors.top: context.barEdge === "top"
+    anchors.bottom: context.barEdge === "bottom"
+    anchors.left: true
+    anchors.right: true
 
-	// Hairline border at the window-facing edge — depth without weight
-	Rectangle {
-		z: 1
-		width: parent.width
-		height: 1
-		color: Theme.borderColor
-		y: barWindow.context.barEdge === "top" ? parent.height - 1 : 0
-	}
+    // Hairline border at the window-facing edge — depth without weight
+    Rectangle {
+        z: 1
+        width: parent.width
+        height: 1
+        color: Theme.glassBorder
+        y: barWindow.context.barEdge === "top" ? parent.height - 1 : 0
+    }
 
-	HoverHandler {
-		id: barHover
+    HoverHandler {
+        id: barHover
 
-		onHoveredChanged: {
-			if (hovered) {
-				BarVisibility.hoverEnter(barWindow.context.name);
-				BarVisibility.cancelHide(barWindow.context.name);
-				BarVisibility.setForceVisible(barWindow.context.name, true);
-			} else {
-				BarVisibility.hoverLeave(barWindow.context.name);
-			}
-		}
-	}
-	BarView {
-		id: barView
+        onHoveredChanged: {
+            if (hovered) {
+                BarVisibility.hoverEnter(barWindow.context.name);
+                BarVisibility.cancelHide(barWindow.context.name);
+                BarVisibility.setForceVisible(barWindow.context.name, true);
+            } else {
+                BarVisibility.hoverLeave(barWindow.context.name);
+            }
+        }
+    }
+    BarView {
+        id: barView
 
-		anchors.fill: parent
-		context: barWindow.context
-		barWindow: barWindow
-		shown: barWindow._barActive
-	}
+        anchors.fill: parent
+        context: barWindow.context
+        barWindow: barWindow
+        shown: barWindow._barActive
+    }
 }

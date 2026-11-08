@@ -16,9 +16,9 @@ Rectangle {
 		root.currentSection = "general";
 	}
 
-	color: Theme.backgroundColor
-	radius: Theme.radiusLarge
-	border.color: Theme.surfaceColor
+	color: Theme.glassSurface
+	radius: Theme.radiusGlassy
+	border.color: Theme.glassBorder
 	border.width: 1
 	implicitHeight: 500
 
@@ -44,7 +44,7 @@ Rectangle {
 		Rectangle {
 			Layout.preferredWidth: 150
 			Layout.fillHeight: true
-			color: Theme.surfaceColor
+			color: Qt.alpha(Theme.surfaceColor, 0.5)
 			radius: Theme.radiusLarge - 1
 
 			ColumnLayout {
@@ -115,7 +115,7 @@ Rectangle {
 		Rectangle {
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-			color: Theme.backgroundColor
+			color: Qt.alpha(Theme.backgroundColor, 0.4)
 			radius: Theme.radiusLarge - 1
 
 			ScrollView {
@@ -421,6 +421,72 @@ Rectangle {
 										font.pixelSize: Theme.fontSizeSmall
 									}
 								}
+							}
+						}
+
+						// Sub-section: Transparency
+						Text {
+							text: "Transparency"
+							color: Theme.foregroundColor
+							font.pixelSize: Theme.fontSizeNormal
+							font.bold: true
+							Layout.topMargin: 10
+						}
+						Rectangle {
+							Layout.fillWidth: true
+							Layout.preferredHeight: 1
+							color: Theme.surfaceColor
+						}
+						ColumnLayout {
+							Layout.fillWidth: true
+							spacing: 15
+
+							SettingNumber {
+								text: "Bar"
+								currentValue: (PersistentConfig.adapterView.transparency && PersistentConfig.adapterView.transparency.bar) !== undefined ? PersistentConfig.adapterView.transparency.bar : 85
+								minValue: 0
+								maxValue: 100
+								step: 5
+
+								onValueChanged: val => {
+									const newTransparency = JSON.parse(JSON.stringify(PersistentConfig.adapterView.transparency || {}));
+									newTransparency.bar = val;
+									PersistentConfig.adapterView.transparency = newTransparency;
+								}
+							}
+							SettingNumber {
+								text: "Popups"
+								currentValue: (PersistentConfig.adapterView.transparency && PersistentConfig.adapterView.transparency.popup) !== undefined ? PersistentConfig.adapterView.transparency.popup : 85
+								minValue: 0
+								maxValue: 100
+								step: 5
+
+								onValueChanged: val => {
+									const newTransparency = JSON.parse(JSON.stringify(PersistentConfig.adapterView.transparency || {}));
+									newTransparency.popup = val;
+									PersistentConfig.adapterView.transparency = newTransparency;
+								}
+							}
+							SettingNumber {
+								text: "Overlay Scrim"
+								currentValue: (PersistentConfig.adapterView.transparency && PersistentConfig.adapterView.transparency.overlay) !== undefined ? PersistentConfig.adapterView.transparency.overlay : 85
+								minValue: 0
+								maxValue: 100
+								step: 5
+
+								onValueChanged: val => {
+									const newTransparency = JSON.parse(JSON.stringify(PersistentConfig.adapterView.transparency || {}));
+									newTransparency.overlay = val;
+									PersistentConfig.adapterView.transparency = newTransparency;
+								}
+							}
+
+							Text {
+								Layout.fillWidth: true
+								text: "Opacity in percent. Bar = bar background, Popups = menus and dialogs, Overlay Scrim = dimmed backdrop behind launcher/settings/clipboard/emoji."
+								color: Theme.mutedColor
+								font.pixelSize: Theme.fontSizeSmall
+								wrapMode: Text.WordWrap
 							}
 						}
 

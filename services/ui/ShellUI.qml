@@ -22,6 +22,9 @@ Singleton {
 	// Emoji picker open state
 	property string _emojiScreen: ""
 
+	// Session overlay open state
+	property string _sessionScreen: ""
+
 	// Track known screens for removal detection
 	property var _knownScreenNames: ([])
 
@@ -31,21 +34,9 @@ Singleton {
 	// Emitted when a popup should close
 	signal popupClosed(screenName: string)
 
-	// Emitted when launcher opens/closes on a screen
-	signal launcherOpened(screenName: string)
-	signal launcherClosed
-
-	// Emitted when cliphist opens/closes on a screen
-	signal cliphistOpened(screenName: string)
-	signal cliphistClosed
-
-	// Emitted when settings opens/closes on a screen
-	signal settingsOpened(screenName: string)
-	signal settingsClosed
-
-	// Emitted when emoji picker opens/closes on a screen
-	signal emojiOpened(screenName: string)
-	signal emojiClosed
+	// Emitted when a fullscreen overlay opens/closes on a screen
+	signal overlayOpened(kind: string, screenName: string)
+	signal overlayClosed(kind: string)
 
 	// Open a named popup on a screen with the component to render and optional anchor X position
 	function openPopup(screenName: string, popupId: string, component: var, anchorX: int): void {
@@ -61,6 +52,9 @@ Singleton {
 		}
 		if (root._emojiScreen !== "") {
 			root.closeEmoji();
+		}
+		if (root._sessionScreen !== "") {
+			root.closeSession();
 		}
 		root._openScreens[screenName] = popupId;
 		root.popupRequested(screenName, popupId, component, anchorX);
@@ -99,18 +93,19 @@ Singleton {
 		if (kind !== "emoji" && root._emojiScreen !== "") {
 			root.closeEmoji();
 		}
+		if (kind !== "session" && root._sessionScreen !== "") {
+			root.closeSession();
+		}
 		const closeSelf = kind === "launcher" ? root.closeLauncher
 			: kind === "cliphist" ? root.closeCliphist
 			: kind === "settings" ? root.closeSettings
-			: root.closeEmoji;
+			: kind === "emoji" ? root.closeEmoji
+			: root.closeSession;
 		if (root["_" + kind + "Screen"] !== "") {
 			closeSelf();
 		}
 		root["_" + kind + "Screen"] = screenName;
-		(kind === "launcher" ? root.launcherOpened
-			: kind === "cliphist" ? root.cliphistOpened
-			: kind === "settings" ? root.settingsOpened
-			: root.emojiOpened)(screenName);
+		root.overlayOpened(kind, screenName);
 	}
 
 	// Launcher open/close
@@ -119,7 +114,7 @@ Singleton {
 	}
 	function closeLauncher(): void {
 		root._launcherScreen = "";
-		root.launcherClosed();
+		root.overlayClosed("launcher");
 	}
 	function isLauncherOpen(): bool {
 		return root._launcherScreen !== "";
@@ -131,7 +126,7 @@ Singleton {
 	}
 	function closeCliphist(): void {
 		root._cliphistScreen = "";
-		root.cliphistClosed();
+		root.overlayClosed("cliphist");
 	}
 	function isCliphistOpen(): bool {
 		return root._cliphistScreen !== "";
@@ -144,7 +139,7 @@ Singleton {
 	function closeSettings(): void {
 		if (root._settingsScreen !== "") {
 			root._settingsScreen = "";
-			root.settingsClosed();
+			root.overlayClosed("settings");
 		}
 	}
 	function isSettingsOpen(): bool {
@@ -158,17 +153,28 @@ Singleton {
 	function closeEmoji(): void {
 		if (root._emojiScreen !== "") {
 			root._emojiScreen = "";
-			root.emojiClosed();
+			root.overlayClosed("emoji");
 		}
 	}
 	function isEmojiOpen(): bool {
 		return root._emojiScreen !== "";
 	}
 
-	onLauncherClosed: gcTimer.restart()
-	onCliphistClosed: gcTimer.restart()
-	onSettingsClosed: gcTimer.restart()
-	onEmojiClosed: gcTimer.restart()
+	// Session overlay open/close
+	function openSession(screenName: string): void {
+		root._openOverlay("session", screenName);
+	}
+	function closeSession(): void {
+		if (root._sessionScreen !== "") {
+			root._sessionScreen = "";
+			root.overlayClosed("session");
+		}
+	}
+	function isSessionOpen(): bool {
+		return root._sessionScreen !== "";
+	}
+
+	onOverlayClosed: gcTimer.restart()
 	Component.onCompleted: {
 		root._knownScreenNames = Quickshell.screens.map(s => s.name);
 	}
@@ -195,6 +201,9 @@ Singleton {
 				}
 				if (root._emojiScreen === name) {
 					root.closeEmoji();
+				}
+				if (root._sessionScreen === name) {
+					root.closeSession();
 				}
 			}
 

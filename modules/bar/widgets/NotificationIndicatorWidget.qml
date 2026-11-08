@@ -10,70 +10,70 @@ import "../../../services/ui"
 import "../../popups/notifications"
 
 BaseWidget {
-	id: widget
+    id: widget
 
-	required property string screenName
-	required property PanelWindow barWindow
-	readonly property bool hasUnread: Notification.unreadCount > 0
-	readonly property bool isDnd: Notification.dndEnabled
+    required property string screenName
+    required property PanelWindow barWindow
+    readonly property bool hasUnread: Notification.unreadCount > 0
+    readonly property bool isDnd: Notification.dndEnabled
 
-	implicitWidth: labelRow.implicitWidth + Theme.paddingSmall * 2
-	implicitHeight: labelRow.implicitHeight + Theme.paddingSmall * 2
+    implicitWidth: labelRow.implicitWidth + Theme.paddingSmall * 2
+    implicitHeight: labelRow.implicitHeight + Theme.paddingSmall * 2
 
-	tooltipComponent: Component {
-		Text {
-			text: Notification.dndEnabled ? "Do Not Disturb is on — " + Notification.unreadCount + " pending" : widget.hasUnread ? "Notifications: " + Notification.unreadCount : "No notifications"
-			font.pixelSize: Theme.fontSizeSmall
-			color: Theme.foregroundColor
-		}
-	}
+    tooltipComponent: Component {
+        Text {
+            text: Notification.dndEnabled ? "Do Not Disturb is on — " + Notification.unreadCount + " pending" : widget.hasUnread ? "Notifications: " + Notification.unreadCount : "No notifications"
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.foregroundColor
+        }
+    }
 
-	Rectangle {
-		anchors.fill: parent
-		radius: Theme.radiusSmall
-		color: mouseArea.containsMouse ? Theme.hoverColor : "transparent"
-	}
+    Rectangle {
+        anchors.fill: parent
+        radius: Theme.radiusSmall
+        color: mouseArea.containsMouse ? Theme.hoverColor : "transparent"
+    }
 
-	Row {
-		id: labelRow
+    Row {
+        id: labelRow
 
-		anchors.centerIn: parent
-		spacing: 2
+        anchors.centerIn: parent
+        spacing: 2
 
-		SvgIcon {
-			source: widget.isDnd ? "icons/outline/bell-off.svg" : (widget.hasUnread ? "icons/outline/bell-ringing.svg" : "icons/outline/bell.svg")
-			color: widget.isDnd ? Theme.accentColor : (widget.hasUnread ? Theme.foregroundColor : Theme.mutedColor)
-			iconSize: ShellConfig.barIconSize
-		}
-		Text {
-			visible: widget.hasUnread
-			text: Notification.unreadCount
-			color: widget.isDnd ? Theme.accentColor : Theme.foregroundColor
-			font.pixelSize: Theme.fontSizeSmall
-			font.family: Theme.fontFamily
-		}
-	}
-	MouseArea {
-		id: mouseArea
-		anchors.fill: parent
-		hoverEnabled: true
-		cursorShape: Qt.PointingHandCursor
-		acceptedButtons: Qt.LeftButton | Qt.RightButton
+        SvgIcon {
+            source: widget.isDnd ? "icons/outline/bell-off.svg" : (widget.hasUnread ? "icons/outline/bell-ringing.svg" : "icons/outline/bell.svg")
+            color: widget.isDnd ? Theme.accentColor : (widget.hasUnread ? Theme.foregroundColor : Theme.mutedColor)
+            iconSize: ShellConfig.barIconSize
+        }
+        Text {
+            visible: widget.hasUnread
+            text: Notification.unreadCount
+            color: widget.isDnd ? Theme.accentColor : Theme.foregroundColor
+            font.pixelSize: Theme.fontSizeSmall
+            font.family: Theme.fontFamily
+        }
+    }
+    MouseArea {
+        id: mouseArea
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-		onClicked: mouse => {
-			if (mouse.button === Qt.RightButton) {
-				Notification.toggleDnd();
-				return;
-			}
-			const pos = widget.mapToItem(null, 0, 0);
-			ShellUI.openPopup(widget.screenName, "notifications", notificationPopupComponent, pos.x);
-		}
-	}
-	Component {
-		id: notificationPopupComponent
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton) {
+                Notification.toggleDnd();
+                return;
+            }
+            const pos = widget.mapToItem(null, 0, 0);
+            ShellUI.openPopup(widget.screenName, "notifications", notificationPopupComponent, pos.x);
+        }
+    }
+    Component {
+        id: notificationPopupComponent
 
-		NotificationPopup {
-			screenName: widget.screenName
-		}
-	}
+        NotificationPopup {
+            screenName: widget.screenName
+        }
+    }
 }
